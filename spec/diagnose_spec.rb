@@ -5,11 +5,18 @@ class Runner
 
   def run
     Dir.chdir(directory)
+    `#{setup_command}`
     @pid = spawn(run_command, out: @write)
   end
 
   def readline
-    @read.readline
+    line = @read.readline
+
+    if ignored_lines.include? line
+      readline
+    else
+      line
+    end
   end
 
   def stop
@@ -22,14 +29,43 @@ class Runner::Ruby < Runner
     File.join(__dir__, "../ruby")
   end
 
+  def setup_command
+    ":"
+  end
+
   def run_command
     "bundle exec appsignal diagnose"
+  end
+
+  def ignored_lines
+    []
+  end
+end
+
+class Runner::Elixir < Runner
+  def directory
+    File.join(__dir__, "../elixir")
+  end
+
+  def setup_command
+    "mix do deps.get, compile"
+  end
+
+  def run_command
+    "mix appsignal.diagnose"
+  end
+
+  def ignored_lines
+    [
+      "==> appsignal\n",
+      "AppSignal extension installation successful\n"
+    ]
   end
 end
 
 RSpec.describe "Diagnose" do
   before do
-    @runner = Runner::Ruby.new()
+    @runner = Runner::Elixir.new()
     @runner.run()
   end
 
