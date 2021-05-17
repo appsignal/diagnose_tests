@@ -65,7 +65,12 @@ end
 
 RSpec.describe "Diagnose" do
   before do
-    @runner = Runner::Elixir.new()
+    language = ENV['LANGUAGE'] || 'ruby'
+    @runner = {
+      'ruby' => Runner::Ruby.new(),
+      'elixir' => Runner::Elixir.new()
+    }[language]
+
     @runner.run()
   end
 
