@@ -63,12 +63,33 @@ class Runner::Elixir < Runner
   end
 end
 
+class Runner::Nodejs < Runner
+  def directory
+    File.join(__dir__, "../nodejs")
+  end
+
+  def setup_command
+    "npm install"
+  end
+
+  def run_command
+    "./node_modules/@appsignal/nodejs/bin/diagnose"
+  end
+
+  def ignored_lines
+    [
+      "WARNING: Error when reading appsignal config, appsignal (as 501/20) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present\n"
+    ]
+  end
+end
+
 RSpec.describe "Diagnose" do
   before do
     language = ENV['LANGUAGE'] || 'ruby'
     @runner = {
       'ruby' => Runner::Ruby.new(),
-      'elixir' => Runner::Elixir.new()
+      'elixir' => Runner::Elixir.new(),
+      'nodejs' => Runner::Nodejs.new()
     }[language]
 
     @runner.run()

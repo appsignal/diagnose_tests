@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@appsignal/nodejs": "file:../../appsignal-nodejs/packages/nodejs"
+  }
+}
