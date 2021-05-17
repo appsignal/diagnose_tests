@@ -1,0 +1,19 @@
+PATH
+  remote: ../../appsignal-ruby
+  specs:
+    appsignal (3.0.4)
+      rack
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rack (2.2.3)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  appsignal!
+
+BUNDLED WITH
+   2.1.4
