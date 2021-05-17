@@ -48,7 +48,7 @@ class Runner::Elixir < Runner
   end
 
   def setup_command
-    "mix do deps.get, compile"
+    "mix do deps.get, deps.compile, compile"
   end
 
   def run_command
