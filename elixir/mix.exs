@@ -22,7 +22,7 @@ defmodule Elixir.MixProject do
   defp deps do
     [
       {:jason, "~> 1.2"},
-      {:appsignal, path: "../../appsignal-elixir"}
+      {:appsignal, path: "../../../.."}
     ]
   end
 end
