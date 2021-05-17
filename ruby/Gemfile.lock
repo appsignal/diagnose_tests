@@ -1,5 +1,5 @@
 PATH
-  remote: ../../appsignal-ruby
+  remote: ../../../..
   specs:
     appsignal (3.0.4)
       rack
