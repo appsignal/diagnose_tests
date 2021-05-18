@@ -96,7 +96,7 @@ class Runner::Nodejs < Runner
 
   def ignored_lines
     [
-      %r(WARNING: Error when reading appsignal config, appsignal (as 501/20) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present)
+      %r(WARNING: Error when reading appsignal config, appsignal \(as \d+/\d+\) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present)
     ]
   end
 
