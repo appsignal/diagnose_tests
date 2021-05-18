@@ -189,7 +189,7 @@ RSpec.describe "Diagnose" do
   TARGET_PATTERN=%r((darwin|linux(-musl)?|freebsd)).freeze
   LIBRARY_TYPE_PATTERN=%r(static|dynamic).freeze
   TAR_FILENAME_PATTERN = %r(appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz).freeze
-  DATETIME_PATTERN = %r(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC).freeze
+  DATETIME_PATTERN = %r(\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}( UTC|.\d+Z)).freeze
   TRUE_OR_FALSE_PATTERN = %r(true|false).freeze
 
   def expect_output(expected)
