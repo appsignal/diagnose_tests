@@ -38,7 +38,9 @@ class Runner::Ruby < Runner
   end
 
   def ignored_lines
-    []
+    [
+      "    Implementation: ruby\n"
+    ]
   end
 
   def language_name
@@ -127,15 +129,52 @@ RSpec.describe "Diagnose" do
     expect_output([
       %r(AppSignal library),
       %r(  Language: #{@runner.language_name}),
-      %r(  (Gem|Package) version: \d+\.\d+\.\d+),
-      %r(  Agent version: \w{6}),
+      %r(  (Gem|Package) version: #{VERSION_PATTERN}),
+      %r(  Agent version: #{REVISION_PATTERN}),
       %r(  (Extension|Nif) loaded: yes)
+    ])
+  end
+
+  it "prints a newline" do
+    expect_newline
+  end
+
+  it "prints the extension installation section" do
+    expect_output([
+      %r(Extension installation report),
+      %r(  Installation result),
+      %r(    Status: success),
+      %r(  Language details),
+      %r(    Ruby version: #{VERSION_PATTERN}),
+      %r(  Download details),
+      %r(    Download URL: https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}),
+      %r(    Checksum: verified),
+      %r(  Build details),
+      %r(    Install time: #{DATETIME_PATTERN}),
+      %r(    Architecture: #{ARCH_PATTERN}),
+      %r(    Target: #{TARGET_PATTERN}),
+      %r(    Musl override: #{TRUE_OR_FALSE_PATTERN}),
+      %r(    Library type: #{LIBRARY_TYPE_PATTERN}),
+      %r(    Dependencies: {}),
+      %r(    Flags: {}),
+      %r(  Host details),
+      %r(    Root user: #{TRUE_OR_FALSE_PATTERN}),
+      %r(    Dependencies: {}),
     ])
   end
 
   after(:all) do
     @runner.stop
   end
+
+  VERSION_PATTERN = %r(\d+\.\d+\.\d+(-[a-z0-9]+)?).freeze
+  REVISION_PATTERN = %r([a-z0-9]{7}).freeze
+  ARCH_PATTERN=%r((x86_64|i686)).freeze
+  TARGET_PATTERN=%r((darwin|linux(-musl)?|freebsd)).freeze
+  LIBRARY_TYPE_PATTERN=%r(static|dynamic).freeze
+  TAR_FILENAME_PATTERN = %r(appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz).freeze
+  DATETIME_PATTERN = %r(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC).freeze
+  TRUE_OR_FALSE_PATTERN = %r(true|false).freeze
 
   def expect_output(expected)
     expected.each do |line|
