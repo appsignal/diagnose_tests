@@ -1,3 +1,4 @@
+require 'logger'
 require 'timeout'
 
 class Runner
@@ -14,6 +15,8 @@ class Runner
   def readline
     line = Timeout::timeout(1) { @read.readline }
 
+    logger.debug(line)
+
     if ignored?(line)
       readline
     else
@@ -27,9 +30,12 @@ class Runner
     end
   end
 
-
   def stop
     Process.kill(3, @pid)
+  end
+
+  def logger
+    Logger.new(STDOUT)
   end
 end
 
