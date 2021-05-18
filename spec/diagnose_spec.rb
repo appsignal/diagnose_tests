@@ -12,12 +12,19 @@ class Runner
   def readline
     line = @read.readline
 
-    if ignored_lines.include? line
+    if ignored?(line)
       readline
     else
       line
     end
   end
+
+  def ignored?(line)
+    ignored_lines.any? do |pattern|
+      pattern.match? line
+    end
+  end
+
 
   def stop
     Process.kill(3, @pid)
@@ -39,7 +46,7 @@ class Runner::Ruby < Runner
 
   def ignored_lines
     [
-      "    Implementation: ruby\n"
+      %r(Implementation: ruby")
     ]
   end
 
@@ -63,8 +70,9 @@ class Runner::Elixir < Runner
 
   def ignored_lines
     [
-      "==> appsignal\n",
-      "AppSignal extension installation successful\n"
+      %r(==> appsignal),
+      %r(AppSignal extension installation successful),
+      %r(OTP version: \"\d+\"),
     ]
   end
 
@@ -88,7 +96,7 @@ class Runner::Nodejs < Runner
 
   def ignored_lines
     [
-      "WARNING: Error when reading appsignal config, appsignal (as 501/20) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present\n"
+      %r(WARNING: Error when reading appsignal config, appsignal (as 501/20) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present)
     ]
   end
 
