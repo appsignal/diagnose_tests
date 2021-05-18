@@ -127,7 +127,7 @@ RSpec.describe "Diagnose" do
     expect_output([
       %r(AppSignal library),
       %r(  Language: #{@runner.language_name}),
-      %r(  Gem version: \d+\.\d+\.\d+),
+      %r(  (Gem|Package) version: \d+\.\d+\.\d+),
       %r(  Agent version: \w{6}),
       %r(  Extension loaded: true)
     ])
