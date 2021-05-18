@@ -1,3 +1,5 @@
+require 'timeout'
+
 class Runner
   def initialize
     @read, @write = IO.pipe
@@ -10,7 +12,7 @@ class Runner
   end
 
   def readline
-    line = @read.readline
+    line = Timeout::timeout(1) { @read.readline }
 
     if ignored?(line)
       readline
