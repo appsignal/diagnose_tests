@@ -84,7 +84,7 @@ class Runner::Nodejs < Runner
 end
 
 RSpec.describe "Diagnose" do
-  before do
+  before(:all) do
     language = ENV['LANGUAGE'] || 'ruby'
     @runner = {
       'ruby' => Runner::Ruby.new(),
@@ -107,7 +107,20 @@ RSpec.describe "Diagnose" do
     ])
   end
 
-  after do
+  it "prints a newline" do
+    expect_newline
+  end
+
+  it "prints the library section" do
+    expect_output([
+      %r(AppSignal library),
+      %r(  Gem version: \d+\.\d+\.\d+),
+      %r(  Agent version: \w{6}),
+      %r(  Extension loaded: true)
+    ])
+  end
+
+  after(:all) do
     @runner.stop
   end
 
@@ -115,5 +128,9 @@ RSpec.describe "Diagnose" do
     expected.each do |line|
       expect(@runner.readline).to match(line)
     end
+  end
+
+  def expect_newline
+    expect(@runner.readline).to match("\n")
   end
 end
