@@ -81,7 +81,7 @@ class Runner::Nodejs < Runner
   end
 
   def run_command
-    "./node_modules/@appsignal/nodejs/bin/diagnose"
+    "../../../../packages/nodejs/bin/diagnose"
   end
 
   def ignored_lines
