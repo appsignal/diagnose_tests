@@ -145,7 +145,7 @@ RSpec.describe "Diagnose" do
       %r(  Installation result),
       %r(    Status: success),
       %r(  Language details),
-      %r(    Ruby version: #{VERSION_PATTERN}),
+      %r(    #{@runner.language_name} version: #{VERSION_PATTERN}),
       %r(  Download details),
       %r(    Download URL: https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}),
       %r(    Checksum: verified),
