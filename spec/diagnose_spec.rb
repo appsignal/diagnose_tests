@@ -40,6 +40,10 @@ class Runner::Ruby < Runner
   def ignored_lines
     []
   end
+
+  def language_name
+    'Ruby'
+  end
 end
 
 class Runner::Elixir < Runner
@@ -61,6 +65,10 @@ class Runner::Elixir < Runner
       "AppSignal extension installation successful\n"
     ]
   end
+
+  def language_name
+    'Elixir'
+  end
 end
 
 class Runner::Nodejs < Runner
@@ -80,6 +88,10 @@ class Runner::Nodejs < Runner
     [
       "WARNING: Error when reading appsignal config, appsignal (as 501/20) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present\n"
     ]
+  end
+
+  def language_name
+    'Node.js'
   end
 end
 
@@ -114,6 +126,7 @@ RSpec.describe "Diagnose" do
   it "prints the library section" do
     expect_output([
       %r(AppSignal library),
+      %r(  Language: #{@runner.language_name}),
       %r(  Gem version: \d+\.\d+\.\d+),
       %r(  Agent version: \w{6}),
       %r(  Extension loaded: true)
