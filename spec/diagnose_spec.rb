@@ -185,7 +185,7 @@ RSpec.describe "Diagnose" do
 
   VERSION_PATTERN = %r(\d+\.\d+\.\d+(-[a-z0-9]+)?).freeze
   REVISION_PATTERN = %r([a-z0-9]{7}).freeze
-  ARCH_PATTERN=%r((x86_64|i686)).freeze
+  ARCH_PATTERN=%r((x(86_)?64|i686)).freeze
   TARGET_PATTERN=%r((darwin|linux(-musl)?|freebsd)).freeze
   LIBRARY_TYPE_PATTERN=%r(static|dynamic).freeze
   TAR_FILENAME_PATTERN = %r(appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz).freeze
