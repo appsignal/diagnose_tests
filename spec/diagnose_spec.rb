@@ -37,6 +37,9 @@ class Runner
   def logger
     Logger.new(STDOUT)
   end
+
+  def prepare
+  end
 end
 
 class Runner::Ruby < Runner
@@ -113,6 +116,30 @@ class Runner::Nodejs < Runner
   def language_name
     'Node.js'
   end
+
+  def prepare
+    File.write("/tmp/appsignal-install-report.json", install_report)
+  end
+
+  def install_report
+    %{{
+      "download": {
+        "checksum": "verified",
+        "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/d08ae6c/appsignal-x86_64-darwin-all-static.tar.gz"
+      },
+      "build": {
+        "time": "2021-05-19 15:47:39UTC",
+        "architecture": "x64",
+        "target": "darwin",
+        "musl_override": false,
+        "library_type": "static"
+      },
+      "host": {
+        "root_user": false,
+        "dependencies": {}
+      }
+    }}
+  end
 end
 
 RSpec.describe "Diagnose" do
@@ -124,6 +151,7 @@ RSpec.describe "Diagnose" do
       'nodejs' => Runner::Nodejs.new()
     }[language]
 
+    @runner.prepare()
     @runner.run()
   end
 
