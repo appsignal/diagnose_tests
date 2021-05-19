@@ -13,7 +13,7 @@ class Runner
   end
 
   def readline
-    line = Timeout::timeout(1) { @read.readline }
+    line = Timeout::timeout(30) { @read.readline }
 
     logger.debug(line)
 
