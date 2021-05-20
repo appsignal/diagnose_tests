@@ -58,7 +58,6 @@ class Runner::Ruby < Runner
   def ignored_lines
     [
       %r(Implementation: ruby),
-      %r(Dependencies: {}),
       %r(Flags: {})
     ]
   end
@@ -201,6 +200,7 @@ RSpec.describe "Diagnose" do
       %r(    Target: #{TARGET_PATTERN}),
       %r(    Musl override: #{TRUE_OR_FALSE_PATTERN}),
       %r(    Library type: #{LIBRARY_TYPE_PATTERN}),
+      %r(    Dependencies: {}),
       %r(  Host details),
       %r(    Root user: #{TRUE_OR_FALSE_PATTERN}),
       %r(    Dependencies: {}),
