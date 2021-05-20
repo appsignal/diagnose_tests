@@ -113,6 +113,7 @@ class Runner::Elixir < Runner
       %r(==> appsignal),
       %r(AppSignal extension installation successful),
       %r(OTP version: \"\d+\"),
+      %r(Download time:),
     ]
   end
 
