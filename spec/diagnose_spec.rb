@@ -207,7 +207,7 @@ RSpec.describe "Diagnose" do
       %r(  Language: #{@runner.language_name}),
       %r(  (Gem|Package) version: #{VERSION_PATTERN}),
       %r(  Agent version: #{REVISION_PATTERN}),
-      %r(  (Extension|Nif) loaded: yes)
+      %r(  (Extension|Nif) loaded: true)
     ])
   end
 
