@@ -58,7 +58,8 @@ class Runner::Ruby < Runner
   def ignored_lines
     [
       %r(Implementation: ruby),
-      %r(Flags: {})
+      %r(Flags: {}),
+      %r(Dependencies: {})
     ]
   end
 
@@ -137,7 +138,8 @@ class Runner::Nodejs < Runner
 
   def ignored_lines
     [
-      %r(WARNING: Error when reading appsignal config, appsignal \(as \d+/\d+\) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present)
+      %r(WARNING: Error when reading appsignal config, appsignal \(as \d+/\d+\) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present),
+      %r(Dependencies: {})
     ]
   end
 
@@ -229,10 +231,8 @@ RSpec.describe "Diagnose" do
       %r(    Target: #{TARGET_PATTERN}),
       %r(    Musl override: #{TRUE_OR_FALSE_PATTERN}),
       %r(    Library type: #{LIBRARY_TYPE_PATTERN}),
-      %r(    Dependencies: {}),
       %r(  Host details),
       %r(    Root user: #{TRUE_OR_FALSE_PATTERN}),
-      %r(    Dependencies: {}),
     ])
   end
 
