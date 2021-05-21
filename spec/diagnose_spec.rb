@@ -252,6 +252,27 @@ RSpec.describe "Diagnose" do
     ])
   end
 
+  it "prints a newline" do
+    expect_newline
+  end
+
+  it "prints the agent diagnostics section" do
+    expect_output([
+      %r(Agent diagnostics),
+      %r(  Extension tests),
+      %r(    Configuration: valid),
+      %r(  Agent tests),
+      %r(    Started: started),
+      %r(    Process user id: \d+),
+      %r(    Process user group id: \d+),
+      %r(    Configuration: valid),
+      %r(    Logger: started),
+      %r(    Working directory user id: \d+),
+      %r(    Working directory user group id: \d+),
+      %r(    Working directory permissions: \d+)
+    ])
+  end
+
   after(:all) do
     @runner.stop
   end
