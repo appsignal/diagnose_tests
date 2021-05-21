@@ -59,7 +59,8 @@ class Runner::Ruby < Runner
     [
       %r(Implementation: ruby),
       %r(Flags: {}),
-      %r(Dependencies: {})
+      %r(Dependencies: {}),
+      %r(appsignal: Unable to log to )
     ]
   end
 
