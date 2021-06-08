@@ -271,7 +271,8 @@ RSpec.describe "Diagnose" do
       %r(    Logger: started),
       %r(    Working directory user id: \d+),
       %r(    Working directory user group id: \d+),
-      %r(    Working directory permissions: \d+)
+      %r(    Working directory permissions: \d+),
+      %r(    Lock path: writable)
     ])
   end
 
