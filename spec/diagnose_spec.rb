@@ -257,6 +257,8 @@ RSpec.describe "Diagnose" do
   end
 
   it "prints the agent diagnostics section" do
+    skip if @runner.class == Runner::Nodejs
+
     expect_output([
       %r(Agent diagnostics),
       %r(  Extension tests),
