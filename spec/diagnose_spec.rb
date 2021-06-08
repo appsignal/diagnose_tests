@@ -52,7 +52,7 @@ class Runner::Ruby < Runner
   end
 
   def run_command
-    "BUNDLE_GEMFILE=#{File.join(__dir__, "../ruby/Gemfile")} bundle exec appsignal diagnose"
+    "BUNDLE_GEMFILE=#{File.join(__dir__, "../ruby/Gemfile")} APPSIGNAL_PUSH_API_KEY=test bundle exec appsignal diagnose --environment=test"
   end
 
   def ignored_lines
