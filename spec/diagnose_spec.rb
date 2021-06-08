@@ -296,6 +296,6 @@ RSpec.describe "Diagnose" do
   end
 
   def expect_newline
-    expect(@runner.readline).to match("\n")
+    expect(@runner.readline).to match(/^\n/)
   end
 end
