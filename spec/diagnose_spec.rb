@@ -64,6 +64,10 @@ class Runner::Ruby < Runner
     ]
   end
 
+  def type
+    :ruby
+  end
+
   def language_name
     'Ruby'
   end
@@ -119,6 +123,10 @@ class Runner::Elixir < Runner
     ]
   end
 
+  def type
+    :elixir
+  end
+
   def language_name
     'Elixir'
   end
@@ -142,6 +150,10 @@ class Runner::Nodejs < Runner
       %r(WARNING: Error when reading appsignal config, appsignal \(as \d+/\d+\) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present),
       %r(Dependencies: {})
     ]
+  end
+
+  def type
+    :nodejs
   end
 
   def language_name
@@ -288,11 +300,46 @@ RSpec.describe "Diagnose" do
       %r(  Environment: #{quoted("test")}),
       %r(  debug: false),
       %r(  log: #{quoted("file")}),
-      %r(  log_path: #{quoted("/tmp")}),
-      %r(  ca_file_path: #{quoted(".+/cacert.pem")}),
-      %r(  endpoint: #{quoted("https://push.appsignal.com")}),
-      %r(  active: true),
     ])
+
+    case @runner.type
+    when :ruby
+      expect_output([
+        %r(  ignore_actions: \[\]),
+        %r(  ignore_errors: \[\]),
+        %r(  ignore_namespaces: \[\]),
+        %r(  filter_parameters: \[\]),
+        %r(  filter_session_data: \[\]),
+        %r(  send_environment_metadata: true),
+        %r(  send_params: true),
+        %r(  request_headers: \["HTTP_ACCEPT", "HTTP_ACCEPT_CHARSET", "HTTP_ACCEPT_ENCODING", "HTTP_ACCEPT_LANGUAGE", "HTTP_CACHE_CONTROL", "HTTP_CONNECTION", "CONTENT_LENGTH", "PATH_INFO", "HTTP_RANGE", "REQUEST_METHOD", "REQUEST_URI", "SERVER_NAME", "SERVER_PORT", "SERVER_PROTOCOL"\]),
+        %r(  endpoint: "https://push.appsignal.com"),
+        %r(  instrument_net_http: true),
+        %r(  instrument_redis: true),
+        %r(  instrument_sequel: true),
+        %r(  skip_session_data: false),
+        %r(  enable_allocation_tracking: true),
+        %r(  enable_gc_instrumentation: false),
+        %r(  enable_host_metrics: true),
+        %r(  enable_minutely_probes: true),
+        %r(  ca_file_path: "/Users/jeffkreeftmeijer/Appsignal/appsignal-ruby/resources/cacert.pem"),
+        %r(  dns_servers: \[\]),
+        %r(  files_world_accessible: true),
+        %r(  transaction_debug_mode: false),
+        %r(  active: true \(Loaded from: system\)),
+        %r(  push_api_key: "test" \(Loaded from: env\))
+      ])
+    when :nodejs
+      expect_output([
+        %r(  log_path: #{quoted("/tmp")}),
+        %r(  ca_file_path: #{quoted(".+/cacert.pem")}),
+        %r(  endpoint: #{quoted("https://push.appsignal.com")}),
+        %r(  active: true),
+        %r(  log_file_path: #{quoted("/tmp/appsignal.log")})
+      ])
+    else
+      raise "No clause for runner #{@runner}"
+    end
   end
 
   after(:all) do
