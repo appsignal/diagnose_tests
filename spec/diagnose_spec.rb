@@ -340,6 +340,13 @@ RSpec.describe "Diagnose" do
     else
       raise "No clause for runner #{@runner}"
     end
+
+    expect_newline
+
+    expect_output([
+      %r(Read more about how the diagnose config output is rendered),
+      %(https://docs.appsignal.com/#{@runner.type}/command-line/diagnose.html)
+    ])
   end
 
   after(:all) do
