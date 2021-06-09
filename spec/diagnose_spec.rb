@@ -276,6 +276,25 @@ RSpec.describe "Diagnose" do
     ])
   end
 
+  it "prints a newline" do
+    skip if @runner.class == Runner::Nodejs
+
+    expect_newline
+  end
+
+  it "prints the configuration section" do
+    expect_output([
+      %r(Configuration),
+      %r(  Environment: #{quoted("test")}),
+      %r(  debug: false),
+      %r(  log: #{quoted("file")}),
+      %r(  log_path: #{quoted("/tmp")}),
+      %r(  ca_file_path: #{quoted(".+/cacert.pem")}),
+      %r(  endpoint: #{quoted("https://push.appsignal.com")}),
+      %r(  active: true),
+    ])
+  end
+
   after(:all) do
     @runner.stop
   end
@@ -297,5 +316,10 @@ RSpec.describe "Diagnose" do
 
   def expect_newline
     expect(@runner.readline).to match(/^\n/)
+  end
+
+  def quoted(string)
+    quote = "['\"]"
+    %(#{quote}#{string}#{quote})
   end
 end
