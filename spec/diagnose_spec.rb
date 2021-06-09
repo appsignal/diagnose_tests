@@ -134,7 +134,7 @@ class Runner::Nodejs < Runner
   end
 
   def run_command
-    "../../../../packages/nodejs/bin/diagnose"
+    "APPSIGNAL_APP_ENV=test ../../../../packages/nodejs/bin/diagnose"
   end
 
   def ignored_lines
