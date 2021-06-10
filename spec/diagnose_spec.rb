@@ -349,6 +349,21 @@ RSpec.describe "Diagnose" do
     ])
   end
 
+  it "prints a newline" do
+    expect_newline
+  end
+
+  it "prints the validation section" do
+    expect_output([%(Validation)])
+
+    case @runner.type
+    when :ruby
+      expect(@runner.readline).to eq("  Validating Push API key: \e[31minvalid\e[0m\n")
+    when :nodejs
+      expect(@runner.readline).to eq("  Validating Push API key: \e[32mvalid\e[0m\n")
+    end
+  end
+
   after(:all) do
     @runner.stop
   end
