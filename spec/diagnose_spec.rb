@@ -364,6 +364,80 @@ RSpec.describe "Diagnose" do
     end
   end
 
+  it "prints a newline" do
+    expect_newline
+  end
+
+  it "prints the paths section" do
+    expect_output([%(Paths)])
+
+    if @runner.type == :ruby
+      expect_output([
+        %(  AppSignal gem path),
+        %r(    Path: #{quoted(PATH_PATTERN)}),
+        %r(    Writable\?: #{TRUE_OR_FALSE_PATTERN}),
+        %r(    Ownership\?: true \(file: \w+:\d+, process: \w+:\d+\))
+      ])
+    end
+
+    expect_output([
+      %(  Current working directory),
+      %r(    Path: #{quoted(PATH_PATTERN)}),
+    ])
+
+    if @runner.type == :ruby
+      expect_output([
+        %r(    Writable\?: #{TRUE_OR_FALSE_PATTERN}),
+        %r(    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\))
+      ])
+    end
+
+    if @runner.type == :ruby
+      expect_output([
+        %(  Root path),
+        %r(    Path: #{quoted(PATH_PATTERN)}),
+        %r(    Writable\?: #{TRUE_OR_FALSE_PATTERN}),
+        %r(    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\))
+      ])
+    end
+
+    expect_output([
+      %(  Log directory),
+      %r(    Path: #{quoted(PATH_PATTERN)}),
+    ])
+
+    if @runner.type == :ruby
+      expect_output([
+        %r(    Writable\?: #{TRUE_OR_FALSE_PATTERN}),
+        %r(    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\))
+      ])
+    end
+
+    if @runner.type == :ruby
+      expect_output([
+        %(  Makefile install log),
+        %r(    Path: #{quoted(PATH_PATTERN)}),
+        %r(    Exists\?: #{TRUE_OR_FALSE_PATTERN}),
+      ])
+    end
+
+    expect_output([
+      %(  AppSignal log\n),
+      %r(    Path: #{quoted(PATH_PATTERN)}),
+    ])
+
+    if @runner.type == :ruby
+      expect_output([
+        %r(    Writable\?: #{TRUE_OR_FALSE_PATTERN}),
+        %r(    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\)),
+      ])
+    end
+
+    expect_output([
+      %r(    Contents \(last 10 lines\):),
+    ] + 10.times.map { LOG_LINE_PATTERN })
+  end
+
   after(:all) do
     @runner.stop
   end
@@ -374,8 +448,10 @@ RSpec.describe "Diagnose" do
   TARGET_PATTERN=%r((darwin|linux(-musl)?|freebsd)).freeze
   LIBRARY_TYPE_PATTERN=%r(static|dynamic).freeze
   TAR_FILENAME_PATTERN = %r(appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz).freeze
-  DATETIME_PATTERN = %r(\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}( ?UTC|.\d+Z)).freeze
+  DATETIME_PATTERN = %r(\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}( ?UTC|.\d+Z)?).freeze
   TRUE_OR_FALSE_PATTERN = %r(true|false).freeze
+  PATH_PATTERN = /[\/\w\.-]+/.freeze
+  LOG_LINE_PATTERN = %r(^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])).freeze
 
   def expect_output(expected)
     expected.each do |line|
