@@ -395,6 +395,7 @@ RSpec.describe "Diagnose" do
         %r(    Writable\?: #{TRUE_OR_FALSE_PATTERN}),
         %r(    Ownership\?: true \(file: \w+:\d+, process: \w+:\d+\))
       ])
+      expect_newline
     end
 
     expect_output([
@@ -408,6 +409,7 @@ RSpec.describe "Diagnose" do
         %r(    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\))
       ])
     end
+    expect_newline
 
     if @runner.type == :ruby
       expect_output([
@@ -416,6 +418,7 @@ RSpec.describe "Diagnose" do
         %r(    Writable\?: #{TRUE_OR_FALSE_PATTERN}),
         %r(    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\))
       ])
+      expect_newline
     end
 
     expect_output([
@@ -429,6 +432,7 @@ RSpec.describe "Diagnose" do
         %r(    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\))
       ])
     end
+    expect_newline
 
     if @runner.type == :ruby
       expect_output([
