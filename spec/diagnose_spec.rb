@@ -462,6 +462,21 @@ RSpec.describe "Diagnose" do
     end
   end
 
+  it "prints a newline" do
+    expect_newline
+  end
+
+  it "prints the diagnostics report section" do
+    expect_output([
+      %(Diagnostics report),
+      %(  Do you want to send this diagnostics report to AppSignal?),
+      %(  If you share this report you will be given a link to),
+      %(  AppSignal.com to validate the report.),
+      %(  You can also contact us at support@appsignal.com),
+      %(  with your support token.),
+    ])
+  end
+
   after(:all) do
     @runner.stop
   end
