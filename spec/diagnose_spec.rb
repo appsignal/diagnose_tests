@@ -449,9 +449,16 @@ RSpec.describe "Diagnose" do
       ])
     end
 
-    expect_output([
-      %r(    Contents \(last 10 lines\):),
-    ] + 10.times.map { LOG_LINE_PATTERN })
+    case @runner.type
+    when :ruby
+      expect_output([
+        %r(    Contents \(last 10 lines\):),
+      ] + 10.times.map { LOG_LINE_PATTERN })
+    when :nodejs
+      expect_output([
+        %r(    Contents \(last 9 lines\):),
+      ] + 9.times.map { LOG_LINE_PATTERN })
+    end
   end
 
   after(:all) do
