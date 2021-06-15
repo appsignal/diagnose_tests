@@ -40,6 +40,21 @@ class Runner
 
   def prepare
   end
+
+  def appsignal_log
+    <<~LOG
+    # Logfile created on 2021-06-14 13:44:22 +0200 by logger.rb/v1.4.2
+    [2021-06-14T13:44:22 (process) #49713][INFO] Starting AppSignal diagnose
+    [2021-06-14T13:50:02 (process) #51074][INFO] Starting AppSignal diagnose
+    [2021-06-14T13:51:54 (process) #51823][INFO] Starting AppSignal diagnose
+    [2021-06-14T13:52:07 (process) #52200][INFO] Starting AppSignal diagnose
+    [2021-06-14T13:53:03 (process) #52625][INFO] Starting AppSignal diagnose
+    [2021-06-14T13:55:20 (process) #53396][INFO] Starting AppSignal diagnose
+    [2021-06-14T13:59:10 (process) #53880][INFO] Starting AppSignal diagnose
+    [2021-06-14T14:05:53 (process) #54792][INFO] Starting AppSignal diagnose
+    [2021-06-14T14:11:37 (process) #55323][INFO] Starting AppSignal diagnose
+    LOG
+  end
 end
 
 class Runner::Ruby < Runner
@@ -74,6 +89,7 @@ class Runner::Ruby < Runner
 
   def prepare
     File.write(File.join(__dir__, "../../../../ext/install.report"), install_report)
+    File.write("/tmp/appsignal.log", appsignal_log)
   end
 
   def install_report
@@ -183,21 +199,6 @@ class Runner::Nodejs < Runner
         "dependencies": {}
       }
     }}
-  end
-
-  def appsignal_log
-    <<~LOG
-    # Logfile created on 2021-06-14 13:44:22 +0200 by logger.rb/v1.4.2
-    [2021-06-14T13:44:22 (process) #49713][INFO] Starting AppSignal diagnose
-    [2021-06-14T13:50:02 (process) #51074][INFO] Starting AppSignal diagnose
-    [2021-06-14T13:51:54 (process) #51823][INFO] Starting AppSignal diagnose
-    [2021-06-14T13:52:07 (process) #52200][INFO] Starting AppSignal diagnose
-    [2021-06-14T13:53:03 (process) #52625][INFO] Starting AppSignal diagnose
-    [2021-06-14T13:55:20 (process) #53396][INFO] Starting AppSignal diagnose
-    [2021-06-14T13:59:10 (process) #53880][INFO] Starting AppSignal diagnose
-    [2021-06-14T14:05:53 (process) #54792][INFO] Starting AppSignal diagnose
-    [2021-06-14T14:11:37 (process) #55323][INFO] Starting AppSignal diagnose
-    LOG
   end
 end
 
