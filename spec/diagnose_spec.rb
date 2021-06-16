@@ -67,7 +67,7 @@ class Runner::Ruby < Runner
   end
 
   def run_command
-    "BUNDLE_GEMFILE=#{File.join(__dir__, "../ruby/Gemfile")} APPSIGNAL_PUSH_API_KEY=test bundle exec appsignal diagnose --environment=test"
+    "echo 'n' | BUNDLE_GEMFILE=#{File.join(__dir__, "../ruby/Gemfile")} APPSIGNAL_PUSH_API_KEY=test bundle exec appsignal diagnose --environment=test"
   end
 
   def ignored_lines
@@ -478,6 +478,16 @@ RSpec.describe "Diagnose" do
       %(  AppSignal.com to validate the report.),
       %(  You can also contact us at support@appsignal.com),
       %(  with your support token.),
+    ])
+  end
+
+  it "prints a newline" do
+    expect_newline
+  end
+
+  it "prints the send-dignostics line" do
+    expect_output([
+      %(  Send diagnostics report to AppSignal? (Y/n):   Not sending diagnostics information to AppSignal.\n)
     ])
   end
 
