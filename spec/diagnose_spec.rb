@@ -158,7 +158,7 @@ class Runner::Nodejs < Runner
   end
 
   def run_command
-    "APPSIGNAL_APP_ENV=test ../../../../packages/nodejs/bin/diagnose"
+    "echo 'n' | APPSIGNAL_APP_ENV=test ../../../../packages/nodejs/bin/diagnose"
   end
 
   def ignored_lines
