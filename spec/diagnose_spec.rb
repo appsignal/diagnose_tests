@@ -2,18 +2,20 @@ require 'logger'
 require 'timeout'
 
 class Runner
+  include Enumerable
+
   def initialize
     @read, @write = IO.pipe
   end
 
-  def run
+  def run(arguments = nil)
     Dir.chdir(directory)
     `#{setup_command}`
-    @pid = spawn(run_command, out: @write)
+    @pid = spawn(command = [run_command, arguments].compact.join(" "), out: @write)
   end
 
   def readline
-    line = Timeout::timeout(30) { @read.readline }
+    line = Timeout::timeout(1) { @read.readline }
 
     logger.debug(line)
 
@@ -21,6 +23,15 @@ class Runner
       readline
     else
       line
+    end
+  end
+
+  def each(&block)
+    begin
+      block.call(readline)
+    rescue Timeout::Error
+    else
+      each(&block)
     end
   end
 
@@ -202,7 +213,7 @@ class Runner::Nodejs < Runner
   end
 end
 
-RSpec.describe "Diagnose" do
+RSpec.describe "Running the diagnose command without any arguments" do
   before(:all) do
     language = ENV['LANGUAGE'] || 'ruby'
     @runner = {
@@ -519,5 +530,35 @@ RSpec.describe "Diagnose" do
   def quoted(string)
     quote = "['\"]"
     %(#{quote}#{string}#{quote})
+  end
+end
+
+RSpec.describe "Running the diagnose command with the --no-send-report option" do
+  before do
+    language = ENV['LANGUAGE'] || 'ruby'
+    @runner = {
+      'ruby' => Runner::Ruby.new(),
+      'elixir' => Runner::Elixir.new(),
+      'nodejs' => Runner::Nodejs.new()
+    }[language]
+
+    @runner.prepare()
+    @runner.run("--no-send-report")
+  end
+
+  it "does not ask to send the report" do
+    expect(
+      @runner.any? do |line|
+        %r(Send diagnostics report to AppSignal\?).match? line
+      end
+    ).to be(false)
+  end
+
+  it "does not send the report" do
+      expect(
+        @runner.any? do |line|
+          line == %(  Not sending report. (Specified with the --no-send-report option.)\n)
+        end
+      ).to be(true)
   end
 end
