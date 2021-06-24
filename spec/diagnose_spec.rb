@@ -11,7 +11,7 @@ class Runner
   def run(arguments = nil)
     Dir.chdir(directory)
     `#{setup_command}`
-    @pid = spawn(command = [run_command, arguments].compact.join(" "), out: @write)
+    @pid = spawn({"APPSIGNAL_PUSH_API_KEY" => "test"}, [run_command, arguments].compact.join(" "), out: @write)
   end
 
   def readline
@@ -78,7 +78,7 @@ class Runner::Ruby < Runner
   end
 
   def run_command
-    "echo 'n' | BUNDLE_GEMFILE=#{File.join(__dir__, "../ruby/Gemfile")} APPSIGNAL_PUSH_API_KEY=test bundle exec appsignal diagnose --environment=test"
+    "echo 'n' | BUNDLE_GEMFILE=#{File.join(__dir__, "../ruby/Gemfile")} bundle exec appsignal diagnose --environment=test"
   end
 
   def ignored_lines
