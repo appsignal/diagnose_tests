@@ -362,6 +362,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         %r(  log_path: #{quoted("/tmp")}),
         %r(  ca_file_path: #{quoted(".+/cacert.pem")}),
         %r(  endpoint: #{quoted("https://push.appsignal.com")}),
+        %r(  push_api_key: #{quoted("test")}),
         %r(  active: true),
         %r(  log_file_path: #{quoted("/tmp/appsignal.log")})
       ])
