@@ -350,7 +350,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         %r(  enable_gc_instrumentation: false),
         %r(  enable_host_metrics: true),
         %r(  enable_minutely_probes: true),
-        %r(  ca_file_path: "/Users/jeffkreeftmeijer/Appsignal/appsignal-ruby/resources/cacert.pem"),
+        %r(  ca_file_path: ".+\/appsignal-ruby\/resources\/cacert.pem"),
         %r(  dns_servers: \[\]),
         %r(  files_world_accessible: true),
         %r(  transaction_debug_mode: false),
