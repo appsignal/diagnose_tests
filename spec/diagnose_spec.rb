@@ -118,6 +118,7 @@ class Runner::Ruby < Runner
       architecture: x86_64
       target: darwin
       musl_override: false
+      linux_arm_override: false
       library_type: static
       dependencies: {}
       source: remote
@@ -203,6 +204,7 @@ class Runner::Nodejs < Runner
         "architecture": "x64",
         "target": "darwin",
         "musl_override": false,
+        "linux_arm_override": false,
         "library_type": "static"
       },
       "host": {
@@ -271,6 +273,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       %r(    Architecture: #{ARCH_PATTERN}),
       %r(    Target: #{TARGET_PATTERN}),
       %r(    Musl override: #{TRUE_OR_FALSE_PATTERN}),
+      %r(    Linux ARM override: false),
       %r(    Library type: #{LIBRARY_TYPE_PATTERN}),
       %r(  Host details),
       %r(    Root user: #{TRUE_OR_FALSE_PATTERN}),
