@@ -28,7 +28,7 @@ class Runner
 
   def each(&block)
     yield(readline)
-  rescue Timeout::Error
+  rescue Timeout::Error # rubocop:disable Lint/HandleExceptions
   else
     each(&block)
   end
