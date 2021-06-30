@@ -64,152 +64,152 @@ class Runner
       "[2021-06-14T14:11:37 (process) #55323][INFO] Starting AppSignal diagnose"
     ].join("\n")
   end
-end
 
-class Runner::Ruby < Runner
-  def directory
-    File.join(__dir__, "../ruby")
+  class Ruby < Runner
+    def directory
+      File.join(__dir__, "../ruby")
+    end
+
+    def setup_command
+      ":"
+    end
+
+    def run_command
+      "echo 'n' | BUNDLE_GEMFILE=#{File.join(__dir__, "../ruby/Gemfile")} bundle exec appsignal diagnose --environment=test"
+    end
+
+    def ignored_lines
+      [
+        /Implementation: ruby/,
+        /Flags: {}/,
+        /Dependencies: {}/,
+        /appsignal: Unable to log to /
+      ]
+    end
+
+    def type
+      :ruby
+    end
+
+    def language_name
+      "Ruby"
+    end
+
+    def prepare
+      File.write(File.join(__dir__, "../../../../ext/install.report"), install_report)
+      File.write("/tmp/appsignal.log", appsignal_log)
+    end
+
+    def install_report
+      %(---
+      result:
+        status: success
+      language:
+        implementation: ruby
+        version: 2.7.0-p83
+      download:
+        download_url: https://appsignal-agent-releases.global.ssl.fastly.net/20f7d0d/appsignal-x86_64-darwin-all-static.tar.gz
+        checksum: verified
+      build:
+        time: 2020-11-17 14:01:02.281856000 Z
+        architecture: x86_64
+        target: darwin
+        musl_override: false
+        linux_arm_override: false
+        library_type: static
+        dependencies: {}
+        source: remote
+        flags: {}
+      host:
+        root_user: false
+        dependencies: {})
+    end
   end
 
-  def setup_command
-    ":"
+  class Elixir < Runner
+    def directory
+      File.join(__dir__, "../elixir")
+    end
+
+    def setup_command
+      "mix do deps.get, deps.compile, compile"
+    end
+
+    def run_command
+      "mix appsignal.diagnose"
+    end
+
+    def ignored_lines
+      [
+        /==> appsignal/,
+        /AppSignal extension installation successful/,
+        /OTP version: \"\d+\"/,
+        /Download time:/
+      ]
+    end
+
+    def type
+      :elixir
+    end
+
+    def language_name
+      "Elixir"
+    end
   end
 
-  def run_command
-    "echo 'n' | BUNDLE_GEMFILE=#{File.join(__dir__, "../ruby/Gemfile")} bundle exec appsignal diagnose --environment=test"
-  end
+  class Nodejs < Runner
+    def directory
+      File.join(__dir__, "../nodejs")
+    end
 
-  def ignored_lines
-    [
-      /Implementation: ruby/,
-      /Flags: {}/,
-      /Dependencies: {}/,
-      /appsignal: Unable to log to /
-    ]
-  end
+    def setup_command
+      "npm install"
+    end
 
-  def type
-    :ruby
-  end
+    def run_command
+      "echo 'n' | APPSIGNAL_APP_ENV=test ../../../../packages/nodejs/bin/diagnose"
+    end
 
-  def language_name
-    "Ruby"
-  end
+    def ignored_lines
+      [
+        %r{WARNING: Error when reading appsignal config, appsignal \(as \d+/\d+\) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present}, # rubocop:disable Metrics/LineLength
+        /Dependencies: {}/
+      ]
+    end
 
-  def prepare
-    File.write(File.join(__dir__, "../../../../ext/install.report"), install_report)
-    File.write("/tmp/appsignal.log", appsignal_log)
-  end
+    def type
+      :nodejs
+    end
 
-  def install_report
-    %(---
-    result:
-      status: success
-    language:
-      implementation: ruby
-      version: 2.7.0-p83
-    download:
-      download_url: https://appsignal-agent-releases.global.ssl.fastly.net/20f7d0d/appsignal-x86_64-darwin-all-static.tar.gz
-      checksum: verified
-    build:
-      time: 2020-11-17 14:01:02.281856000 Z
-      architecture: x86_64
-      target: darwin
-      musl_override: false
-      linux_arm_override: false
-      library_type: static
-      dependencies: {}
-      source: remote
-      flags: {}
-    host:
-      root_user: false
-      dependencies: {})
-  end
-end
+    def language_name
+      "Node.js"
+    end
 
-class Runner::Elixir < Runner
-  def directory
-    File.join(__dir__, "../elixir")
-  end
+    def prepare
+      File.write("/tmp/appsignal-install-report.json", install_report)
+      File.write("/tmp/appsignal.log", appsignal_log)
+    end
 
-  def setup_command
-    "mix do deps.get, deps.compile, compile"
-  end
-
-  def run_command
-    "mix appsignal.diagnose"
-  end
-
-  def ignored_lines
-    [
-      /==> appsignal/,
-      /AppSignal extension installation successful/,
-      /OTP version: \"\d+\"/,
-      /Download time:/
-    ]
-  end
-
-  def type
-    :elixir
-  end
-
-  def language_name
-    "Elixir"
-  end
-end
-
-class Runner::Nodejs < Runner
-  def directory
-    File.join(__dir__, "../nodejs")
-  end
-
-  def setup_command
-    "npm install"
-  end
-
-  def run_command
-    "echo 'n' | APPSIGNAL_APP_ENV=test ../../../../packages/nodejs/bin/diagnose"
-  end
-
-  def ignored_lines
-    [
-      %r{WARNING: Error when reading appsignal config, appsignal \(as \d+/\d+\) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present}, # rubocop:disable Metrics/LineLength
-      /Dependencies: {}/
-    ]
-  end
-
-  def type
-    :nodejs
-  end
-
-  def language_name
-    "Node.js"
-  end
-
-  def prepare
-    File.write("/tmp/appsignal-install-report.json", install_report)
-    File.write("/tmp/appsignal.log", appsignal_log)
-  end
-
-  def install_report
-    %({
-      "download": {
-        "checksum": "verified",
-        "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/d08ae6c/appsignal-x86_64-darwin-all-static.tar.gz"
-      },
-      "build": {
-        "time": "2021-05-19 15:47:39UTC",
-        "architecture": "x64",
-        "target": "darwin",
-        "musl_override": false,
-        "linux_arm_override": false,
-        "library_type": "static"
-      },
-      "host": {
-        "root_user": false,
-        "dependencies": {}
-      }
-    })
+    def install_report
+      %({
+        "download": {
+          "checksum": "verified",
+          "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/d08ae6c/appsignal-x86_64-darwin-all-static.tar.gz"
+        },
+        "build": {
+          "time": "2021-05-19 15:47:39UTC",
+          "architecture": "x64",
+          "target": "darwin",
+          "musl_override": false,
+          "linux_arm_override": false,
+          "library_type": "static"
+        },
+        "host": {
+          "root_user": false,
+          "dependencies": {}
+        }
+      })
+    end
   end
 end
 
