@@ -516,7 +516,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
   TAR_FILENAME_PATTERN = /appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz/
   DATETIME_PATTERN = /\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}( ?UTC|.\d+Z)?/
   TRUE_OR_FALSE_PATTERN = /true|false/
-  PATH_PATTERN = /[\/\w\.-]+/
+  PATH_PATTERN = %r{[\/\w\.-]+}
   LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/
 
   def expect_output(expected)
