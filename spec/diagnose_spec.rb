@@ -360,12 +360,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
       ])
     when :nodejs
       expect_output([
-        /  log_path: #{quoted("/tmp")}/,
-        /  ca_file_path: #{quoted(".+/cacert.pem")}/,
         /  endpoint: #{quoted("https://push.appsignal.com")}/,
-        /  push_api_key: #{quoted("test")}/,
+        /  ca_file_path: #{quoted(".+/cacert.pem")}/,
         /  active: true/,
-        /  log_file_path: #{quoted("/tmp/appsignal.log")}/
+        /  push_api_key: #{quoted("test")}/,
       ])
     else
       raise "No clause for runner #{@runner}"
