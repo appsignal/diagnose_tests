@@ -10,8 +10,17 @@ class Runner
 
   def run(arguments = nil)
     Dir.chdir(directory)
-    `#{setup_command}`
+    setup_commands.each do |command|
+      run_setup command
+    end
     @pid = spawn({ "APPSIGNAL_PUSH_API_KEY" => "test" }, [run_command, arguments].compact.join(" "), :out => @write)
+  end
+
+  def run_setup(command)
+    output = `#{command}`
+    unless Process.last_status.success?
+      raise "Command failed: #{command}\nOutput:\n#{output}"
+    end
   end
 
   def readline
@@ -72,8 +81,8 @@ class Runner
       File.join(__dir__, "../ruby")
     end
 
-    def setup_command
-      ":"
+    def setup_commands
+      []
     end
 
     def run_command
@@ -133,8 +142,8 @@ class Runner
       File.join(__dir__, "../elixir")
     end
 
-    def setup_command
-      "mix do deps.get, deps.compile, compile"
+    def setup_commands
+      ["mix do deps.get, deps.compile, compile"]
     end
 
     def run_command
@@ -164,12 +173,15 @@ class Runner
       File.join(__dir__, "../nodejs")
     end
 
-    def setup_command
-      "npm install"
+    def setup_commands
+      [
+        "npm install",
+        "npm link @appsignal/nodejs @appsignal/nodejs-ext"
+      ]
     end
 
     def run_command
-      "echo 'n' | APPSIGNAL_APP_ENV=test ../../../../packages/nodejs/bin/diagnose"
+      "echo 'n' | APPSIGNAL_APP_ENV=test node_modules/.bin/appsignal-diagnose"
     end
 
     def ignored_lines
