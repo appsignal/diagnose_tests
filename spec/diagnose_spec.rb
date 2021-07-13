@@ -53,9 +53,7 @@ class Runner
   end
 
   def logger
-    logger = Logger.new(STDOUT)
-    logger.level = ENV["CI"] ? Logger::WARN : Logger::DEBUG
-    logger
+    Logger.new(STDOUT)
   end
 
   def prepare
