@@ -479,16 +479,9 @@ RSpec.describe "Running the diagnose command without any arguments" do
       ])
     end
 
-    case @runner.type
-    when :ruby
-      expect_output([
-        /    Contents \(last 10 lines\):/
-      ] + Array.new(10).map { LOG_LINE_PATTERN })
-    when :nodejs
-      expect_output([
-        /    Contents \(last 9 lines\):/
-      ] + Array.new(9).map { LOG_LINE_PATTERN })
-    end
+    expect_output([
+      /    Contents \(last 10 lines\):/
+    ] + Array.new(10).map { LOG_LINE_PATTERN })
   end
 
   it "prints a newline" do
