@@ -532,8 +532,11 @@ RSpec.describe "Running the diagnose command without any arguments" do
   LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/
 
   def expect_output(expected)
-    expected.each do |line|
-      expect(@runner.readline).to match(line)
+    actual_output = []
+    expected.each do |expected_line|
+      actual_line = @runner.readline
+      actual_output << actual_line
+      expect(actual_line).to match(expected_line), actual_output.join("\n")
     end
   end
 
