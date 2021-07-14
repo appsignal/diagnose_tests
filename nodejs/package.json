@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@appsignal/nodejs": "file:../../../.."
+    "@appsignal/nodejs": "*",
+    "@appsignal/nodejs-ext": "*"
   }
 }
