@@ -73,7 +73,7 @@ class Runner
       "[2021-06-14T13:59:10 (process) #53880][INFO] Starting AppSignal diagnose",
       "[2021-06-14T14:05:53 (process) #54792][INFO] Starting AppSignal diagnose",
       "[2021-06-14T14:11:37 (process) #55323][INFO] Starting AppSignal diagnose"
-    ].join("\n")
+    ].join("\n") + "\n"
   end
 
   class Ruby < Runner
