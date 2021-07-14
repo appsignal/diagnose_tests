@@ -70,8 +70,9 @@ class Runner
       "[2021-06-14T13:55:20 (process) #53396][INFO] Starting AppSignal diagnose",
       "[2021-06-14T13:59:10 (process) #53880][INFO] Starting AppSignal diagnose",
       "[2021-06-14T14:05:53 (process) #54792][INFO] Starting AppSignal diagnose",
-      "[2021-06-14T14:11:37 (process) #55323][INFO] Starting AppSignal diagnose"
-    ].join("\n")
+      "[2021-06-14T14:11:37 (process) #55323][INFO] Starting AppSignal diagnose",
+      "[2021-06-14T14:12:37 (process) #55323][INFO] Starting AppSignal diagnose"
+    ].join("\n") + "\n"
   end
 
   class Ruby < Runner
@@ -484,8 +485,8 @@ RSpec.describe "Running the diagnose command without any arguments" do
       ] + Array.new(10).map { LOG_LINE_PATTERN })
     when :nodejs
       expect_output([
-        /    Contents \(last 9 lines\):/
-      ] + Array.new(9).map { LOG_LINE_PATTERN })
+        /    Contents \(last 10 lines\):/
+      ] + Array.new(10).map { LOG_LINE_PATTERN })
     end
   end
 
@@ -530,8 +531,11 @@ RSpec.describe "Running the diagnose command without any arguments" do
   LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/
 
   def expect_output(expected)
-    expected.each do |line|
-      expect(@runner.readline).to match(line)
+    actual_output = []
+    expected.each do |expected_line|
+      actual_line = @runner.readline
+      actual_output << actual_line
+      expect(actual_line).to match(expected_line), actual_output.join("\n")
     end
   end
 
