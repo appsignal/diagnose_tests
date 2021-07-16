@@ -398,12 +398,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
   it "prints the validation section" do
     expect_output([%(Validation)])
 
-    case @runner.type
-    when :ruby
-      expect(@runner.readline).to eq("  Validating Push API key: \e[31minvalid\e[0m\n")
-    when :nodejs
-      expect(@runner.readline).to eq("  Validating Push API key: \e[32mvalid\e[0m\n")
-    end
+    expect(@runner.readline).to eq("  Validating Push API key: \e[31minvalid\e[0m\n")
   end
 
   it "prints a newline" do
