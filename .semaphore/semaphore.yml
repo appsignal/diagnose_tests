@@ -15,6 +15,12 @@ blocks:
         commands:
           - checkout
       jobs:
+        - name: Ruby Lint (RuboCop)
+          commands:
+            - cache restore
+            - bundle install
+            - cache store
+            - bundle exec rubocop
         - name: Git Lint (Lintje)
           env_vars:
             - name: LINTJE_VERSION

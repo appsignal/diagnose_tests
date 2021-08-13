@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "logger"
 require "timeout"
 
@@ -13,14 +15,16 @@ class Runner
     setup_commands.each do |command|
       run_setup command
     end
-    @pid = spawn({ "APPSIGNAL_PUSH_API_KEY" => "test" }, [run_command, arguments].compact.join(" "), :out => @write)
+    @pid = spawn(
+      { "APPSIGNAL_PUSH_API_KEY" => "test" },
+      [run_command, arguments].compact.join(" "),
+      :out => @write
+    )
   end
 
   def run_setup(command)
     output = `#{command}`
-    unless Process.last_status.success?
-      raise "Command failed: #{command}\nOutput:\n#{output}"
-    end
+    raise "Command failed: #{command}\nOutput:\n#{output}" unless Process.last_status.success?
   end
 
   def readline
@@ -37,7 +41,8 @@ class Runner
 
   def each(&block)
     yield(readline)
-  rescue Timeout::Error # rubocop:disable Lint/HandleExceptions
+  rescue Timeout::Error
+    # Do nothing
   else
     each(&block)
   end
@@ -53,16 +58,17 @@ class Runner
   end
 
   def logger
-    logger = Logger.new(STDOUT)
+    logger = Logger.new($stdout)
     logger.level = ENV["CI"] ? Logger::WARN : Logger::DEBUG
     logger
   end
 
   def prepare
+    # Placeholder
   end
 
   def appsignal_log
-    [
+    [ # rubocop:disable Style/StringConcatenation
       "# Logfile created on 2021-06-14 13:44:22 +0200 by logger.rb/v1.4.2",
       "[2021-06-14T13:44:22 (process) #49713][INFO] Starting AppSignal diagnose",
       "[2021-06-14T13:50:02 (process) #51074][INFO] Starting AppSignal diagnose",
@@ -86,7 +92,8 @@ class Runner
     end
 
     def run_command
-      "echo 'n' | BUNDLE_GEMFILE=#{File.join(__dir__, "../ruby/Gemfile")} bundle exec appsignal diagnose --environment=test"
+      "echo 'n' | BUNDLE_GEMFILE=#{File.join(__dir__, "../ruby/Gemfile")} " \
+        "bundle exec appsignal diagnose --environment=test"
     end
 
     def ignored_lines
@@ -154,7 +161,7 @@ class Runner
       [
         /==> appsignal/,
         /AppSignal extension installation successful/,
-        /OTP version: \"\d+\"/,
+        /OTP version: "\d+"/,
         /Download time:/
       ]
     end
@@ -186,7 +193,7 @@ class Runner
 
     def ignored_lines
       [
-        %r{WARNING: Error when reading appsignal config, appsignal \(as \d+/\d+\) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present}, # rubocop:disable Metrics/LineLength
+        %r{WARNING: Error when reading appsignal config, appsignal \(as \d+/\d+\) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present}, # rubocop:disable Layout/LineLength
         /Dependencies: {}/
       ]
     end
@@ -226,6 +233,18 @@ class Runner
     end
   end
 end
+
+VERSION_PATTERN = /\d+\.\d+\.\d+(-[a-z0-9]+)?/.freeze
+REVISION_PATTERN = /[a-z0-9]{7}/.freeze
+ARCH_PATTERN = /(x(86_)?64|i686)/.freeze
+TARGET_PATTERN = /(darwin|linux(-musl)?|freebsd)/.freeze
+LIBRARY_TYPE_PATTERN = /static|dynamic/.freeze
+TAR_FILENAME_PATTERN =
+  /appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz/.freeze
+DATETIME_PATTERN = /\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}( ?UTC|.\d+Z)?/.freeze
+TRUE_OR_FALSE_PATTERN = /true|false/.freeze
+PATH_PATTERN = %r{[/\w.-]+}.freeze
+LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/.freeze
 
 RSpec.describe "Running the diagnose command without any arguments" do
   before(:all) do
@@ -312,7 +331,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the agent diagnostics section" do
-    skip if @runner.class == Runner::Nodejs
+    skip if @runner.instance_of?(Runner::Nodejs)
 
     expect_output([
       /Agent diagnostics/,
@@ -332,7 +351,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints a newline" do
-    skip if @runner.class == Runner::Nodejs
+    skip if @runner.instance_of?(Runner::Nodejs)
 
     expect_newline
   end
@@ -355,7 +374,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  filter_session_data: \[\]/,
         /  send_environment_metadata: true/,
         /  send_params: true/,
-        /  request_headers: \["HTTP_ACCEPT", "HTTP_ACCEPT_CHARSET", "HTTP_ACCEPT_ENCODING", "HTTP_ACCEPT_LANGUAGE", "HTTP_CACHE_CONTROL", "HTTP_CONNECTION", "CONTENT_LENGTH", "PATH_INFO", "HTTP_RANGE", "REQUEST_METHOD", "REQUEST_URI", "SERVER_NAME", "SERVER_PORT", "SERVER_PROTOCOL"\]/, # rubocop:disable Metrics/LineLength
+        /  request_headers: \["HTTP_ACCEPT", "HTTP_ACCEPT_CHARSET", "HTTP_ACCEPT_ENCODING", "HTTP_ACCEPT_LANGUAGE", "HTTP_CACHE_CONTROL", "HTTP_CONNECTION", "CONTENT_LENGTH", "PATH_INFO", "HTTP_RANGE", "REQUEST_METHOD", "REQUEST_URI", "SERVER_NAME", "SERVER_PORT", "SERVER_PROTOCOL"\]/, # rubocop:disable Layout/LineLength
         %r{  endpoint: "https://push.appsignal.com"},
         /  instrument_net_http: true/,
         /  instrument_redis: true/,
@@ -365,7 +384,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  enable_gc_instrumentation: false/,
         /  enable_host_metrics: true/,
         /  enable_minutely_probes: true/,
-        %r{  ca_file_path: ".+\/appsignal-ruby\/resources\/cacert.pem"},
+        %r{  ca_file_path: ".+/appsignal-ruby/resources/cacert.pem"},
         /  dns_servers: \[\]/,
         /  files_world_accessible: true/,
         /  transaction_debug_mode: false/,
@@ -377,7 +396,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  endpoint: #{quoted("https://push.appsignal.com")}/,
         /  ca_file_path: #{quoted(".+/cacert.pem")}/,
         /  active: true/,
-        /  push_api_key: #{quoted("test")}/,
+        /  push_api_key: #{quoted("test")}/
       ])
     else
       raise "No clause for runner #{@runner}"
@@ -500,24 +519,14 @@ RSpec.describe "Running the diagnose command without any arguments" do
 
   it "prints the send-dignostics line" do
     expect_output([
-      %(  Send diagnostics report to AppSignal? (Y/n):   Not sending diagnostics information to AppSignal.\n)
+      "  Send diagnostics report to AppSignal? (Y/n):   " \
+        "Not sending diagnostics information to AppSignal.\n"
     ])
   end
 
   after(:all) do
     @runner.stop
   end
-
-  VERSION_PATTERN = /\d+\.\d+\.\d+(-[a-z0-9]+)?/
-  REVISION_PATTERN = /[a-z0-9]{7}/
-  ARCH_PATTERN = /(x(86_)?64|i686)/
-  TARGET_PATTERN = /(darwin|linux(-musl)?|freebsd)/
-  LIBRARY_TYPE_PATTERN = /static|dynamic/
-  TAR_FILENAME_PATTERN = /appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz/
-  DATETIME_PATTERN = /\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}( ?UTC|.\d+Z)?/
-  TRUE_OR_FALSE_PATTERN = /true|false/
-  PATH_PATTERN = %r{[\/\w\.-]+}
-  LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/
 
   def expect_output(expected)
     actual_output = []
