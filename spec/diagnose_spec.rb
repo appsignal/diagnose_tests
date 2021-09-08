@@ -2,6 +2,7 @@
 
 require "logger"
 require "timeout"
+require "digest"
 
 class Runner
   include Enumerable
@@ -225,7 +226,10 @@ class Runner
 
     def after_setup
       # Overwite created install report so we have a consistent test environment
-      File.write("/tmp/appsignal-install-report.json", install_report)
+      package_path = "#{File.expand_path("../../../../../", __dir__)}/"
+      report_path_digest = Digest::SHA256.hexdigest(package_path)
+
+      File.write("/tmp/appsignal-#{report_path_digest}-install.report", install_report)
       File.write("/tmp/appsignal.log", appsignal_log)
     end
 
