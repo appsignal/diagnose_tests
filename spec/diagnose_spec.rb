@@ -12,9 +12,11 @@ class Runner
 
   def run(arguments = nil)
     Dir.chdir(directory)
+    before_setup
     setup_commands.each do |command|
       run_setup command
     end
+    after_setup
     @pid = spawn(
       { "APPSIGNAL_PUSH_API_KEY" => "test" },
       [run_command, arguments].compact.join(" "),
@@ -63,7 +65,11 @@ class Runner
     logger
   end
 
-  def prepare
+  def before_setup
+    # Placeholder
+  end
+
+  def after_setup
     # Placeholder
   end
 
@@ -113,7 +119,12 @@ class Runner
       "Ruby"
     end
 
-    def prepare
+    def before_setup
+      # Placeholder
+    end
+
+    def after_setup
+      # Overwite created install report so we have a consistent test environment
       File.write(File.join(__dir__, "../../../../ext/install.report"), install_report)
       File.write("/tmp/appsignal.log", appsignal_log)
     end
@@ -208,7 +219,12 @@ class Runner
       "Node.js"
     end
 
-    def prepare
+    def before_setup
+      # Placeholder
+    end
+
+    def after_setup
+      # Overwite created install report so we have a consistent test environment
       File.write("/tmp/appsignal-install-report.json", install_report)
       File.write("/tmp/appsignal.log", appsignal_log)
     end
@@ -258,8 +274,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
       "elixir" => Runner::Elixir.new,
       "nodejs" => Runner::Nodejs.new
     }[language]
-
-    @runner.prepare
     @runner.run
   end
 
@@ -561,7 +575,6 @@ RSpec.describe "Running the diagnose command with the --no-send-report option" d
       "nodejs" => Runner::Nodejs.new
     }[language]
 
-    @runner.prepare
     @runner.run("--no-send-report")
   end
 
