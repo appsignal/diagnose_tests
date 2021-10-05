@@ -1,3 +1,4 @@
 cd "$(dirname "$0")/../"
-bundle install --gemfile=./Gemfile
-bundle exec --gemfile=./Gemfile rspec
+bundle config set --local gemfile ./Gemfile
+bundle install
+bundle exec rspec
