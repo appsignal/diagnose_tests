@@ -236,6 +236,14 @@ class Runner
     def install_report
       <<~REPORT
         {
+          "result": {
+            "status": "success"
+          },
+          "language": {
+            "name": "nodejs",
+            "version": "16.4.0",
+            "implementation": "nodejs"
+          },
           "download": {
             "checksum": "verified",
             "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/d08ae6c/appsignal-x86_64-darwin-all-static.tar.gz"
