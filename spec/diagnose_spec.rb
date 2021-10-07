@@ -1,14 +1,48 @@
 # frozen_string_literal: true
 
 require "logger"
-require "timeout"
+require "forwardable"
 require "digest"
 
 class Runner
-  include Enumerable
+  attr_reader :output
 
-  def initialize
-    @read, @write = IO.pipe
+  class Output
+    extend Forwardable
+
+    attr_reader :index
+
+    def_delegator :@lines, :any?
+
+    def initialize(lines)
+      @lines = lines
+      @index = -1
+    end
+
+    def next
+      @index += 1
+      @lines[@index]
+    end
+
+    def any?(&block)
+      @lines.any?(&block)
+    end
+
+    def to_s
+      @lines.join
+    end
+  end
+
+  class CommandFailed < StandardError
+    def initialize(command, output)
+      @command = command
+      @output = output
+      super()
+    end
+
+    def message
+      "The command has failed to run: #{@command}\nOutput:\n#{@output}"
+    end
   end
 
   def run(arguments = nil)
@@ -18,11 +52,29 @@ class Runner
       run_setup command
     end
     after_setup
-    @pid = spawn(
+
+    # Run the command
+    read, write = IO.pipe
+    pid = spawn(
       { "APPSIGNAL_PUSH_API_KEY" => "test" },
       [run_command, arguments].compact.join(" "),
-      :out => @write
+      { [:out, :err] => write }
     )
+    _pid, status = Process.wait2 pid # Wait until command exits
+    write.close
+
+    # Collect command output
+    output_lines = []
+    begin
+      while line = read.readline # rubocop:disable Lint/AssignmentInCondition
+        output_lines << line
+      end
+    rescue EOFError
+      # Nothing to read anymore. Reached of "file".
+    end
+    @output = Output.new(output_lines)
+
+    raise CommandFailed.new(command, output.to_s) unless status.success?
   end
 
   def run_setup(command)
@@ -31,10 +83,7 @@ class Runner
   end
 
   def readline
-    line = Timeout.timeout(1) { @read.readline }
-
-    logger.debug(line)
-
+    line = @output.next
     if ignored?(line)
       readline
     else
@@ -42,22 +91,10 @@ class Runner
     end
   end
 
-  def each(&block)
-    yield(readline)
-  rescue Timeout::Error
-    # Do nothing
-  else
-    each(&block)
-  end
-
   def ignored?(line)
     ignored_lines.any? do |pattern|
       pattern.match? line
     end
-  end
-
-  def stop
-    Process.kill(3, @pid)
   end
 
   def logger
@@ -555,21 +592,15 @@ RSpec.describe "Running the diagnose command without any arguments" do
     ])
   end
 
-  after(:all) do
-    @runner.stop
-  end
-
   def expect_output(expected)
-    actual_output = []
     expected.each do |expected_line|
-      actual_line = @runner.readline
-      actual_output << actual_line
-      expect(actual_line).to match(expected_line), actual_output.join("\n")
+      line = @runner.readline
+      expect(line).to match(expected_line), @runner.output.to_s
     end
   end
 
   def expect_newline
-    expect(@runner.readline).to match(/^\n/)
+    expect(@runner.readline).to match(/^\n/), @runner.output.to_s
   end
 
   def quoted(string)
@@ -592,7 +623,7 @@ RSpec.describe "Running the diagnose command with the --no-send-report option" d
 
   it "does not ask to send the report" do
     expect(
-      @runner.any? do |line|
+      @runner.output.any? do |line|
         /Send diagnostics report to AppSignal\?/.match? line
       end
     ).to be(false)
@@ -600,7 +631,7 @@ RSpec.describe "Running the diagnose command with the --no-send-report option" d
 
   it "does not send the report" do
     expect(
-      @runner.any? do |line|
+      @runner.output.any? do |line|
         line == %(  Not sending report. (Specified with the --no-send-report option.)\n)
       end
     ).to be(true)
