@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "support/runner"
+
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     # This option will default to `true` in RSpec 4. It makes the `description`
