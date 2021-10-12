@@ -46,19 +46,20 @@ class Runner
   end
 
   def run(arguments = nil)
-    Dir.chdir(directory)
-    before_setup
-    setup_commands.each do |command|
-      run_setup command
+    Dir.chdir directory do
+      before_setup
+      setup_commands.each do |command|
+        run_setup command
+      end
+      after_setup
     end
-    after_setup
 
     # Run the command
     read, write = IO.pipe
     pid = spawn(
       { "APPSIGNAL_PUSH_API_KEY" => "test" },
       [run_command, arguments].compact.join(" "),
-      { [:out, :err] => write }
+      { [:out, :err] => write, :chdir => directory }
     )
     _pid, status = Process.wait2 pid # Wait until command exits
     write.close
