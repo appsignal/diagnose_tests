@@ -288,22 +288,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
         "Not sending diagnostics information to AppSignal.\n"
     ])
   end
-
-  def expect_output(expected)
-    expected.each do |expected_line|
-      line = @runner.readline
-      expect(line).to match(expected_line), @runner.output.to_s
-    end
-  end
-
-  def expect_newline
-    expect(@runner.readline).to match(/^\n/), @runner.output.to_s
-  end
-
-  def quoted(string)
-    quote = "['\"]"
-    %(#{quote}#{string}#{quote})
-  end
 end
 
 RSpec.describe "Running the diagnose command with the --no-send-report option" do
