@@ -55,10 +55,11 @@ class Runner
     end
 
     # Run the command
+    command = [run_command, arguments].compact.join(" ")
     read, write = IO.pipe
     pid = spawn(
       { "APPSIGNAL_PUSH_API_KEY" => "test" },
-      [run_command, arguments].compact.join(" "),
+      command,
       { [:out, :err] => write, :chdir => directory }
     )
     _pid, status = Process.wait2 pid # Wait until command exits
