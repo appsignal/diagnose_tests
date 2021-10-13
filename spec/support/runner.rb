@@ -8,28 +8,60 @@ class Runner
   attr_reader :output
 
   class Output
-    extend Forwardable
-
     attr_reader :index
 
-    def_delegator :@lines, :any?
-
-    def initialize(lines)
+    def initialize(lines, ignore: [])
       @lines = lines
-      @index = -1
+      @ignored_lines = ignore
     end
 
-    def next
-      @index += 1
-      @lines[@index]
+    def sections
+      @sections ||= parse_output
     end
 
-    def any?(&block)
-      @lines.any?(&block)
+    def section(key)
+      raise "No section for `#{key}` found!\nOutput: #{self}" unless sections.key?(key)
+
+      sections[key].join("\n")
     end
 
     def to_s
-      @lines.join
+      @lines.join("\n")
+    end
+
+    private
+
+    SECTIONS = {
+      "AppSignal diagnose" => :header,
+      "AppSignal library" => :library,
+      "Extension installation report" => :installation,
+      "Host information" => :host,
+      "Agent diagnostics" => :agent,
+      "Configuration" => :config,
+      "Validation" => :validation,
+      "Paths" => :paths,
+      "Diagnostics report" => :send_report
+    }.freeze
+
+    def parse_output
+      sections = Hash.new { |hash, key| hash[key] = [] }
+      section_index = :other
+      section_headings = SECTIONS.keys
+      @lines.each do |line|
+        next if ignored?(line)
+
+        section_index = SECTIONS[line] if section_headings.include?(line)
+
+        current_section = sections[section_index]
+        current_section << line
+      end
+      sections
+    end
+
+    def ignored?(line)
+      @ignored_lines.any? do |pattern|
+        pattern.match? line
+      end
     end
   end
 
@@ -69,12 +101,12 @@ class Runner
     output_lines = []
     begin
       while line = read.readline # rubocop:disable Lint/AssignmentInCondition
-        output_lines << line
+        output_lines << line.rstrip
       end
     rescue EOFError
       # Nothing to read anymore. Reached of "file".
     end
-    @output = Output.new(output_lines)
+    @output = Output.new(output_lines, :ignore => ignored_lines)
 
     raise CommandFailed.new(command, output.to_s) unless status.success?
   end
@@ -82,21 +114,6 @@ class Runner
   def run_setup(command)
     output = `#{command}`
     raise "Command failed: #{command}\nOutput:\n#{output}" unless Process.last_status.success?
-  end
-
-  def readline
-    line = @output.next
-    if ignored?(line)
-      readline
-    else
-      line
-    end
-  end
-
-  def ignored?(line)
-    ignored_lines.any? do |pattern|
-      pattern.match? line
-    end
   end
 
   def logger
