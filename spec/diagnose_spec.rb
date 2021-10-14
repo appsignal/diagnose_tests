@@ -316,3 +316,21 @@ RSpec.describe "Running the diagnose command with the --no-send-report option" d
     )
   end
 end
+
+RSpec.describe "Running the diagnose command without install report file" do
+  before do
+    @runner = init_runner(:install_report => false)
+    @runner.run
+  end
+
+  it "prints handled errors instead of the report" do
+    expect_section(
+      :installation,
+      [
+        "Extension installation report",
+        "  Error found while parsing the report.",
+        /^  Error: .* [nN]o such file or directory.*install\.report/
+      ]
+    )
+  end
+end
