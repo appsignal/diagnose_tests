@@ -14,12 +14,7 @@ LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/.freeze
 
 RSpec.describe "Running the diagnose command without any arguments" do
   before(:all) do
-    language = ENV["LANGUAGE"] || "ruby"
-    @runner = {
-      "ruby" => Runner::Ruby.new,
-      "elixir" => Runner::Elixir.new,
-      "nodejs" => Runner::Nodejs.new
-    }[language]
+    @runner = init_runner
     @runner.run
   end
 
@@ -309,13 +304,7 @@ end
 
 RSpec.describe "Running the diagnose command with the --no-send-report option" do
   before do
-    language = ENV["LANGUAGE"] || "ruby"
-    @runner = {
-      "ruby" => Runner::Ruby.new,
-      "elixir" => Runner::Elixir.new,
-      "nodejs" => Runner::Nodejs.new
-    }[language]
-
+    @runner = init_runner
     @runner.run("--no-send-report")
   end
 

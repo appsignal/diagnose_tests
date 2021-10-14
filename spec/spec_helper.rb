@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 require_relative "support/runner"
+require_relative "support/runner_helper"
 require_relative "support/output_helper"
 
 RSpec.configure do |config|
   config.include OutputHelper
+  config.include RunnerHelper
 
   config.expect_with :rspec do |expectations|
     # This option will default to `true` in RSpec 4. It makes the `description`
