@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 require_relative "support/runner"
+require_relative "support/output_helper"
 
 RSpec.configure do |config|
+  config.include OutputHelper
+
   config.expect_with :rspec do |expectations|
     # This option will default to `true` in RSpec 4. It makes the `description`
     # and `failure_message` of custom matchers include text for helper methods
