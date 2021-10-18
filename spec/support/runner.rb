@@ -85,12 +85,13 @@ class Runner
     @options.fetch(:install_report, true)
   end
 
-  def run(arguments = nil)
+  def run(arguments = nil) # rubocop:disable Metrics/MethodLength
     Dir.chdir directory do
       before_setup
       setup_commands.each do |command|
         run_setup command
       end
+      write_install_report
       after_setup
     end
 
@@ -136,6 +137,17 @@ class Runner
 
   def after_setup
     # Placeholder
+  end
+
+  def write_install_report
+    if install_report?
+      # Overwite created install report so we have a consistent test environment
+      File.write(install_report_path, install_report)
+    elsif File.exist?(install_report_path)
+      # Remove existing report, if any, so no install report is present for the
+      # diagnose report
+      File.delete(install_report_path)
+    end
   end
 
   def appsignal_log
@@ -189,14 +201,11 @@ class Runner
     end
 
     def after_setup
-      install_report_path = File.join(__dir__, "../../../../../ext/install.report")
-      if install_report?
-        # Overwite created install report so we have a consistent test environment
-        File.write(install_report_path, install_report)
-      elsif File.exist?(install_report_path)
-        File.delete(install_report_path)
-      end
       File.write("/tmp/appsignal.log", appsignal_log)
+    end
+
+    def install_report_path
+      File.join(__dir__, "../../../../../ext/install.report")
     end
 
     def install_report
@@ -294,17 +303,17 @@ class Runner
     end
 
     def after_setup
-      # Overwite created install report so we have a consistent test environment
-      package_path = "#{File.expand_path("../../../../../../", __dir__)}/"
-      report_path_digest = Digest::SHA256.hexdigest(package_path)
-
-      install_report_path = "/tmp/appsignal-#{report_path_digest}-install.report"
-      if install_report?
-        File.write(install_report_path, install_report)
-      elsif File.exist?(install_report_path)
-        File.delete(install_report_path)
-      end
       File.write("/tmp/appsignal.log", appsignal_log)
+    end
+
+    def install_report_path
+      @install_report_path ||=
+        begin
+          package_path = "#{File.expand_path("../../../../../../", __dir__)}/"
+          report_path_digest = Digest::SHA256.hexdigest(package_path)
+
+          "/tmp/appsignal-#{report_path_digest}-install.report"
+        end
     end
 
     def install_report
