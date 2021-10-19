@@ -202,7 +202,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       :validation,
       [
         "Validation",
-        "  Validating Push API key: \e[31minvalid\e[0m"
+        /  Validating Push API key: (\e\[31m)?invalid(\e\[0m)?/
       ]
     )
   end
