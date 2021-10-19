@@ -14,12 +14,7 @@ LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/.freeze
 
 RSpec.describe "Running the diagnose command without any arguments" do
   before(:all) do
-    language = ENV["LANGUAGE"] || "ruby"
-    @runner = {
-      "ruby" => Runner::Ruby.new,
-      "elixir" => Runner::Elixir.new,
-      "nodejs" => Runner::Nodejs.new
-    }[language]
+    @runner = init_runner
     @runner.run
   end
 
@@ -309,13 +304,7 @@ end
 
 RSpec.describe "Running the diagnose command with the --no-send-report option" do
   before do
-    language = ENV["LANGUAGE"] || "ruby"
-    @runner = {
-      "ruby" => Runner::Ruby.new,
-      "elixir" => Runner::Elixir.new,
-      "nodejs" => Runner::Nodejs.new
-    }[language]
-
+    @runner = init_runner
     @runner.run("--no-send-report")
   end
 
@@ -324,6 +313,24 @@ RSpec.describe "Running the diagnose command with the --no-send-report option" d
     expect(send_report).to_not include("Send diagnostics report to AppSignal?")
     expect(send_report).to include(
       "Not sending report. (Specified with the --no-send-report option.)"
+    )
+  end
+end
+
+RSpec.describe "Running the diagnose command without install report file" do
+  before do
+    @runner = init_runner(:install_report => false)
+    @runner.run
+  end
+
+  it "prints handled errors instead of the report" do
+    expect_section(
+      :installation,
+      [
+        "Extension installation report",
+        "  Error found while parsing the report.",
+        /^  Error: .* [nN]o such file or directory.*install\.report/
+      ]
     )
   end
 end

@@ -77,6 +77,14 @@ class Runner
     end
   end
 
+  def initialize(options = {})
+    @options = options
+  end
+
+  def install_report?
+    @options.fetch(:install_report, true)
+  end
+
   def run(arguments = nil)
     Dir.chdir directory do
       before_setup
@@ -181,8 +189,13 @@ class Runner
     end
 
     def after_setup
-      # Overwite created install report so we have a consistent test environment
-      File.write(File.join(__dir__, "../../../../../ext/install.report"), install_report)
+      install_report_path = File.join(__dir__, "../../../../../ext/install.report")
+      if install_report?
+        # Overwite created install report so we have a consistent test environment
+        File.write(install_report_path, install_report)
+      elsif File.exist?(install_report_path)
+        File.delete(install_report_path)
+      end
       File.write("/tmp/appsignal.log", appsignal_log)
     end
 
@@ -285,7 +298,12 @@ class Runner
       package_path = "#{File.expand_path("../../../../../../", __dir__)}/"
       report_path_digest = Digest::SHA256.hexdigest(package_path)
 
-      File.write("/tmp/appsignal-#{report_path_digest}-install.report", install_report)
+      install_report_path = "/tmp/appsignal-#{report_path_digest}-install.report"
+      if install_report?
+        File.write(install_report_path, install_report)
+      elsif File.exist?(install_report_path)
+        File.delete(install_report_path)
+      end
       File.write("/tmp/appsignal.log", appsignal_log)
     end
 
