@@ -3,7 +3,7 @@
 VERSION_PATTERN = /\d+\.\d+\.\d+(-[a-z0-9]+)?/.freeze
 REVISION_PATTERN = /[a-z0-9]{7}/.freeze
 ARCH_PATTERN = /(x(86_)?64|i686)/.freeze
-TARGET_PATTERN = /(darwin|linux(-musl)?|freebsd)/.freeze
+TARGET_PATTERN = /(darwin\d*|linux(-gnu|-musl)?|freebsd)/.freeze
 LIBRARY_TYPE_PATTERN = /static|dynamic/.freeze
 TAR_FILENAME_PATTERN =
   /appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz/.freeze
@@ -73,8 +73,8 @@ RSpec.describe "Running the diagnose command without any arguments" do
       [
         /AppSignal library/,
         /  Language: #{@runner.language_name}/,
-        /  (Gem|Package) version: #{VERSION_PATTERN}/,
-        /  Agent version: #{REVISION_PATTERN}/,
+        /  (Gem|Package) version: #{quoted VERSION_PATTERN}/,
+        /  Agent version: #{quoted REVISION_PATTERN}/,
         /  (Extension|Nif) loaded: true/
       ]
     )
@@ -88,17 +88,17 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  Installation result/,
         /    Status: success/,
         /  Language details/,
-        /    #{@runner.language_name} version: #{VERSION_PATTERN}/,
+        /    #{@runner.language_name} version: #{quoted VERSION_PATTERN}/,
         /  Download details/,
-        %r{    Download URL: https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}},
-        /    Checksum: verified/,
+        /    Download URL: #{quoted %r{https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}}}/,
+        /    Checksum: #{quoted "verified"}/,
         /  Build details/,
-        /    Install time: #{DATETIME_PATTERN}/,
-        /    Architecture: #{ARCH_PATTERN}/,
-        /    Target: #{TARGET_PATTERN}/,
+        /    Install time: #{quoted DATETIME_PATTERN}/,
+        /    Architecture: #{quoted ARCH_PATTERN}/,
+        /    Target: #{quoted TARGET_PATTERN}/,
         /    Musl override: #{TRUE_OR_FALSE_PATTERN}/,
         /    Linux ARM override: false/,
-        /    Library type: #{LIBRARY_TYPE_PATTERN}/,
+        /    Library type: #{quoted LIBRARY_TYPE_PATTERN}/,
         /  Host details/,
         /    Root user: #{TRUE_OR_FALSE_PATTERN}/
       ]
@@ -110,9 +110,9 @@ RSpec.describe "Running the diagnose command without any arguments" do
       :host,
       [
         /Host information/,
-        /  Architecture: #{ARCH_PATTERN}/,
-        /  Operating System: #{TARGET_PATTERN}/,
-        /  #{@runner.language_name} version: #{VERSION_PATTERN}/,
+        /  Architecture: #{quoted ARCH_PATTERN}/,
+        /  Operating System: #{quoted TARGET_PATTERN}/,
+        /  #{@runner.language_name} version: #{quoted VERSION_PATTERN}/,
         /  Root user: #{TRUE_OR_FALSE_PATTERN}/,
         /  Running in container: #{TRUE_OR_FALSE_PATTERN}/
       ]
@@ -171,7 +171,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  enable_host_metrics: true/,
         /  enable_minutely_probes: true/,
         /  enable_statsd: true/,
-        %r{  ca_file_path: ".+/appsignal-ruby/resources/cacert.pem"},
+        %r{  ca_file_path: ".+/appsignal[-/]ruby/resources/cacert.pem"},
         /  dns_servers: \[\]/,
         /  files_world_accessible: true/,
         /  transaction_debug_mode: false/,
@@ -180,10 +180,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
       ]
     when :nodejs
       matchers += [
-        /  endpoint: #{quoted("https://push.appsignal.com")}/,
-        /  ca_file_path: #{quoted(".+/cacert.pem")}/,
+        /  endpoint: #{quoted "https://push.appsignal.com"}/,
+        /  ca_file_path: #{quoted ".+\/cacert.pem"}/,
         /  active: true/,
-        /  push_api_key: #{quoted("test")}/
+        /  push_api_key: #{quoted "test"}/
       ]
     else
       raise "No clause for runner #{@runner}"
