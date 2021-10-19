@@ -2,6 +2,7 @@
 
 source "https://rubygems.org"
 
+gem "pry"
 gem "rack"
 gem "rspec"
 gem "rubocop"
