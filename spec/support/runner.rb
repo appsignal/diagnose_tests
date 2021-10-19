@@ -153,9 +153,13 @@ class Runner
     ].join("\n") + "\n"
   end
 
+  def project_path
+    File.expand_path("../../", __dir__)
+  end
+
   class Ruby < Runner
     def directory
-      File.join(__dir__, "../../ruby")
+      File.join(project_path, "ruby")
     end
 
     def setup_commands
@@ -163,7 +167,7 @@ class Runner
     end
 
     def run_command
-      "echo 'n' | BUNDLE_GEMFILE=#{File.join(__dir__, "../../ruby/Gemfile")} " \
+      "echo 'n' | BUNDLE_GEMFILE=#{File.join(directory, "Gemfile")} " \
         "bundle exec appsignal diagnose --environment=test"
     end
 
@@ -189,7 +193,7 @@ class Runner
     end
 
     def after_setup
-      install_report_path = File.join(__dir__, "../../../../../ext/install.report")
+      install_report_path = File.expand_path("../../../ext/install.report", project_path)
       if install_report?
         # Overwite created install report so we have a consistent test environment
         File.write(install_report_path, install_report)
@@ -229,7 +233,7 @@ class Runner
 
   class Elixir < Runner
     def directory
-      File.join(__dir__, "../../elixir")
+      File.join(project_path, "elixir")
     end
 
     def setup_commands
@@ -260,7 +264,7 @@ class Runner
 
   class Nodejs < Runner
     def directory
-      File.join(__dir__, "../../nodejs")
+      File.join(project_path, "nodejs")
     end
 
     def setup_commands
@@ -295,7 +299,7 @@ class Runner
 
     def after_setup
       # Overwite created install report so we have a consistent test environment
-      package_path = "#{File.expand_path("../../../../../../", __dir__)}/"
+      package_path = "#{File.expand_path("../../../../", project_path)}/"
       report_path_digest = Digest::SHA256.hexdigest(package_path)
 
       install_report_path = "/tmp/appsignal-#{report_path_digest}-install.report"
