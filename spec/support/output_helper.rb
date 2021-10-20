@@ -25,7 +25,7 @@ module OutputHelper
   end
 
   def quoted(string)
-    quote = "['\"]"
-    %(#{quote}#{string}#{quote})
+    quote = /['"]/
+    /#{quote}#{string}#{quote}/
   end
 end
