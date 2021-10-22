@@ -79,6 +79,7 @@ class Runner
 
   def initialize(options = {})
     @prompt = options.delete(:prompt)
+    @arguments = options.delete(:args) { [] }
     @options = options
   end
 
@@ -86,7 +87,7 @@ class Runner
     @options.fetch(:install_report, true)
   end
 
-  def run(arguments = nil) # rubocop:disable Metrics/MethodLength
+  def run # rubocop:disable Metrics/MethodLength
     Dir.chdir directory do
       before_setup
       setup_commands.each do |command|
@@ -97,7 +98,7 @@ class Runner
 
     # Run the command
     prompt = @prompt ? %(echo "#{@prompt}" | ) : ""
-    command = [run_command, arguments].compact.join(" ")
+    command = run_command
     read, write = IO.pipe
     pid = spawn(
       { "APPSIGNAL_PUSH_API_KEY" => "test" },
@@ -169,8 +170,9 @@ class Runner
     end
 
     def run_command
+      arguments = ["--environment=test"] + @arguments
       "BUNDLE_GEMFILE=#{File.join(directory, "Gemfile")} " \
-        "bundle exec appsignal diagnose --environment=test"
+        "bundle exec appsignal diagnose #{arguments.join(" ")}"
     end
 
     def ignored_lines
@@ -243,7 +245,7 @@ class Runner
     end
 
     def run_command
-      "mix appsignal.diagnose"
+      "mix appsignal.diagnose #{@arguments.join(" ")}"
     end
 
     def ignored_lines
@@ -277,7 +279,7 @@ class Runner
     end
 
     def run_command
-      "APPSIGNAL_APP_ENV=test node_modules/.bin/appsignal-diagnose"
+      "APPSIGNAL_APP_ENV=test node_modules/.bin/appsignal-diagnose #{@arguments.join(" ")}"
     end
 
     def ignored_lines

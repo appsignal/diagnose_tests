@@ -336,8 +336,8 @@ end
 
 RSpec.describe "Running the diagnose command with the --no-send-report option" do
   before do
-    @runner = init_runner
-    @runner.run("--no-send-report")
+    @runner = init_runner(:args => ["--no-send-report"])
+    @runner.run
   end
 
   it "does not ask to send the report" do
