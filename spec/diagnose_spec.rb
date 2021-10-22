@@ -356,13 +356,24 @@ RSpec.describe "Running the diagnose command without install report file" do
   end
 
   it "prints handled errors instead of the report" do
-    expect_section(
-      :installation,
-      [
-        "Extension installation report",
+    matchers = ["Extension installation report"]
+    case @runner.type
+    when :ruby, :nodejs
+      matchers += [
         "  Error found while parsing the report.",
         /^  Error: .* [nN]o such file or directory.*install\.report/
       ]
-    )
+    when :elixir
+      matchers += [
+        "  Error found while parsing the download report.",
+        "  Error: :enoent",
+        "  Error found while parsing the installation report.",
+        "  Error: :enoent"
+      ]
+    else
+      raise "No match found for runner #{@runner.type}"
+    end
+
+    expect_section(:installation, matchers)
   end
 end
