@@ -215,7 +215,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         %(  AppSignal gem path),
         /    Path: #{quoted(PATH_PATTERN)}/,
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: true \(file: \w+:\d+, process: \w+:\d+\)/,
+        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/,
         ""
       ]
     end
@@ -225,10 +225,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /    Path: #{quoted(PATH_PATTERN)}/
     ]
 
-    if @runner.type == :ruby
+    if [:ruby, :elixir].include? @runner.type
       matchers += [
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\)/
+        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/
       ]
     end
     matchers += [""]
@@ -238,7 +238,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         %(  Root path),
         /    Path: #{quoted(PATH_PATTERN)}/,
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\)/,
+        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/,
         ""
       ]
     end
@@ -248,10 +248,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /    Path: #{quoted(PATH_PATTERN)}/
     ]
 
-    if @runner.type == :ruby
+    if [:ruby, :elixir].include? @runner.type
       matchers += [
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\)/
+        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/
       ]
     end
     matchers += [""]
@@ -270,10 +270,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /    Path: #{quoted(PATH_PATTERN)}/
     ]
 
-    if @runner.type == :ruby
+    if [:ruby, :elixir].include? @runner.type
       matchers += [
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\)/
+        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/
       ]
     end
 
