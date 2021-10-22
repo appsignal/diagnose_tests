@@ -21,7 +21,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
   it "prints all sections in the correct order" do
     section_keys =
       case @runner.type
-      when :ruby
+      when :ruby, :elixir
         [
           :header,
           :library,
@@ -45,8 +45,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
           :paths,
           :send_report
         ]
+      else
+        raise "Language `#{@runner.language}` not configured for this spec!"
       end
-    expect(@runner.output.sections.keys).to eq(section_keys)
+    expect(@runner.output.sections.keys).to eq(section_keys), @runner.output.to_s
   end
 
   it "prints no 'other' section" do
