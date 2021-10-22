@@ -143,16 +143,14 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the configuration section" do
-    matchers = [
-      /Configuration/,
-      /  Environment: #{quoted("test")}/,
-      /  debug: false/,
-      /  log: #{quoted("file")}/
-    ]
+    matchers = ["Configuration"]
 
     case @runner.type
     when :ruby
       matchers += [
+        /  Environment: #{quoted("test")}/,
+        /  debug: false/,
+        /  log: #{quoted("file")}/,
         /  ignore_actions: \[\]/,
         /  ignore_errors: \[\]/,
         /  ignore_namespaces: \[\]/,
@@ -180,10 +178,42 @@ RSpec.describe "Running the diagnose command without any arguments" do
       ]
     when :nodejs
       matchers += [
+        /  Environment: #{quoted("test")}/,
+        /  debug: false/,
+        /  log: #{quoted("file")}/,
         /  endpoint: #{quoted "https://push.appsignal.com"}/,
         /  ca_file_path: #{quoted ".+\/cacert.pem"}/,
         /  active: true/,
         /  push_api_key: #{quoted "test"}/
+      ]
+    when :elixir
+      matchers += [
+        /  active: true/,
+        /    Sources:/,
+        /      default: false/,
+        /      system:  true/,
+        /  ca_file_path: #{quoted ".+/_build/dev/rel/elixir_diagnose/lib/appsignal-\\d+\\.\\d+\\.\\d+/priv/cacert.pem"}/, # rubocop:disable Layout/LineLength
+        /  debug: false/,
+        /  diagnose_endpoint: #{quoted "https://appsignal.com/diag"}/,
+        /  dns_servers: \[\]/,
+        /  enable_host_metrics: true/,
+        /  enable_minutely_probes: true/,
+        /  endpoint: #{quoted "https://push.appsignal.com"}/,
+        /  env: "dev"/,
+        /  files_world_accessible: true/,
+        /  filter_data_keys: \[\]/,
+        /  filter_parameters: \[\]/,
+        /  filter_session_data: \[\]/,
+        /  ignore_actions: \[\]/,
+        /  ignore_errors: \[\]/,
+        /  ignore_namespaces: \[\]/,
+        /  log: "file"/,
+        /  push_api_key: #{quoted "test"} \(Loaded from env\)/,
+        /  request_headers: \["accept", "accept-charset", "accept-encoding", "accept-language", "cache-control", "connection", "content-length", "path-info", "range", "request-method", "request-uri", "server-name", "server-port", "server-protocol"\]/, # rubocop:disable Layout/LineLength
+        /  send_params: true/,
+        /  skip_session_data: false/,
+        /  transaction_debug_mode: false/,
+        /  valid: true/
       ]
     else
       raise "No clause for runner #{@runner}"
