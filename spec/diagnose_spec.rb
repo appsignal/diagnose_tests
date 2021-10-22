@@ -14,7 +14,7 @@ LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/.freeze
 
 RSpec.describe "Running the diagnose command without any arguments" do
   before(:all) do
-    @runner = init_runner
+    @runner = init_runner(:prompt => "n")
     @runner.run
   end
 
@@ -351,7 +351,7 @@ end
 
 RSpec.describe "Running the diagnose command without install report file" do
   before do
-    @runner = init_runner(:install_report => false)
+    @runner = init_runner(:install_report => false, :prompt => "n")
     @runner.run
   end
 

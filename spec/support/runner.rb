@@ -78,6 +78,7 @@ class Runner
   end
 
   def initialize(options = {})
+    @prompt = options.delete(:prompt)
     @options = options
   end
 
@@ -85,7 +86,7 @@ class Runner
     @options.fetch(:install_report, true)
   end
 
-  def run(arguments = nil)
+  def run(arguments = nil) # rubocop:disable Metrics/MethodLength
     Dir.chdir directory do
       before_setup
       setup_commands.each do |command|
@@ -95,11 +96,12 @@ class Runner
     end
 
     # Run the command
+    prompt = @prompt ? %(echo "#{@prompt}" | ) : ""
     command = [run_command, arguments].compact.join(" ")
     read, write = IO.pipe
     pid = spawn(
       { "APPSIGNAL_PUSH_API_KEY" => "test" },
-      command,
+      "#{prompt} #{command}",
       { [:out, :err] => write, :chdir => directory }
     )
     _pid, status = Process.wait2 pid # Wait until command exits
@@ -167,7 +169,7 @@ class Runner
     end
 
     def run_command
-      "echo 'n' | BUNDLE_GEMFILE=#{File.join(directory, "Gemfile")} " \
+      "BUNDLE_GEMFILE=#{File.join(directory, "Gemfile")} " \
         "bundle exec appsignal diagnose --environment=test"
     end
 
@@ -275,7 +277,7 @@ class Runner
     end
 
     def run_command
-      "echo 'n' | APPSIGNAL_APP_ENV=test node_modules/.bin/appsignal-diagnose"
+      "APPSIGNAL_APP_ENV=test node_modules/.bin/appsignal-diagnose"
     end
 
     def ignored_lines
