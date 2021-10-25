@@ -257,7 +257,8 @@ class Runner
       [
         /==> appsignal/,
         /AppSignal extension installation successful/,
-        /Download time:/
+        /Download time:/,
+        /Dependencies: %{}/
       ]
     end
 

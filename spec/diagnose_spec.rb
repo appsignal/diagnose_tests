@@ -83,28 +83,54 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the extension installation section" do
-    expect_section(
-      :installation,
-      [
-        "Extension installation report",
-        /  Installation result/,
-        /    Status: success/,
-        /  Language details/,
-        /    #{@runner.language_name} version: #{quoted VERSION_PATTERN}/,
-        /  Download details/,
-        /    Download URL: #{quoted %r{https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}}}/,
-        /    Checksum: #{quoted "verified"}/,
-        /  Build details/,
-        /    Install time: #{quoted DATETIME_PATTERN}/,
+    matchers = [
+      "Extension installation report",
+      /  Installation result/,
+      /    Status: success/,
+      /  Language details/,
+      /    #{@runner.language_name} version: #{quoted VERSION_PATTERN}/
+    ]
+
+    matchers << /    OTP version: #{quoted(/\d+/)}/ if @runner.type == :elixir
+
+    matchers += [
+      /  Download details/,
+      /    Download URL: #{quoted %r{https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}}}/
+    ]
+
+    if @runner.type == :elixir
+      matchers += [
         /    Architecture: #{quoted ARCH_PATTERN}/,
         /    Target: #{quoted TARGET_PATTERN}/,
         /    Musl override: #{TRUE_OR_FALSE_PATTERN}/,
         /    Linux ARM override: false/,
-        /    Library type: #{quoted LIBRARY_TYPE_PATTERN}/,
-        /  Host details/,
-        /    Root user: #{TRUE_OR_FALSE_PATTERN}/
+        /    Library type: #{quoted LIBRARY_TYPE_PATTERN}/
       ]
-    )
+    end
+
+    matchers += [
+      /    Checksum: #{quoted "verified"}/,
+      /  Build details/,
+      /    Install time: #{quoted DATETIME_PATTERN}/
+    ]
+
+    if @runner.type == :elixir
+      matchers += [
+        /    Source: #{quoted "remote"}/,
+        /    Agent version: #{quoted REVISION_PATTERN}/
+      ]
+    end
+
+    matchers += [
+      /    Architecture: #{quoted ARCH_PATTERN}/,
+      /    Target: #{quoted TARGET_PATTERN}/,
+      /    Musl override: #{TRUE_OR_FALSE_PATTERN}/,
+      /    Linux ARM override: false/,
+      /    Library type: #{quoted LIBRARY_TYPE_PATTERN}/,
+      /  Host details/,
+      /    Root user: #{TRUE_OR_FALSE_PATTERN}/
+    ]
+    expect_section(:installation, matchers)
   end
 
   it "prints the host information section" do
