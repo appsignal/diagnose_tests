@@ -14,14 +14,14 @@ LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/.freeze
 
 RSpec.describe "Running the diagnose command without any arguments" do
   before(:all) do
-    @runner = init_runner
+    @runner = init_runner(:prompt => "n")
     @runner.run
   end
 
   it "prints all sections in the correct order" do
     section_keys =
       case @runner.type
-      when :ruby
+      when :ruby, :elixir
         [
           :header,
           :library,
@@ -45,8 +45,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
           :paths,
           :send_report
         ]
+      else
+        raise "Language `#{@runner.language}` not configured for this spec!"
       end
-    expect(@runner.output.sections.keys).to eq(section_keys)
+    expect(@runner.output.sections.keys).to eq(section_keys), @runner.output.to_s
   end
 
   it "prints no 'other' section" do
@@ -81,42 +83,75 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the extension installation section" do
-    expect_section(
-      :installation,
-      [
-        "Extension installation report",
-        /  Installation result/,
-        /    Status: success/,
-        /  Language details/,
-        /    #{@runner.language_name} version: #{quoted VERSION_PATTERN}/,
-        /  Download details/,
-        /    Download URL: #{quoted %r{https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}}}/,
-        /    Checksum: #{quoted "verified"}/,
-        /  Build details/,
-        /    Install time: #{quoted DATETIME_PATTERN}/,
+    matchers = [
+      "Extension installation report",
+      /  Installation result/,
+      /    Status: success/,
+      /  Language details/,
+      /    #{@runner.language_name} version: #{quoted VERSION_PATTERN}/
+    ]
+
+    matchers << /    OTP version: #{quoted(/\d+/)}/ if @runner.type == :elixir
+
+    matchers += [
+      /  Download details/,
+      /    Download URL: #{quoted %r{https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}}}/
+    ]
+
+    if @runner.type == :elixir
+      matchers += [
         /    Architecture: #{quoted ARCH_PATTERN}/,
         /    Target: #{quoted TARGET_PATTERN}/,
         /    Musl override: #{TRUE_OR_FALSE_PATTERN}/,
         /    Linux ARM override: false/,
-        /    Library type: #{quoted LIBRARY_TYPE_PATTERN}/,
-        /  Host details/,
-        /    Root user: #{TRUE_OR_FALSE_PATTERN}/
+        /    Library type: #{quoted LIBRARY_TYPE_PATTERN}/
       ]
-    )
+    end
+
+    matchers += [
+      /    Checksum: #{quoted "verified"}/,
+      /  Build details/,
+      /    Install time: #{quoted DATETIME_PATTERN}/
+    ]
+
+    if @runner.type == :elixir
+      matchers += [
+        /    Source: #{quoted "remote"}/,
+        /    Agent version: #{quoted REVISION_PATTERN}/
+      ]
+    end
+
+    matchers += [
+      /    Architecture: #{quoted ARCH_PATTERN}/,
+      /    Target: #{quoted TARGET_PATTERN}/,
+      /    Musl override: #{TRUE_OR_FALSE_PATTERN}/,
+      /    Linux ARM override: false/,
+      /    Library type: #{quoted LIBRARY_TYPE_PATTERN}/,
+      /  Host details/,
+      /    Root user: #{TRUE_OR_FALSE_PATTERN}/
+    ]
+    expect_section(:installation, matchers)
   end
 
   it "prints the host information section" do
-    expect_section(
-      :host,
-      [
-        /Host information/,
-        /  Architecture: #{quoted ARCH_PATTERN}/,
-        /  Operating System: #{quoted TARGET_PATTERN}/,
-        /  #{@runner.language_name} version: #{quoted VERSION_PATTERN}/,
-        /  Root user: #{TRUE_OR_FALSE_PATTERN}/,
-        /  Running in container: #{TRUE_OR_FALSE_PATTERN}/
-      ]
-    )
+    architecture =
+      if @runner.type == :elixir
+        /#{ARCH_PATTERN}-.+/
+      else
+        ARCH_PATTERN
+      end
+    matchers = [
+      /Host information/,
+      /  Architecture: #{quoted architecture}/,
+      /  Operating System: #{quoted TARGET_PATTERN}/,
+      /  #{@runner.language_name} version: #{quoted VERSION_PATTERN}/
+    ]
+    matchers << /  OTP version: #{quoted(/\d+/)}/ if @runner.type == :elixir
+    matchers += [
+      /  Root user: #{TRUE_OR_FALSE_PATTERN}/,
+      /  Running in container: #{TRUE_OR_FALSE_PATTERN}/
+    ]
+    expect_section(:host, matchers)
   end
 
   it "prints the agent diagnostics section" do
@@ -143,16 +178,14 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the configuration section" do
-    matchers = [
-      /Configuration/,
-      /  Environment: #{quoted("test")}/,
-      /  debug: false/,
-      /  log: #{quoted("file")}/
-    ]
+    matchers = ["Configuration"]
 
     case @runner.type
     when :ruby
       matchers += [
+        /  Environment: #{quoted("test")}/,
+        /  debug: false/,
+        /  log: #{quoted("file")}/,
         /  ignore_actions: \[\]/,
         /  ignore_errors: \[\]/,
         /  ignore_namespaces: \[\]/,
@@ -180,10 +213,42 @@ RSpec.describe "Running the diagnose command without any arguments" do
       ]
     when :nodejs
       matchers += [
+        /  Environment: #{quoted("test")}/,
+        /  debug: false/,
+        /  log: #{quoted("file")}/,
         /  endpoint: #{quoted "https://push.appsignal.com"}/,
         /  ca_file_path: #{quoted ".+\/cacert.pem"}/,
         /  active: true/,
         /  push_api_key: #{quoted "test"}/
+      ]
+    when :elixir
+      matchers += [
+        /  active: true/,
+        /    Sources:/,
+        /      default: false/,
+        /      system:  true/,
+        /  ca_file_path: #{quoted ".+/_build/dev/rel/elixir_diagnose/lib/appsignal-\\d+\\.\\d+\\.\\d+/priv/cacert.pem"}/, # rubocop:disable Layout/LineLength
+        /  debug: false/,
+        /  diagnose_endpoint: #{quoted "https://appsignal.com/diag"}/,
+        /  dns_servers: \[\]/,
+        /  enable_host_metrics: true/,
+        /  enable_minutely_probes: true/,
+        /  endpoint: #{quoted "https://push.appsignal.com"}/,
+        /  env: "dev"/,
+        /  files_world_accessible: true/,
+        /  filter_data_keys: \[\]/,
+        /  filter_parameters: \[\]/,
+        /  filter_session_data: \[\]/,
+        /  ignore_actions: \[\]/,
+        /  ignore_errors: \[\]/,
+        /  ignore_namespaces: \[\]/,
+        /  log: "file"/,
+        /  push_api_key: #{quoted "test"} \(Loaded from env\)/,
+        /  request_headers: \["accept", "accept-charset", "accept-encoding", "accept-language", "cache-control", "connection", "content-length", "path-info", "range", "request-method", "request-uri", "server-name", "server-port", "server-protocol"\]/, # rubocop:disable Layout/LineLength
+        /  send_params: true/,
+        /  skip_session_data: false/,
+        /  transaction_debug_mode: false/,
+        /  valid: true/
       ]
     else
       raise "No clause for runner #{@runner}"
@@ -202,7 +267,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       :validation,
       [
         "Validation",
-        "  Validating Push API key: \e[31minvalid\e[0m"
+        /  Validating Push API key: (\e\[31m)?invalid(\e\[0m)?/
       ]
     )
   end
@@ -215,7 +280,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         %(  AppSignal gem path),
         /    Path: #{quoted(PATH_PATTERN)}/,
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: true \(file: \w+:\d+, process: \w+:\d+\)/,
+        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/,
         ""
       ]
     end
@@ -225,10 +290,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /    Path: #{quoted(PATH_PATTERN)}/
     ]
 
-    if @runner.type == :ruby
+    if [:ruby, :elixir].include? @runner.type
       matchers += [
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\)/
+        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/
       ]
     end
     matchers += [""]
@@ -238,7 +303,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         %(  Root path),
         /    Path: #{quoted(PATH_PATTERN)}/,
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\)/,
+        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/,
         ""
       ]
     end
@@ -248,10 +313,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /    Path: #{quoted(PATH_PATTERN)}/
     ]
 
-    if @runner.type == :ruby
+    if [:ruby, :elixir].include? @runner.type
       matchers += [
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\)/
+        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/
       ]
     end
     matchers += [""]
@@ -270,10 +335,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /    Path: #{quoted(PATH_PATTERN)}/
     ]
 
-    if @runner.type == :ruby
+    if [:ruby, :elixir].include? @runner.type
       matchers += [
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: \w+:\d+, process: \w+:\d+\)/
+        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/
       ]
     end
 
@@ -304,8 +369,8 @@ end
 
 RSpec.describe "Running the diagnose command with the --no-send-report option" do
   before do
-    @runner = init_runner
-    @runner.run("--no-send-report")
+    @runner = init_runner(:args => ["--no-send-report"])
+    @runner.run
   end
 
   it "does not ask to send the report" do
@@ -319,18 +384,29 @@ end
 
 RSpec.describe "Running the diagnose command without install report file" do
   before do
-    @runner = init_runner(:install_report => false)
+    @runner = init_runner(:install_report => false, :prompt => "n")
     @runner.run
   end
 
   it "prints handled errors instead of the report" do
-    expect_section(
-      :installation,
-      [
-        "Extension installation report",
+    matchers = ["Extension installation report"]
+    case @runner.type
+    when :ruby, :nodejs
+      matchers += [
         "  Error found while parsing the report.",
         /^  Error: .* [nN]o such file or directory.*install\.report/
       ]
-    )
+    when :elixir
+      matchers += [
+        "  Error found while parsing the download report.",
+        "  Error: :enoent",
+        "  Error found while parsing the installation report.",
+        "  Error: :enoent"
+      ]
+    else
+      raise "No match found for runner #{@runner.type}"
+    end
+
+    expect_section(:installation, matchers)
   end
 end

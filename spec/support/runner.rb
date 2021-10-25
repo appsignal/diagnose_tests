@@ -78,6 +78,8 @@ class Runner
   end
 
   def initialize(options = {})
+    @prompt = options.delete(:prompt)
+    @arguments = options.delete(:args) { [] }
     @options = options
   end
 
@@ -85,7 +87,7 @@ class Runner
     @options.fetch(:install_report, true)
   end
 
-  def run(arguments = nil)
+  def run # rubocop:disable Metrics/MethodLength
     Dir.chdir directory do
       before_setup
       setup_commands.each do |command|
@@ -95,11 +97,12 @@ class Runner
     end
 
     # Run the command
-    command = [run_command, arguments].compact.join(" ")
+    prompt = @prompt ? %(echo "#{@prompt}" | ) : ""
+    command = run_command
     read, write = IO.pipe
     pid = spawn(
       { "APPSIGNAL_PUSH_API_KEY" => "test" },
-      command,
+      "#{prompt} #{command}",
       { [:out, :err] => write, :chdir => directory }
     )
     _pid, status = Process.wait2 pid # Wait until command exits
@@ -167,8 +170,9 @@ class Runner
     end
 
     def run_command
-      "echo 'n' | BUNDLE_GEMFILE=#{File.join(directory, "Gemfile")} " \
-        "bundle exec appsignal diagnose --environment=test"
+      arguments = ["--environment=test"] + @arguments
+      "BUNDLE_GEMFILE=#{File.join(directory, "Gemfile")} " \
+        "bundle exec appsignal diagnose #{arguments.join(" ")}"
     end
 
     def ignored_lines
@@ -237,19 +241,24 @@ class Runner
     end
 
     def setup_commands
-      ["mix do deps.get, deps.compile, compile"]
+      [
+        "mix deps.get",
+        "mix release --overwrite"
+      ]
     end
 
     def run_command
-      "mix appsignal.diagnose"
+      arguments = @arguments.map { |a| %("#{a}") }.join(" ")
+      "_build/dev/rel/elixir_diagnose/bin/elixir_diagnose " \
+        "eval ':appsignal_tasks.diagnose([#{arguments}])'"
     end
 
     def ignored_lines
       [
         /==> appsignal/,
         /AppSignal extension installation successful/,
-        /OTP version: "\d+"/,
-        /Download time:/
+        /Download time:/,
+        /Dependencies: %{}/
       ]
     end
 
@@ -259,6 +268,82 @@ class Runner
 
     def language_name
       "Elixir"
+    end
+
+    def before_setup
+      # Placeholder
+    end
+
+    def after_setup
+      priv_dir = Dir.glob(
+        "_build/dev/rel/elixir_diagnose/lib/appsignal-*.*.*/priv/",
+        :base => File.join(project_path, "elixir")
+      ).first
+      raise "No Elixir package priv dir found!" unless priv_dir
+
+      download_report_path = File.join(priv_dir, "download.report")
+      install_report_path = File.join(priv_dir, "install.report")
+      if install_report?
+        # Overwite created install report so we have a consistent test environment
+        File.write(download_report_path, download_report)
+        File.write(install_report_path, install_report)
+      else
+        File.delete(download_report_path) if File.exist?(download_report_path)
+        File.delete(install_report_path) if File.exist?(install_report_path)
+      end
+
+      File.write("/tmp/appsignal.log", appsignal_log)
+    end
+
+    def download_report
+      <<~REPORT
+        {
+          "download": {
+            "architecture": "x86_64",
+            "checksum": "verified",
+            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/7376537/appsignal-x86_64-darwin-all-static.tar.gz",
+            "library_type": "static",
+            "linux_arm_override": false,
+            "musl_override": false,
+            "target": "darwin",
+            "time": "2021-10-19T08:35:03.854017Z"
+          }
+        }
+      REPORT
+    end
+
+    def install_report
+      <<~REPORT
+        {
+          "build": {
+            "agent_version": "7376537",
+            "architecture": "x86_64",
+            "library_type": "static",
+            "linux_arm_override": false,
+            "musl_override": false,
+            "package_path": "/appsignal-elixir/_build/dev/lib/appsignal/priv",
+            "source": "remote",
+            "target": "darwin",
+            "time": "2021-10-19T08:35:03.854017Z"
+          },
+          "download": {
+            "checksum": "verified",
+            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/7376537/appsignal-x86_64-darwin-all-static.tar.gz"
+          },
+          "host": {
+            "dependencies": {},
+            "root_user": false
+          },
+          "language": {
+            "name": "elixir",
+            "otp_version": "23",
+            "version": "1.11.3"
+          },
+          "result": {
+            "status": "success"
+          }
+        }
+      REPORT
     end
   end
 
@@ -275,7 +360,7 @@ class Runner
     end
 
     def run_command
-      "echo 'n' | APPSIGNAL_APP_ENV=test node_modules/.bin/appsignal-diagnose"
+      "APPSIGNAL_APP_ENV=test node_modules/.bin/appsignal-diagnose #{@arguments.join(" ")}"
     end
 
     def ignored_lines
