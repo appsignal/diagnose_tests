@@ -134,9 +134,15 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the host information section" do
+    architecture =
+      if @runner.type == :elixir
+        /#{ARCH_PATTERN}-.+/
+      else
+        ARCH_PATTERN
+      end
     matchers = [
       /Host information/,
-      /  Architecture: #{quoted ARCH_PATTERN}/,
+      /  Architecture: #{quoted architecture}/,
       /  Operating System: #{quoted TARGET_PATTERN}/,
       /  #{@runner.language_name} version: #{quoted VERSION_PATTERN}/
     ]
