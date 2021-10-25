@@ -108,17 +108,18 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the host information section" do
-    expect_section(
-      :host,
-      [
-        /Host information/,
-        /  Architecture: #{quoted ARCH_PATTERN}/,
-        /  Operating System: #{quoted TARGET_PATTERN}/,
-        /  #{@runner.language_name} version: #{quoted VERSION_PATTERN}/,
-        /  Root user: #{TRUE_OR_FALSE_PATTERN}/,
-        /  Running in container: #{TRUE_OR_FALSE_PATTERN}/
-      ]
-    )
+    matchers = [
+      /Host information/,
+      /  Architecture: #{quoted ARCH_PATTERN}/,
+      /  Operating System: #{quoted TARGET_PATTERN}/,
+      /  #{@runner.language_name} version: #{quoted VERSION_PATTERN}/
+    ]
+    matchers << /  OTP version: #{quoted(/\d+/)}/ if @runner.type == :elixir
+    matchers += [
+      /  Root user: #{TRUE_OR_FALSE_PATTERN}/,
+      /  Running in container: #{TRUE_OR_FALSE_PATTERN}/
+    ]
+    expect_section(:host, matchers)
   end
 
   it "prints the agent diagnostics section" do

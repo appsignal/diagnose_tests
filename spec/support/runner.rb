@@ -257,7 +257,6 @@ class Runner
       [
         /==> appsignal/,
         /AppSignal extension installation successful/,
-        /OTP version: "\d+"/,
         /Download time:/
       ]
     end
