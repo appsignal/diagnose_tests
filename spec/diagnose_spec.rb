@@ -233,6 +233,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  dns_servers: \[\]/,
         /  enable_host_metrics: true/,
         /  enable_minutely_probes: true/,
+        /  enable_statsd: false/,
         /  endpoint: #{quoted "https://push.appsignal.com"}/,
         /  env: "dev"/,
         /  files_world_accessible: true/,
