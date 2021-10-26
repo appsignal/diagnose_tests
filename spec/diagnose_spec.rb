@@ -20,34 +20,17 @@ RSpec.describe "Running the diagnose command without any arguments" do
 
   it "prints all sections in the correct order" do
     section_keys =
-      case @runner.type
-      when :ruby, :elixir
-        [
-          :header,
-          :library,
-          :installation,
-          :host,
-          :agent,
-          :config,
-          :validation,
-          :paths,
-          :send_report
-        ]
-      when :nodejs
-        [
-          :header,
-          :library,
-          :installation,
-          :host,
-          # TODO: Add agent section for Node.js
-          :config,
-          :validation,
-          :paths,
-          :send_report
-        ]
-      else
-        raise "Language `#{@runner.language}` not configured for this spec!"
-      end
+      [
+        :header,
+        :library,
+        :installation,
+        :host,
+        :agent,
+        :config,
+        :validation,
+        :paths,
+        :send_report
+      ]
     expect(@runner.output.sections.keys).to eq(section_keys), @runner.output.to_s
   end
 
@@ -155,8 +138,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the agent diagnostics section" do
-    skip if @runner.instance_of?(Runner::Nodejs)
-
     expect_section(
       :agent,
       [
