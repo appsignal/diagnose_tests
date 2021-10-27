@@ -20,34 +20,17 @@ RSpec.describe "Running the diagnose command without any arguments" do
 
   it "prints all sections in the correct order" do
     section_keys =
-      case @runner.type
-      when :ruby, :elixir
-        [
-          :header,
-          :library,
-          :installation,
-          :host,
-          :agent,
-          :config,
-          :validation,
-          :paths,
-          :send_report
-        ]
-      when :nodejs
-        [
-          :header,
-          :library,
-          :installation,
-          :host,
-          # TODO: Add agent section for Node.js
-          :config,
-          :validation,
-          :paths,
-          :send_report
-        ]
-      else
-        raise "Language `#{@runner.language}` not configured for this spec!"
-      end
+      [
+        :header,
+        :library,
+        :installation,
+        :host,
+        :agent,
+        :config,
+        :validation,
+        :paths,
+        :send_report
+      ]
     expect(@runner.output.sections.keys).to eq(section_keys), @runner.output.to_s
   end
 
@@ -155,8 +138,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the agent diagnostics section" do
-    skip if @runner.instance_of?(Runner::Nodejs)
-
     expect_section(
       :agent,
       [
@@ -409,5 +390,34 @@ RSpec.describe "Running the diagnose command without install report file" do
     end
 
     expect_section(:installation, matchers)
+  end
+end
+
+RSpec.describe "Running the diagnose command without Push API key" do
+  before do
+    @runner = init_runner(:push_api_key => "", :prompt => "n")
+    @runner.run
+  end
+
+  it "prints agent diagnose section with errors" do
+    expect_section(
+      :agent,
+      [
+        /Agent diagnostics/,
+        /  Extension tests/,
+        /  Configuration: invalid/,
+        /     Error: RequiredEnvVarNotPresent\("_APPSIGNAL_PUSH_API_KEY"\)/,
+        /  Agent tests/,
+        /    Started: -/,
+        /    Process user id: -/,
+        /    Process user group id: -/,
+        /    Configuration: -/,
+        /    Logger: -/,
+        /    Working directory user id: -/,
+        /    Working directory user group id: -/,
+        /    Working directory permissions: -/,
+        /    Lock path: -/
+      ]
+    )
   end
 end
