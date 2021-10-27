@@ -391,3 +391,32 @@ RSpec.describe "Running the diagnose command without install report file" do
     expect_section(:installation, matchers)
   end
 end
+
+RSpec.describe "Running the diagnose command without Push API key" do
+  before do
+    @runner = init_runner(:push_api_key => "", :prompt => "n")
+    @runner.run
+  end
+
+  it "prints agent diagnose section with errors" do
+    expect_section(
+      :agent,
+      [
+        /Agent diagnostics/,
+        /  Extension tests/,
+        /  Configuration: invalid/,
+        /     Error: RequiredEnvVarNotPresent\("_APPSIGNAL_PUSH_API_KEY"\)/,
+        /  Agent tests/,
+        /    Started: -/,
+        /    Process user id: -/,
+        /    Process user group id: -/,
+        /    Configuration: -/,
+        /    Logger: -/,
+        /    Working directory user id: -/,
+        /    Working directory user group id: -/,
+        /    Working directory permissions: -/,
+        /    Lock path: -/
+      ]
+    )
+  end
+end

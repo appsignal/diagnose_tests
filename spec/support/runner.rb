@@ -81,6 +81,7 @@ class Runner
     @prompt = options.delete(:prompt)
     @arguments = options.delete(:args) { [] }
     @options = options
+    @push_api_key = options.fetch(:push_api_key, "test")
   end
 
   def install_report?
@@ -101,7 +102,7 @@ class Runner
     command = run_command
     read, write = IO.pipe
     pid = spawn(
-      { "APPSIGNAL_PUSH_API_KEY" => "test" },
+      { "APPSIGNAL_PUSH_API_KEY" => @push_api_key },
       "#{prompt} #{command}",
       { [:out, :err] => write, :chdir => directory }
     )
