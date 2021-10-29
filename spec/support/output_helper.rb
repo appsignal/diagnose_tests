@@ -5,7 +5,7 @@ module OutputHelper
     @runner.output.section(key)
   end
 
-  def expect_section(section_key, expected)
+  def expect_output_for(section_key, expected)
     actual_section = section(section_key)
     section_lines = actual_section.split("\n")
     unless section_lines.length == expected.length

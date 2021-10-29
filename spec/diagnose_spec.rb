@@ -53,7 +53,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the library section" do
-    expect_section(
+    expect_output_for(
       :library,
       [
         /AppSignal library/,
@@ -113,7 +113,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /  Host details/,
       /    Root user: #{TRUE_OR_FALSE_PATTERN}/
     ]
-    expect_section(:installation, matchers)
+    expect_output_for(:installation, matchers)
   end
 
   it "prints the host information section" do
@@ -134,11 +134,11 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /  Root user: #{TRUE_OR_FALSE_PATTERN}/,
       /  Running in container: #{TRUE_OR_FALSE_PATTERN}/
     ]
-    expect_section(:host, matchers)
+    expect_output_for(:host, matchers)
   end
 
   it "prints the agent diagnostics section" do
-    expect_section(
+    expect_output_for(
       :agent,
       [
         /Agent diagnostics/,
@@ -241,11 +241,11 @@ RSpec.describe "Running the diagnose command without any arguments" do
       "Read more about how the diagnose config output is rendered",
       "https://docs.appsignal.com/#{@runner.type}/command-line/diagnose.html"
     ]
-    expect_section(:config, matchers)
+    expect_output_for(:config, matchers)
   end
 
   it "prints the validation section" do
-    expect_section(
+    expect_output_for(
       :validation,
       [
         "Validation",
@@ -328,11 +328,11 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /    Contents \(last 10 lines\):/
     ] + Array.new(10).map { LOG_LINE_PATTERN })
 
-    expect_section(:paths, matchers)
+    expect_output_for(:paths, matchers)
   end
 
   it "prints the diagnostics report section" do
-    expect_section(
+    expect_output_for(
       :send_report,
       [
         "Diagnostics report",
@@ -389,7 +389,7 @@ RSpec.describe "Running the diagnose command without install report file" do
       raise "No match found for runner #{@runner.type}"
     end
 
-    expect_section(:installation, matchers)
+    expect_output_for(:installation, matchers)
   end
 end
 
@@ -400,7 +400,7 @@ RSpec.describe "Running the diagnose command without Push API key" do
   end
 
   it "prints agent diagnose section with errors" do
-    expect_section(
+    expect_output_for(
       :agent,
       [
         /Agent diagnostics/,
