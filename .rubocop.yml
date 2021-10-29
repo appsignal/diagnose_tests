@@ -64,3 +64,6 @@ Metrics/MethodLength:
   Max: 25
   Exclude:
     - Rakefile
+
+Bundler/OrderedGems:
+  Enabled: false
