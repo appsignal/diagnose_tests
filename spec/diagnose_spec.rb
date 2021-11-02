@@ -160,7 +160,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
         "target" => TARGET_PATTERN,
         "musl_override" => false,
         "linux_arm_override" => false,
-        "library_type" => "static"
+        "library_type" => "static",
+        "source" => "remote",
+        "dependencies" => {},
+        "flags" => {}
       },
       "host" => {
         "dependencies" => {},
@@ -346,7 +349,55 @@ RSpec.describe "Running the diagnose command without any arguments" do
   it "submitted report contains configuration section" do
     expected_report_section =
       case @runner.type
-      when :ruby, :elixir
+      when :ruby
+        {
+          "options" => {
+            "active" => true,
+            "ca_file_path" => matching(%r{.+/appsignal[-/]ruby/resources/cacert\.pem$}),
+            "debug" => false,
+            "dns_servers" => [],
+            "enable_allocation_tracking" => true,
+            "enable_gc_instrumentation" => false,
+            "enable_host_metrics" => true,
+            "enable_minutely_probes" => true,
+            "enable_statsd" => true,
+            "endpoint" => "https://push.appsignal.com",
+            "env" => "test",
+            "files_world_accessible" => true,
+            "filter_parameters" => [],
+            "filter_session_data" => [],
+            "ignore_actions" => [],
+            "ignore_errors" => [],
+            "ignore_namespaces" => [],
+            "instrument_net_http" => true,
+            "instrument_redis" => true,
+            "instrument_sequel" => true,
+            "log" => "file",
+            "push_api_key" => "test",
+            "request_headers" => [
+              "HTTP_ACCEPT",
+              "HTTP_ACCEPT_CHARSET",
+              "HTTP_ACCEPT_ENCODING",
+              "HTTP_ACCEPT_LANGUAGE",
+              "HTTP_CACHE_CONTROL",
+              "HTTP_CONNECTION",
+              "CONTENT_LENGTH",
+              "PATH_INFO",
+              "HTTP_RANGE",
+              "REQUEST_METHOD",
+              "REQUEST_URI",
+              "SERVER_NAME",
+              "SERVER_PORT",
+              "SERVER_PROTOCOL"
+            ],
+            "send_environment_metadata" => true,
+            "send_params" => true,
+            "skip_session_data" => false,
+            "transaction_debug_mode" => false
+          },
+          "sources" => kind_of(Hash) # TODO: make separate spec for this?
+        }
+      when :elixir
         # TODO
         raise "Report matchers missing"
       when :nodejs
@@ -465,56 +516,72 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "submitted report contains paths section" do
+    default_paths = {
+      "appsignal.log" => {
+        "content" => including(
+          "[2021-06-14T13:44:22 (process) #49713][INFO] Starting AppSignal diagnose",
+          "[2021-06-14T13:50:02 (process) #51074][INFO] Starting AppSignal diagnose",
+          "[2021-06-14T13:51:54 (process) #51823][INFO] Starting AppSignal diagnose",
+          "[2021-06-14T13:52:07 (process) #52200][INFO] Starting AppSignal diagnose",
+          "[2021-06-14T13:53:03 (process) #52625][INFO] Starting AppSignal diagnose",
+          "[2021-06-14T13:55:20 (process) #53396][INFO] Starting AppSignal diagnose",
+          "[2021-06-14T13:59:10 (process) #53880][INFO] Starting AppSignal diagnose",
+          "[2021-06-14T14:05:53 (process) #54792][INFO] Starting AppSignal diagnose",
+          "[2021-06-14T14:11:37 (process) #55323][INFO] Starting AppSignal diagnose"
+        ),
+        "exists" => true,
+        "mode" => kind_of(String),
+        "ownership" => path_ownership(@runner.type),
+        "path" => ending_with("/appsignal.log"),
+        "type" => "file",
+        "writable" => true
+      },
+      "log_dir_path" => {
+        "exists" => true,
+        "mode" => kind_of(String),
+        "ownership" => path_ownership(@runner.type),
+        "path" => ending_with("/tmp"),
+        "type" => "directory",
+        "writable" => true
+      },
+      "working_dir" => {
+        "exists" => true,
+        "mode" => kind_of(String),
+        "ownership" => path_ownership(@runner.type),
+        "path" => match(PATH_PATTERN),
+        "type" => "directory",
+        "writable" => true
+      }
+    }
+
     matchers =
       case @runner.type
       when :nodejs
-        {
-          "appsignal.log" => {
-            "content" => including(
-              "[2021-06-14T13:44:22 (process) #49713][INFO] Starting AppSignal diagnose",
-              "[2021-06-14T13:50:02 (process) #51074][INFO] Starting AppSignal diagnose",
-              "[2021-06-14T13:51:54 (process) #51823][INFO] Starting AppSignal diagnose",
-              "[2021-06-14T13:52:07 (process) #52200][INFO] Starting AppSignal diagnose",
-              "[2021-06-14T13:53:03 (process) #52625][INFO] Starting AppSignal diagnose",
-              "[2021-06-14T13:55:20 (process) #53396][INFO] Starting AppSignal diagnose",
-              "[2021-06-14T13:59:10 (process) #53880][INFO] Starting AppSignal diagnose",
-              "[2021-06-14T14:05:53 (process) #54792][INFO] Starting AppSignal diagnose",
-              "[2021-06-14T14:11:37 (process) #55323][INFO] Starting AppSignal diagnose"
-            ),
-            "exists" => true,
-            "mode" => kind_of(Numeric),
-            "ownership" => {
-              "gid" => kind_of(Numeric),
-              "uid" => kind_of(Numeric)
-            },
-            "path" => "/tmp/appsignal.log",
-            "type" => "file",
-            "writable" => true
+        default_paths
+      when :ruby
+        default_paths.merge(
+          "ext/mkmf.log" => {
+            "exists" => false,
+            "path" => ending_with("ext/mkmf.log")
           },
-          "log_dir_path" => {
+          "package_install_path" => { # TODO: Add this to Node.js as well
             "exists" => true,
-            "mode" => kind_of(Numeric),
-            "ownership" => {
-              "gid" => kind_of(Numeric),
-              "uid" => kind_of(Numeric)
-            },
-            "path" => "/tmp",
+            "mode" => kind_of(String),
+            "ownership" => path_ownership(@runner.type),
+            "path" => ending_with("ruby"),
             "type" => "directory",
             "writable" => true
           },
-          "working_dir" => {
+          "root_path" => { # TODO: Add this to Node.js as well
             "exists" => true,
-            "mode" => kind_of(Numeric),
-            "ownership" => {
-              "gid" => kind_of(Numeric),
-              "uid" => kind_of(Numeric)
-            },
-            "path" => match(PATH_PATTERN),
+            "mode" => kind_of(String),
+            "ownership" => path_ownership(@runner.type),
+            "path" => @runner.directory,
             "type" => "directory",
             "writable" => true
           }
-        }
-      when :ruby, :elixir
+        )
+      when :elixir
         # TODO
         raise "Report matchers missing"
       else
@@ -534,8 +601,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
         "  You can also contact us at support@appsignal.com",
         "  with your support token.",
         "",
-        "  Send diagnostics report to AppSignal? (Y/n):   Your support token: diag_support_token",
-        "  View this report: https://appsignal.com/diagnose/diag_support_token"
+        "  Send diagnostics report to AppSignal? (Y/n):   Transmitting diagnostics report",
+        "",
+        "  Your support token: diag_support_token",
+        "  View this report:   https://appsignal.com/diagnose/diag_support_token"
       ]
     )
   end
@@ -582,7 +651,7 @@ RSpec.describe "Running the diagnose command with the --send-report option" do
     expect(send_report).to_not include("Send diagnostics report to AppSignal?")
     expect(send_report).to include(
       "  Your support token: diag_support_token",
-      "  View this report: https://appsignal.com/diagnose/diag_support_token"
+      "  View this report:   https://appsignal.com/diagnose/diag_support_token"
     )
   end
 
@@ -643,11 +712,18 @@ RSpec.describe "Running the diagnose command without install report file" do
   it "submitted report contains install report errors" do
     matchers =
       case @runner.type
-      when :ruby, :nodejs
+      when :nodejs
         {
           "parsing_error" => {
             "backtrace" => kind_of(Array),
-            "error" => match(/Error: ENOENT: [nN]o such file or directory.*install\.report/)
+            "error" => match(/Error: ENOENT: no such file or directory.*install\.report/)
+          }
+        }
+      when :ruby
+        {
+          "parsing_error" => {
+            "backtrace" => kind_of(Array),
+            "error" => match(/Errno::ENOENT: No such file or directory.*install\.report/)
           }
         }
       when :elixir
@@ -690,25 +766,16 @@ RSpec.describe "Running the diagnose command without Push API key" do
   end
 
   it "submitted report contains agent diagnostics errors" do
-    matchers =
-      case @runner.type
-      when :nodejs
-        {
-          "extension" => {
-            "config" => {
-              "valid" => {
-                "error" => "RequiredEnvVarNotPresent(\"_APPSIGNAL_PUSH_API_KEY\")",
-                "result" => false
-              }
-            }
+    expect_report_for(
+      :agent,
+      "extension" => {
+        "config" => {
+          "valid" => {
+            "error" => "RequiredEnvVarNotPresent(\"_APPSIGNAL_PUSH_API_KEY\")",
+            "result" => false
           }
         }
-      when :ruby, :elixir
-        # TODO
-        raise "Report matchers missing"
-      else
-        raise "No clause for runner #{@runner}"
-      end
-    expect_report_for(:agent, matchers)
+      }
+    )
   end
 end

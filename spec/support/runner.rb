@@ -214,6 +214,7 @@ class Runner
         result:
           status: success
         language:
+          name: ruby
           implementation: ruby
           version: 2.7.0-p83
         download:
