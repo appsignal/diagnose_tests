@@ -39,7 +39,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
   it "submitted report contains all keys" do
     expect(@received_report.to_h.keys).to contain_exactly(
       "agent",
-      "app",
       "config",
       "host",
       "installation",
