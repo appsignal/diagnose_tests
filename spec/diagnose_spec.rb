@@ -7,6 +7,7 @@ TARGET_PATTERN = /(darwin\d*|linux(-gnu|-musl)?|freebsd)/.freeze
 LIBRARY_TYPE_PATTERN = /static|dynamic/.freeze
 TAR_FILENAME_PATTERN =
   /appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz/.freeze
+DOWNLOAD_URL = %r{https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}}.freeze
 DATETIME_PATTERN = /\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}( ?UTC|.\d+Z)?/.freeze
 TRUE_OR_FALSE_PATTERN = /true|false/.freeze
 PATH_PATTERN = %r{[/\w.-]+}.freeze
@@ -14,8 +15,9 @@ LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/.freeze
 
 RSpec.describe "Running the diagnose command without any arguments" do
   before(:all) do
-    @runner = init_runner(:prompt => "n")
+    @runner = init_runner(:prompt => "y")
     @runner.run
+    @received_report = DiagnoseServer.last_received_report
   end
 
   it "prints all sections in the correct order" do
@@ -32,6 +34,19 @@ RSpec.describe "Running the diagnose command without any arguments" do
         :send_report
       ]
     expect(@runner.output.sections.keys).to eq(section_keys), @runner.output.to_s
+  end
+
+  it "submitted report contains all keys" do
+    expect(@received_report.to_h.keys).to contain_exactly(
+      "agent",
+      "config",
+      "host",
+      "installation",
+      "library",
+      "paths",
+      "process",
+      "validation"
+    )
   end
 
   it "prints no 'other' section" do
@@ -53,7 +68,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the library section" do
-    expect_section(
+    expect_output_for(
       :library,
       [
         /AppSignal library/,
@@ -62,6 +77,16 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  Agent version: #{quoted REVISION_PATTERN}/,
         /  (Extension|Nif) loaded: true/
       ]
+    )
+  end
+
+  it "submitted report contains library section" do
+    expect_report_for(
+      :library,
+      "language" => @runner.type.to_s,
+      "agent_version" => REVISION_PATTERN,
+      "package_version" => VERSION_PATTERN,
+      "extension_loaded" => true
     )
   end
 
@@ -78,7 +103,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
 
     matchers += [
       /  Download details/,
-      /    Download URL: #{quoted %r{https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}}}/
+      /    Download URL: #{quoted DOWNLOAD_URL}/
     ]
 
     if @runner.type == :elixir
@@ -113,7 +138,35 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /  Host details/,
       /    Root user: #{TRUE_OR_FALSE_PATTERN}/
     ]
-    expect_section(:installation, matchers)
+    expect_output_for(:installation, matchers)
+  end
+
+  it "submitted report contains extension installation section" do
+    expect_report_for(
+      :installation,
+      "result" => { "status" => "success" },
+      "language" => {
+        "name" => @runner.type.to_s,
+        "version" => VERSION_PATTERN,
+        "implementation" => be_kind_of(String)
+      },
+      "download" => {
+        "checksum" => "verified",
+        "download_url" => DOWNLOAD_URL
+      },
+      "build" => {
+        "time" => DATETIME_PATTERN,
+        "architecture" => ARCH_PATTERN,
+        "target" => TARGET_PATTERN,
+        "musl_override" => false,
+        "linux_arm_override" => false,
+        "library_type" => "static"
+      },
+      "host" => {
+        "dependencies" => {},
+        "root_user" => false
+      }
+    )
   end
 
   it "prints the host information section" do
@@ -134,11 +187,23 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /  Root user: #{TRUE_OR_FALSE_PATTERN}/,
       /  Running in container: #{TRUE_OR_FALSE_PATTERN}/
     ]
-    expect_section(:host, matchers)
+    expect_output_for(:host, matchers)
+  end
+
+  it "submitted report contains host section" do
+    expect_report_for(
+      :host,
+      "architecture" => ARCH_PATTERN,
+      "heroku" => false,
+      "language_version" => VERSION_PATTERN,
+      "os" => TARGET_PATTERN,
+      "root" => false,
+      "running_in_container" => boolean
+    )
   end
 
   it "prints the agent diagnostics section" do
-    expect_section(
+    expect_output_for(
       :agent,
       [
         /Agent diagnostics/,
@@ -155,6 +220,40 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /    Working directory permissions: \d+/,
         /    Lock path: writable/
       ]
+    )
+  end
+
+  it "submitted report contains agent diagnostics section" do
+    expect_report_for(
+      :agent,
+      "agent" => {
+        "boot" => {
+          "started" => { "result" => true }
+        },
+        "config" => {
+          "valid" => { "result" => true }
+        },
+        "host" => {
+          "gid" => { "result" => kind_of(Numeric) },
+          "uid" => { "result" => kind_of(Numeric) }
+        },
+        "lock_path" => {
+          "created" => { "result" => true }
+        },
+        "logger" => {
+          "started" => { "result" => true }
+        },
+        "working_directory_stat" => {
+          "gid" => { "result" => kind_of(Numeric) },
+          "mode" => { "result" => kind_of(Numeric) },
+          "uid" => { "result" => kind_of(Numeric) }
+        }
+      },
+      "extension" => {
+        "config" => {
+          "valid" => { "result" => true }
+        }
+      }
     )
   end
 
@@ -241,16 +340,50 @@ RSpec.describe "Running the diagnose command without any arguments" do
       "Read more about how the diagnose config output is rendered",
       "https://docs.appsignal.com/#{@runner.type}/command-line/diagnose.html"
     ]
-    expect_section(:config, matchers)
+    expect_output_for(:config, matchers)
+  end
+
+  it "submitted report contains configuration section" do
+    expected_report_section =
+      case @runner.type
+      when :ruby, :elixir
+        # TODO
+        raise "Report matchers missing"
+      when :nodejs
+        {
+          "options" => {
+            "active" => true,
+            "ca_file_path" => ending_with("cert/cacert.pem"),
+            "debug" => false,
+            "endpoint" => "https://push.appsignal.com",
+            "env" => "test",
+            "log" => "file",
+            "log_path" => "/tmp",
+            "push_api_key" => "test",
+            "undefined" => "/tmp/appsignal.log" # TODO: Fix in integration: https://github.com/appsignal/appsignal-nodejs/issues/472
+          },
+          "sources" => {} # TODO: Fix in integration: https://github.com/appsignal/appsignal-nodejs/issues/473
+        }
+      else
+        raise "No clause for runner #{@runner}"
+      end
+    expect_report_for(:config, expected_report_section)
   end
 
   it "prints the validation section" do
-    expect_section(
+    expect_output_for(
       :validation,
       [
         "Validation",
         /  Validating Push API key: (\e\[31m)?invalid(\e\[0m)?/
       ]
+    )
+  end
+
+  it "submitted report contains validation section" do
+    expect_report_for(
+      :validation,
+      "push_api_key" => "invalid"
     )
   end
 
@@ -328,11 +461,95 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /    Contents \(last 10 lines\):/
     ] + Array.new(10).map { LOG_LINE_PATTERN })
 
-    expect_section(:paths, matchers)
+    expect_output_for(:paths, matchers)
+  end
+
+  it "submitted report contains paths section" do
+    matchers =
+      case @runner.type
+      when :nodejs
+        {
+          "appsignal.log" => {
+            "content" => including(
+              "[2021-06-14T13:44:22 (process) #49713][INFO] Starting AppSignal diagnose",
+              "[2021-06-14T13:50:02 (process) #51074][INFO] Starting AppSignal diagnose",
+              "[2021-06-14T13:51:54 (process) #51823][INFO] Starting AppSignal diagnose",
+              "[2021-06-14T13:52:07 (process) #52200][INFO] Starting AppSignal diagnose",
+              "[2021-06-14T13:53:03 (process) #52625][INFO] Starting AppSignal diagnose",
+              "[2021-06-14T13:55:20 (process) #53396][INFO] Starting AppSignal diagnose",
+              "[2021-06-14T13:59:10 (process) #53880][INFO] Starting AppSignal diagnose",
+              "[2021-06-14T14:05:53 (process) #54792][INFO] Starting AppSignal diagnose",
+              "[2021-06-14T14:11:37 (process) #55323][INFO] Starting AppSignal diagnose"
+            ),
+            "exists" => true,
+            "mode" => kind_of(Numeric),
+            "ownership" => {
+              "gid" => kind_of(Numeric),
+              "uid" => kind_of(Numeric)
+            },
+            "path" => "/tmp/appsignal.log",
+            "type" => "file",
+            "writable" => true
+          },
+          "log_dir_path" => {
+            "exists" => true,
+            "mode" => kind_of(Numeric),
+            "ownership" => {
+              "gid" => kind_of(Numeric),
+              "uid" => kind_of(Numeric)
+            },
+            "path" => "/tmp",
+            "type" => "directory",
+            "writable" => true
+          },
+          "working_dir" => {
+            "exists" => true,
+            "mode" => kind_of(Numeric),
+            "ownership" => {
+              "gid" => kind_of(Numeric),
+              "uid" => kind_of(Numeric)
+            },
+            "path" => match(PATH_PATTERN),
+            "type" => "directory",
+            "writable" => true
+          }
+        }
+      when :ruby, :elixir
+        # TODO
+        raise "Report matchers missing"
+      else
+        raise "No match found for runner #{@runner.type}"
+      end
+    expect_report_for(:paths, matchers)
   end
 
   it "prints the diagnostics report section" do
-    expect_section(
+    expect_output_for(
+      :send_report,
+      [
+        "Diagnostics report",
+        "  Do you want to send this diagnostics report to AppSignal?",
+        "  If you share this report you will be given a link to",
+        "  AppSignal.com to validate the report.",
+        "  You can also contact us at support@appsignal.com",
+        "  with your support token.",
+        "",
+        "  Send diagnostics report to AppSignal? (Y/n):   Your support token: diag_support_token",
+        "  View this report: https://appsignal.com/diagnose/diag_support_token"
+      ]
+    )
+  end
+end
+
+RSpec.describe "Running the diagnose command and not submitting report" do
+  before :all do
+    @runner = init_runner(:prompt => "n")
+    @runner.run
+    @received_report = DiagnoseServer.last_received_report
+  end
+
+  it "does not ask to send the report" do
+    expect_output_for(
       :send_report,
       [
         "Diagnostics report",
@@ -347,12 +564,38 @@ RSpec.describe "Running the diagnose command without any arguments" do
       ]
     )
   end
+
+  it "does not submit a report" do
+    expect(@received_report).to be_nil
+  end
+end
+
+RSpec.describe "Running the diagnose command with the --send-report option" do
+  before :all do
+    @runner = init_runner(:args => ["--send-report"])
+    @runner.run
+    @received_report = DiagnoseServer.last_received_report
+  end
+
+  it "sends the report automatically" do
+    send_report = section(:send_report)
+    expect(send_report).to_not include("Send diagnostics report to AppSignal?")
+    expect(send_report).to include(
+      "  Your support token: diag_support_token",
+      "  View this report: https://appsignal.com/diagnose/diag_support_token"
+    )
+  end
+
+  it "submit a report automatically" do
+    expect(@received_report).to be_instance_of(DiagnoseReport)
+  end
 end
 
 RSpec.describe "Running the diagnose command with the --no-send-report option" do
-  before do
+  before :all do
     @runner = init_runner(:args => ["--no-send-report"])
     @runner.run
+    @received_report = DiagnoseServer.last_received_report
   end
 
   it "does not ask to send the report" do
@@ -362,12 +605,17 @@ RSpec.describe "Running the diagnose command with the --no-send-report option" d
       "Not sending report. (Specified with the --no-send-report option.)"
     )
   end
+
+  it "does not submit a report" do
+    expect(@received_report).to be_nil
+  end
 end
 
 RSpec.describe "Running the diagnose command without install report file" do
-  before do
-    @runner = init_runner(:install_report => false, :prompt => "n")
+  before :all do
+    @runner = init_runner(:install_report => false, :prompt => "y")
     @runner.run
+    @received_report = DiagnoseServer.last_received_report
   end
 
   it "prints handled errors instead of the report" do
@@ -389,18 +637,38 @@ RSpec.describe "Running the diagnose command without install report file" do
       raise "No match found for runner #{@runner.type}"
     end
 
-    expect_section(:installation, matchers)
+    expect_output_for(:installation, matchers)
+  end
+
+  it "submitted report contains install report errors" do
+    matchers =
+      case @runner.type
+      when :ruby, :nodejs
+        {
+          "parsing_error" => {
+            "backtrace" => kind_of(Array),
+            "error" => match(/Error: ENOENT: [nN]o such file or directory.*install\.report/)
+          }
+        }
+      when :elixir
+        # TODO
+        raise "Report matchers missing"
+      else
+        raise "No clause for runner #{@runner}"
+      end
+    expect_report_for(:installation, matchers)
   end
 end
 
 RSpec.describe "Running the diagnose command without Push API key" do
-  before do
-    @runner = init_runner(:push_api_key => "", :prompt => "n")
+  before :all do
+    @runner = init_runner(:push_api_key => "", :prompt => "y")
     @runner.run
+    @received_report = DiagnoseServer.last_received_report
   end
 
   it "prints agent diagnose section with errors" do
-    expect_section(
+    expect_output_for(
       :agent,
       [
         /Agent diagnostics/,
@@ -419,5 +687,28 @@ RSpec.describe "Running the diagnose command without Push API key" do
         /    Lock path: -/
       ]
     )
+  end
+
+  it "submitted report contains agent diagnostics errors" do
+    matchers =
+      case @runner.type
+      when :nodejs
+        {
+          "extension" => {
+            "config" => {
+              "valid" => {
+                "error" => "RequiredEnvVarNotPresent(\"_APPSIGNAL_PUSH_API_KEY\")",
+                "result" => false
+              }
+            }
+          }
+        }
+      when :ruby, :elixir
+        # TODO
+        raise "Report matchers missing"
+      else
+        raise "No clause for runner #{@runner}"
+      end
+    expect_report_for(:agent, matchers)
   end
 end

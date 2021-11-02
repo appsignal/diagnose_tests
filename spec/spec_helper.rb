@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
+require_relative "support/server"
 require_relative "support/runner"
 require_relative "support/runner_helper"
 require_relative "support/output_helper"
+require_relative "support/diagnose_report_helper"
 
 RSpec.configure do |config|
   config.include OutputHelper
   config.include RunnerHelper
+  config.include DiagnoseReportHelper
 
   config.expect_with :rspec do |expectations|
     # This option will default to `true` in RSpec 4. It makes the `description`
@@ -36,4 +39,23 @@ RSpec.configure do |config|
   config.example_status_persistence_file_path = "spec/examples.txt"
   config.disable_monkey_patching!
   config.warnings = true
+
+  config.before :suite do
+    # Configure integrations to submit their report to a custom server
+    port = 4005
+    ENV["APPSIGNAL_DIAGNOSE_ENDPOINT"] = "http://localhost:#{port}/diag"
+    # Boot mock diagnose report server
+    Thread.new { DiagnoseServer.run!(port) }
+    # Wait for Sinatra to boot if needed
+    sleep 0.01 until DiagnoseServer.running?
+  end
+
+  config.after :context do
+    DiagnoseServer.clear!
+  end
+
+  config.after :suite do
+    DiagnoseServer.clear!
+    DiagnoseServer.quit!
+  end
 end
