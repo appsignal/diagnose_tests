@@ -39,7 +39,7 @@ class DiagnoseServer < Sinatra::Base
         if request
           DiagnoseReport.new(
             :params => request.params,
-            :report => JSON.parse(request.body.read)
+            :report => JSON.parse(request.body.read)["diagnose"]
           )
         end
       end
