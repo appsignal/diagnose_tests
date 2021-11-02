@@ -419,7 +419,10 @@ class Runner
             "target": "darwin",
             "musl_override": false,
             "linux_arm_override": false,
-            "library_type": "static"
+            "library_type": "static",
+            "flags": {},
+            "dependencies": {},
+            "source": "remote"
           },
           "host": {
             "root_user": false,
