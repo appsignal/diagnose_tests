@@ -237,7 +237,7 @@ class Runner
     end
   end
 
-  class Elixir < Runner
+  class Elixir < Runner # rubocop:disable Metrics/ClassLength
     def directory
       File.join(project_path, "elixir")
     end
@@ -273,7 +273,16 @@ class Runner
     end
 
     def before_setup
-      # Placeholder
+      # Delete previous versions of the AppSignal package so it doesn't get
+      # confused later on, in which package to stub the install and download
+      # reports
+      package_dirs = Dir.glob(
+        "_build/dev/rel/elixir_diagnose/lib/appsignal-*.*.*/",
+        :base => File.join(project_path, "elixir")
+      )
+      package_dirs.each do |dir|
+        FileUtils.rm_rf(dir)
+      end
     end
 
     def after_setup
