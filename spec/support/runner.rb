@@ -335,7 +335,9 @@ class Runner
             "package_path": "/appsignal-elixir/_build/dev/lib/appsignal/priv",
             "source": "remote",
             "target": "darwin",
-            "time": "2021-10-19T08:35:03.854017Z"
+            "time": "2021-10-19T08:35:03.854017Z",
+            "dependencies": {},
+            "flags": {}
           },
           "download": {
             "checksum": "verified",
