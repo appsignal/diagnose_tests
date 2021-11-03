@@ -142,18 +142,42 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "submitted report contains extension installation section" do
+    extra_language =
+      case @runner.type
+      when :elixir
+        { "otp_version" => /\d+/ }
+      else
+        { "implementation" => be_kind_of(String) }
+      end
+    extra_download =
+      if @runner.type == :elixir
+        {
+          "time" => DATETIME_PATTERN,
+          "architecture" => ARCH_PATTERN,
+          "target" => TARGET_PATTERN,
+          "musl_override" => false,
+          "linux_arm_override" => false,
+          "library_type" => "static"
+        }
+      end
+    extra_build =
+      if @runner.type == :elixir
+        { # TODO: should also be part of the other integrations?
+          "agent_version" => REVISION_PATTERN,
+          "package_path" => ending_with("appsignal/priv")
+        }
+      end
     expect_report_for(
       :installation,
       "result" => { "status" => "success" },
       "language" => {
         "name" => @runner.type.to_s,
-        "version" => VERSION_PATTERN,
-        "implementation" => be_kind_of(String)
-      },
+        "version" => VERSION_PATTERN
+      }.merge(extra_language || {}),
       "download" => {
         "checksum" => "verified",
         "download_url" => DOWNLOAD_URL
-      },
+      }.merge(extra_download || {}),
       "build" => {
         "time" => DATETIME_PATTERN,
         "architecture" => ARCH_PATTERN,
@@ -164,7 +188,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         "source" => "remote",
         "dependencies" => {},
         "flags" => {}
-      },
+      }.merge(extra_build || {}),
       "host" => {
         "dependencies" => {},
         "root_user" => false
@@ -194,15 +218,22 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "submitted report contains host section" do
-    expect_report_for(
-      :host,
+    default_fields = {
       "architecture" => ARCH_PATTERN,
       "heroku" => false,
       "language_version" => VERSION_PATTERN,
       "os" => TARGET_PATTERN,
       "root" => false,
       "running_in_container" => boolean
-    )
+    }
+    matchers =
+      case @runner.type
+      when :elixir
+        default_fields.merge("otp_version" => matching(/\d+/))
+      else
+        default_fields
+      end
+    expect_report_for(:host, matchers)
   end
 
   it "prints the agent diagnostics section" do
@@ -326,7 +357,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /      system:  true/,
         /  ca_file_path: #{quoted ".+/_build/dev/rel/elixir_diagnose/lib/appsignal-\\d+\\.\\d+\\.\\d+/priv/cacert.pem"}/, # rubocop:disable Layout/LineLength
         /  debug: false/,
-        /  diagnose_endpoint: #{quoted "https://appsignal.com/diag"}/,
         /  dns_servers: \[\]/,
         /  enable_host_metrics: true/,
         /  enable_minutely_probes: true/,
@@ -409,11 +439,53 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "skip_session_data" => false,
             "transaction_debug_mode" => false
           },
-          "sources" => kind_of(Hash) # TODO: make separate spec for this?
+          "sources" => kind_of(Hash) # TODO: make separate spec for this
         }
       when :elixir
-        # TODO
-        raise "Report matchers missing"
+        {
+          "options" => {
+            "active" => true,
+            "ca_file_path" => ending_with("priv/cacert.pem"),
+            "debug" => false,
+            "diagnose_endpoint" => ENV["APPSIGNAL_DIAGNOSE_ENDPOINT"],
+            "dns_servers" => [],
+            "enable_host_metrics" => true,
+            "enable_minutely_probes" => true,
+            "enable_statsd" => false,
+            "endpoint" => "https://push.appsignal.com",
+            "env" => "dev",
+            "files_world_accessible" => true,
+            "filter_data_keys" => [],
+            "filter_parameters" => [],
+            "filter_session_data" => [],
+            "ignore_actions" => [],
+            "ignore_errors" => [],
+            "ignore_namespaces" => [],
+            "log" => "file",
+            "push_api_key" => "test",
+            "request_headers" => [
+              "accept",
+              "accept-charset",
+              "accept-encoding",
+              "accept-language",
+              "cache-control",
+              "connection",
+              "content-length",
+              "path-info",
+              "range",
+              "request-method",
+              "request-uri",
+              "server-name",
+              "server-port",
+              "server-protocol"
+            ],
+            "send_params" => true,
+            "skip_session_data" => false,
+            "transaction_debug_mode" => false,
+            "valid" => true
+          },
+          "sources" => kind_of(Hash) # TODO: make separate spec for this
+        }
       when :nodejs
         {
           "options" => {
@@ -583,7 +655,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
 
     matchers =
       case @runner.type
-      when :nodejs
+      when :elixir, :nodejs
         default_paths
       when :ruby
         default_paths.merge(
@@ -591,7 +663,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "exists" => false,
             "path" => ending_with("ext/mkmf.log")
           },
-          "package_install_path" => { # TODO: Add this to Node.js as well
+          "package_install_path" => { # TODO: Add this to Elixir and Node.js as well
             "exists" => true,
             "mode" => kind_of(String),
             "ownership" => path_ownership(@runner.type),
@@ -599,7 +671,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "type" => "directory",
             "writable" => true
           },
-          "root_path" => { # TODO: Add this to Node.js as well
+          "root_path" => { # TODO: Add this to Elixir and Node.js as well
             "exists" => true,
             "mode" => kind_of(String),
             "ownership" => path_ownership(@runner.type),
@@ -608,9 +680,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "writable" => true
           }
         )
-      when :elixir
-        # TODO
-        raise "Report matchers missing"
       else
         raise "No match found for runner #{@runner.type}"
       end
@@ -754,8 +823,10 @@ RSpec.describe "Running the diagnose command without install report file" do
           }
         }
       when :elixir
-        # TODO
-        raise "Report matchers missing"
+        {
+          "download_parsing_error" => { "error" => "enoent" },
+          "installation_parsing_error" => { "error" => "enoent" }
+        }
       else
         raise "No clause for runner #{@runner}"
       end
