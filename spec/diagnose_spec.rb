@@ -142,18 +142,42 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "submitted report contains extension installation section" do
+    extra_language =
+      case @runner.type
+      when :elixir
+        { "otp_version" => /\d+/ }
+      else
+        { "implementation" => be_kind_of(String) }
+      end
+    extra_download =
+      if @runner.type == :elixir
+        {
+          "time" => DATETIME_PATTERN,
+          "architecture" => ARCH_PATTERN,
+          "target" => TARGET_PATTERN,
+          "musl_override" => false,
+          "linux_arm_override" => false,
+          "library_type" => "static"
+        }
+      end
+    extra_build =
+      if @runner.type == :elixir
+        { # TODO: should also be part of the other integrations?
+          "agent_version" => REVISION_PATTERN,
+          "package_path" => ending_with("appsignal/priv")
+        }
+      end
     expect_report_for(
       :installation,
       "result" => { "status" => "success" },
       "language" => {
         "name" => @runner.type.to_s,
-        "version" => VERSION_PATTERN,
-        "implementation" => be_kind_of(String)
-      },
+        "version" => VERSION_PATTERN
+      }.merge(extra_language || {}),
       "download" => {
         "checksum" => "verified",
         "download_url" => DOWNLOAD_URL
-      },
+      }.merge(extra_download || {}),
       "build" => {
         "time" => DATETIME_PATTERN,
         "architecture" => ARCH_PATTERN,
@@ -164,7 +188,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         "source" => "remote",
         "dependencies" => {},
         "flags" => {}
-      },
+      }.merge(extra_build || {}),
       "host" => {
         "dependencies" => {},
         "root_user" => false
