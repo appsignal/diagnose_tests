@@ -514,8 +514,110 @@ RSpec.describe "Running the diagnose command without any arguments" do
   it "submitted report contains configuration sources section" do
     expected_report_section =
       case @runner.type
-      when :ruby, :elixir
-        kind_of(Hash)
+      when :ruby
+        {
+          "default" => {
+            "ca_file_path" => matching(%r{.+/appsignal[-/]ruby/resources/cacert\.pem$}),
+            "debug" => false,
+            "dns_servers" => [],
+            "enable_allocation_tracking" => true,
+            "enable_gc_instrumentation" => false,
+            "enable_host_metrics" => true,
+            "enable_minutely_probes" => true,
+            "enable_statsd" => true,
+            "endpoint" => "https://push.appsignal.com",
+            "files_world_accessible" => true,
+            "filter_parameters" => [],
+            "filter_session_data" => [],
+            "ignore_actions" => [],
+            "ignore_errors" => [],
+            "ignore_namespaces" => [],
+            "instrument_net_http" => true,
+            "instrument_redis" => true,
+            "instrument_sequel" => true,
+            "log" => "file",
+            "request_headers" => [
+              "HTTP_ACCEPT",
+              "HTTP_ACCEPT_CHARSET",
+              "HTTP_ACCEPT_ENCODING",
+              "HTTP_ACCEPT_LANGUAGE",
+              "HTTP_CACHE_CONTROL",
+              "HTTP_CONNECTION",
+              "CONTENT_LENGTH",
+              "PATH_INFO",
+              "HTTP_RANGE",
+              "REQUEST_METHOD",
+              "REQUEST_URI",
+              "SERVER_NAME",
+              "SERVER_PORT",
+              "SERVER_PROTOCOL"
+            ],
+            "send_environment_metadata" => true,
+            "send_params" => true,
+            "skip_session_data" => false,
+            "transaction_debug_mode" => false
+          },
+          "env" => {
+            "push_api_key" => "test"
+          },
+          "file" => {},
+          "initial" => {
+            "env" => "test"
+          },
+          "system" => {
+            "active" => true
+          }
+        }
+      when :elixir
+        {
+          "default" => {
+            "active" => false,
+            "ca_file_path" => ending_with("priv/cacert.pem"),
+            "debug" => false,
+            "diagnose_endpoint" => "https://appsignal.com/diag",
+            "dns_servers" => [],
+            "enable_host_metrics" => true,
+            "enable_minutely_probes" => true,
+            "enable_statsd" => false,
+            "endpoint" => "https://push.appsignal.com",
+            "env" => "dev",
+            "files_world_accessible" => true,
+            "filter_data_keys" => [],
+            "filter_parameters" => [],
+            "filter_session_data" => [],
+            "ignore_actions" => [],
+            "ignore_errors" => [],
+            "ignore_namespaces" => [],
+            "log" => "file",
+            "request_headers" => [
+              "accept",
+              "accept-charset",
+              "accept-encoding",
+              "accept-language",
+              "cache-control",
+              "connection",
+              "content-length",
+              "path-info",
+              "range",
+              "request-method",
+              "request-uri",
+              "server-name",
+              "server-port",
+              "server-protocol"
+            ],
+            "send_params" => true,
+            "skip_session_data" => false,
+            "transaction_debug_mode" => false
+          },
+          "env" => {
+            "diagnose_endpoint" => "http://localhost:4005/diag",
+            "push_api_key" => "test"
+          },
+          "file" => {},
+          "system" => {
+            "active" => true
+          }
+        }
       when :nodejs
         {}
       else
