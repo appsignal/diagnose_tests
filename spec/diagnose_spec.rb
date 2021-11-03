@@ -662,7 +662,35 @@ RSpec.describe "Running the diagnose command without any arguments" do
           }
         }
       when :nodejs
-        {}
+        {
+          "default" => {
+            "ca_file_path" => ending_with("cert/cacert.pem"),
+            "debug" => false,
+            "dns_servers" => [],
+            "enable_host_metrics" => true,
+            "enable_minutely_probes" => true,
+            "enable_statsd" => false,
+            "endpoint" => "https://push.appsignal.com",
+            "env" => "development",
+            "files_world_accessible" => true,
+            "filter_data_keys" => [],
+            "filter_parameters" => [],
+            "filter_session_data" => [],
+            "ignore_actions" => [],
+            "ignore_errors" => [],
+            "ignore_namespaces" => [],
+            "log" => "file",
+            "log_path" => "/tmp",
+            "transaction_debug_mode" => false
+          },
+          "env" => {
+            "env" => "test",
+            "push_api_key" => "test"
+          },
+          "initial" => {
+            "active" => true
+          }
+        }
       else
         raise "No clause for runner #{@runner}"
       end
