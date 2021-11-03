@@ -336,7 +336,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /      system:  true/,
         /  ca_file_path: #{quoted ".+/_build/dev/rel/elixir_diagnose/lib/appsignal-\\d+\\.\\d+\\.\\d+/priv/cacert.pem"}/, # rubocop:disable Layout/LineLength
         /  debug: false/,
-        /  diagnose_endpoint: #{quoted "https://appsignal.com/diag"}/,
         /  dns_servers: \[\]/,
         /  enable_host_metrics: true/,
         /  enable_minutely_probes: true/,
