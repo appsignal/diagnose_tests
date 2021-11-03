@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
-VERSION_PATTERN = /\d+\.\d+\.\d+(-[a-z0-9]+)?/.freeze
-REVISION_PATTERN = /[a-z0-9]{7}/.freeze
-ARCH_PATTERN = /(x(86_)?64|i686)/.freeze
-TARGET_PATTERN = /(darwin\d*|linux(-gnu|-musl)?|freebsd)/.freeze
-LIBRARY_TYPE_PATTERN = /static|dynamic/.freeze
+VERSION_PATTERN = /\d+\.\d+\.\d+(-[a-z0-9]+)?/
+REVISION_PATTERN = /[a-z0-9]{7}/
+ARCH_PATTERN = /(x(86_)?64|i686)/
+TARGET_PATTERN = /(darwin\d*|linux(-gnu|-musl)?|freebsd)/
+LIBRARY_TYPE_PATTERN = /static|dynamic/
 TAR_FILENAME_PATTERN =
-  /appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz/.freeze
-DOWNLOAD_URL = %r{https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}}.freeze
-DATETIME_PATTERN = /\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}( ?UTC|.\d+Z)?/.freeze
-TRUE_OR_FALSE_PATTERN = /true|false/.freeze
-PATH_PATTERN = %r{[/\w.-]+}.freeze
-LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/.freeze
+  /appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz/
+DOWNLOAD_URL = %r{https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}}
+DATETIME_PATTERN = /\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}( ?UTC|.\d+Z)?/
+TRUE_OR_FALSE_PATTERN = /true|false/
+PATH_PATTERN = %r{[/\w.-]+}
+LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/
 
 RSpec.describe "Running the diagnose command without any arguments" do
   before(:all) do
