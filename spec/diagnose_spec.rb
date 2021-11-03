@@ -297,7 +297,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
     case @runner.type
     when :ruby
       matchers += [
-        /  Environment: #{quoted("test")}/,
+        /  Environment: #{quoted("test")} \(Loaded from: initial\)/,
         /  debug: false/,
         /  log: #{quoted("file")}/,
         /  ignore_actions: \[\]/,
@@ -316,13 +316,17 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  enable_allocation_tracking: true/,
         /  enable_gc_instrumentation: false/,
         /  enable_host_metrics: true/,
-        /  enable_minutely_probes: true/,
+        /  enable_minutely_probes: false/,
+        /    Sources:/,
+        /      default: true/,
+        /      file:    false/,
         /  enable_statsd: true/,
         %r{  ca_file_path: ".+/appsignal[-/]ruby/resources/cacert.pem"},
         /  dns_servers: \[\]/,
         /  files_world_accessible: true/,
         /  transaction_debug_mode: false/,
         /  active: true \(Loaded from: system\)/,
+        /  name: #{quoted "DiagnoseTests"} \(Loaded from: file\)/,
         /  push_api_key: "test" \(Loaded from: env\)/
       ]
     when :nodejs
@@ -359,7 +363,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  debug: false/,
         /  dns_servers: \[\]/,
         /  enable_host_metrics: true/,
-        /  enable_minutely_probes: true/,
+        /  enable_minutely_probes: false/,
+        /    Sources:/,
+        /      default: true/,
+        /      file:    false/,
         /  enable_statsd: false/,
         /  endpoint: #{quoted "https://push.appsignal.com"}/,
         /  env: "dev"/,
@@ -371,6 +378,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  ignore_errors: \[\]/,
         /  ignore_namespaces: \[\]/,
         /  log: "file"/,
+        /  name: #{quoted "DiagnoseTests"} \(Loaded from file\)/,
         /  push_api_key: #{quoted "test"} \(Loaded from env\)/,
         /  request_headers: \["accept", "accept-charset", "accept-encoding", "accept-language", "cache-control", "connection", "content-length", "path-info", "range", "request-method", "request-uri", "server-name", "server-port", "server-protocol"\]/, # rubocop:disable Layout/LineLength
         /  send_params: true/,
@@ -402,7 +410,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "enable_allocation_tracking" => true,
           "enable_gc_instrumentation" => false,
           "enable_host_metrics" => true,
-          "enable_minutely_probes" => true,
+          "enable_minutely_probes" => false,
           "enable_statsd" => true,
           "endpoint" => "https://push.appsignal.com",
           "env" => "test",
@@ -416,6 +424,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "instrument_redis" => true,
           "instrument_sequel" => true,
           "log" => "file",
+          "name" => "DiagnoseTests",
           "push_api_key" => "test",
           "request_headers" => [
             "HTTP_ACCEPT",
@@ -446,7 +455,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "diagnose_endpoint" => ENV["APPSIGNAL_DIAGNOSE_ENDPOINT"],
           "dns_servers" => [],
           "enable_host_metrics" => true,
-          "enable_minutely_probes" => true,
+          "enable_minutely_probes" => false,
           "enable_statsd" => false,
           "endpoint" => "https://push.appsignal.com",
           "env" => "dev",
@@ -458,6 +467,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "ignore_errors" => [],
           "ignore_namespaces" => [],
           "log" => "file",
+          "name" => "DiagnoseTests",
           "push_api_key" => "test",
           "request_headers" => [
             "accept",
@@ -560,7 +570,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "env" => {
             "push_api_key" => "test"
           },
-          "file" => {},
+          "file" => {
+            "enable_minutely_probes" => false,
+            "name" => "DiagnoseTests"
+          },
           "initial" => {
             "env" => "test"
           },
@@ -613,7 +626,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "diagnose_endpoint" => "http://localhost:4005/diag",
             "push_api_key" => "test"
           },
-          "file" => {},
+          "file" => {
+            "name" => "DiagnoseTests",
+            "enable_minutely_probes" => false
+          },
           "system" => {
             "active" => true
           }
