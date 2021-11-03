@@ -4,6 +4,7 @@ source "https://rubygems.org"
 
 gem "pry"
 gem "rack"
-gem "sinatra"
 gem "rspec"
 gem "rubocop"
+gem "sinatra"
+gem "thin"
