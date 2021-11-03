@@ -9,4 +9,16 @@ module DiagnoseReportHelper
     section = @received_report.section(section_key.to_s)
     expect(section).to match(expected)
   end
+
+  def path_ownership(runner_type)
+    {
+      "gid" => kind_of(Numeric),
+      "uid" => kind_of(Numeric)
+    }.tap do |hash|
+      if runner_type == :ruby
+        hash["group"] = kind_of(String)
+        hash["user"] = kind_of(String)
+      end
+    end
+  end
 end

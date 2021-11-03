@@ -1,7 +1,7 @@
 PATH
   remote: ../../../..
   specs:
-    appsignal (3.0.4)
+    appsignal (3.0.14)
       rack
 
 GEM
@@ -16,4 +16,4 @@ DEPENDENCIES
   appsignal!
 
 BUNDLED WITH
-   2.1.4
+   2.2.17
