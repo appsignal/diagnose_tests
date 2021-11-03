@@ -296,13 +296,27 @@ RSpec.describe "Running the diagnose command without any arguments" do
       ]
     when :nodejs
       matchers += [
-        /  Environment: #{quoted("test")}/,
-        /  debug: false/,
-        /  log: #{quoted("file")}/,
-        /  endpoint: #{quoted "https://push.appsignal.com"}/,
-        /  ca_file_path: #{quoted ".+\/cacert.pem"}/,
         /  active: true/,
-        /  push_api_key: #{quoted "test"}/
+        /  ca_file_path: #{quoted ".+\/cacert.pem"}/,
+        /  debug: false/,
+        /  dns_servers: \[\]/,
+        /  enable_host_metrics: true/,
+        /  enable_minutely_probes: true/,
+        /  enable_statsd: false/,
+        /  endpoint: #{quoted "https://push.appsignal.com"}/,
+        /  env: #{quoted("test")}/,
+        /  files_world_accessible: true/,
+        /  filter_data_keys: \[\]/,
+        /  filter_parameters: \[\]/,
+        /  filter_session_data: \[\]/,
+        /  ignore_actions: \[\]/,
+        /  ignore_errors: \[\]/,
+        /  ignore_namespaces: \[\]/,
+        /  log: #{quoted("file")}/,
+        /  log_file_path: #{quoted ".+\/appsignal.log"}/,
+        /  log_path: #{quoted("/tmp")}/,
+        /  push_api_key: #{quoted "test"}/,
+        /  transaction_debug_mode: false/
       ]
     when :elixir
       matchers += [
@@ -406,18 +420,31 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "active" => true,
             "ca_file_path" => ending_with("cert/cacert.pem"),
             "debug" => false,
+            "dns_servers" => [],
+            "enable_host_metrics" => true,
+            "enable_minutely_probes" => true,
+            "enable_statsd" => false,
             "endpoint" => "https://push.appsignal.com",
             "env" => "test",
+            "files_world_accessible" => true,
+            "filter_data_keys" => [],
+            "filter_parameters" => [],
+            "filter_session_data" => [],
+            "ignore_actions" => [],
+            "ignore_errors" => [],
+            "ignore_namespaces" => [],
             "log" => "file",
+            "log_file_path" => "/tmp/appsignal.log",
             "log_path" => "/tmp",
             "push_api_key" => "test",
-            "undefined" => "/tmp/appsignal.log" # TODO: Fix in integration: https://github.com/appsignal/appsignal-nodejs/issues/472
+            "transaction_debug_mode" => false
           },
           "sources" => {} # TODO: Fix in integration: https://github.com/appsignal/appsignal-nodejs/issues/473
         }
       else
         raise "No clause for runner #{@runner}"
       end
+
     expect_report_for(:config, expected_report_section)
   end
 
