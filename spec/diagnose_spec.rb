@@ -390,134 +390,138 @@ RSpec.describe "Running the diagnose command without any arguments" do
     expect_output_for(:config, matchers)
   end
 
-  it "submitted report contains configuration section" do
+  it "submitted report contains configuration options section" do
     expected_report_section =
       case @runner.type
       when :ruby
         {
-          "options" => {
-            "active" => true,
-            "ca_file_path" => matching(%r{.+/appsignal[-/]ruby/resources/cacert\.pem$}),
-            "debug" => false,
-            "dns_servers" => [],
-            "enable_allocation_tracking" => true,
-            "enable_gc_instrumentation" => false,
-            "enable_host_metrics" => true,
-            "enable_minutely_probes" => true,
-            "enable_statsd" => true,
-            "endpoint" => "https://push.appsignal.com",
-            "env" => "test",
-            "files_world_accessible" => true,
-            "filter_parameters" => [],
-            "filter_session_data" => [],
-            "ignore_actions" => [],
-            "ignore_errors" => [],
-            "ignore_namespaces" => [],
-            "instrument_net_http" => true,
-            "instrument_redis" => true,
-            "instrument_sequel" => true,
-            "log" => "file",
-            "push_api_key" => "test",
-            "request_headers" => [
-              "HTTP_ACCEPT",
-              "HTTP_ACCEPT_CHARSET",
-              "HTTP_ACCEPT_ENCODING",
-              "HTTP_ACCEPT_LANGUAGE",
-              "HTTP_CACHE_CONTROL",
-              "HTTP_CONNECTION",
-              "CONTENT_LENGTH",
-              "PATH_INFO",
-              "HTTP_RANGE",
-              "REQUEST_METHOD",
-              "REQUEST_URI",
-              "SERVER_NAME",
-              "SERVER_PORT",
-              "SERVER_PROTOCOL"
-            ],
-            "send_environment_metadata" => true,
-            "send_params" => true,
-            "skip_session_data" => false,
-            "transaction_debug_mode" => false
-          },
-          "sources" => kind_of(Hash) # TODO: make separate spec for this
+          "active" => true,
+          "ca_file_path" => matching(%r{.+/appsignal[-/]ruby/resources/cacert\.pem$}),
+          "debug" => false,
+          "dns_servers" => [],
+          "enable_allocation_tracking" => true,
+          "enable_gc_instrumentation" => false,
+          "enable_host_metrics" => true,
+          "enable_minutely_probes" => true,
+          "enable_statsd" => true,
+          "endpoint" => "https://push.appsignal.com",
+          "env" => "test",
+          "files_world_accessible" => true,
+          "filter_parameters" => [],
+          "filter_session_data" => [],
+          "ignore_actions" => [],
+          "ignore_errors" => [],
+          "ignore_namespaces" => [],
+          "instrument_net_http" => true,
+          "instrument_redis" => true,
+          "instrument_sequel" => true,
+          "log" => "file",
+          "push_api_key" => "test",
+          "request_headers" => [
+            "HTTP_ACCEPT",
+            "HTTP_ACCEPT_CHARSET",
+            "HTTP_ACCEPT_ENCODING",
+            "HTTP_ACCEPT_LANGUAGE",
+            "HTTP_CACHE_CONTROL",
+            "HTTP_CONNECTION",
+            "CONTENT_LENGTH",
+            "PATH_INFO",
+            "HTTP_RANGE",
+            "REQUEST_METHOD",
+            "REQUEST_URI",
+            "SERVER_NAME",
+            "SERVER_PORT",
+            "SERVER_PROTOCOL"
+          ],
+          "send_environment_metadata" => true,
+          "send_params" => true,
+          "skip_session_data" => false,
+          "transaction_debug_mode" => false
         }
       when :elixir
         {
-          "options" => {
-            "active" => true,
-            "ca_file_path" => ending_with("priv/cacert.pem"),
-            "debug" => false,
-            "diagnose_endpoint" => ENV["APPSIGNAL_DIAGNOSE_ENDPOINT"],
-            "dns_servers" => [],
-            "enable_host_metrics" => true,
-            "enable_minutely_probes" => true,
-            "enable_statsd" => false,
-            "endpoint" => "https://push.appsignal.com",
-            "env" => "dev",
-            "files_world_accessible" => true,
-            "filter_data_keys" => [],
-            "filter_parameters" => [],
-            "filter_session_data" => [],
-            "ignore_actions" => [],
-            "ignore_errors" => [],
-            "ignore_namespaces" => [],
-            "log" => "file",
-            "push_api_key" => "test",
-            "request_headers" => [
-              "accept",
-              "accept-charset",
-              "accept-encoding",
-              "accept-language",
-              "cache-control",
-              "connection",
-              "content-length",
-              "path-info",
-              "range",
-              "request-method",
-              "request-uri",
-              "server-name",
-              "server-port",
-              "server-protocol"
-            ],
-            "send_params" => true,
-            "skip_session_data" => false,
-            "transaction_debug_mode" => false,
-            "valid" => true
-          },
-          "sources" => kind_of(Hash) # TODO: make separate spec for this
+          "active" => true,
+          "ca_file_path" => ending_with("priv/cacert.pem"),
+          "debug" => false,
+          "diagnose_endpoint" => ENV["APPSIGNAL_DIAGNOSE_ENDPOINT"],
+          "dns_servers" => [],
+          "enable_host_metrics" => true,
+          "enable_minutely_probes" => true,
+          "enable_statsd" => false,
+          "endpoint" => "https://push.appsignal.com",
+          "env" => "dev",
+          "files_world_accessible" => true,
+          "filter_data_keys" => [],
+          "filter_parameters" => [],
+          "filter_session_data" => [],
+          "ignore_actions" => [],
+          "ignore_errors" => [],
+          "ignore_namespaces" => [],
+          "log" => "file",
+          "push_api_key" => "test",
+          "request_headers" => [
+            "accept",
+            "accept-charset",
+            "accept-encoding",
+            "accept-language",
+            "cache-control",
+            "connection",
+            "content-length",
+            "path-info",
+            "range",
+            "request-method",
+            "request-uri",
+            "server-name",
+            "server-port",
+            "server-protocol"
+          ],
+          "send_params" => true,
+          "skip_session_data" => false,
+          "transaction_debug_mode" => false,
+          "valid" => true
         }
       when :nodejs
         {
-          "options" => {
-            "active" => true,
-            "ca_file_path" => ending_with("cert/cacert.pem"),
-            "debug" => false,
-            "dns_servers" => [],
-            "enable_host_metrics" => true,
-            "enable_minutely_probes" => true,
-            "enable_statsd" => false,
-            "endpoint" => "https://push.appsignal.com",
-            "env" => "test",
-            "files_world_accessible" => true,
-            "filter_data_keys" => [],
-            "filter_parameters" => [],
-            "filter_session_data" => [],
-            "ignore_actions" => [],
-            "ignore_errors" => [],
-            "ignore_namespaces" => [],
-            "log" => "file",
-            "log_file_path" => "/tmp/appsignal.log",
-            "log_path" => "/tmp",
-            "push_api_key" => "test",
-            "transaction_debug_mode" => false
-          },
-          "sources" => {} # TODO: Fix in integration: https://github.com/appsignal/appsignal-nodejs/issues/473
+          "active" => true,
+          "ca_file_path" => ending_with("cert/cacert.pem"),
+          "debug" => false,
+          "dns_servers" => [],
+          "enable_host_metrics" => true,
+          "enable_minutely_probes" => true,
+          "enable_statsd" => false,
+          "endpoint" => "https://push.appsignal.com",
+          "env" => "test",
+          "files_world_accessible" => true,
+          "filter_data_keys" => [],
+          "filter_parameters" => [],
+          "filter_session_data" => [],
+          "ignore_actions" => [],
+          "ignore_errors" => [],
+          "ignore_namespaces" => [],
+          "log" => "file",
+          "log_file_path" => "/tmp/appsignal.log",
+          "log_path" => "/tmp",
+          "push_api_key" => "test",
+          "transaction_debug_mode" => false
         }
       else
         raise "No clause for runner #{@runner}"
       end
 
-    expect_report_for(:config, expected_report_section)
+    expect_report_for(:config, :options, expected_report_section)
+  end
+
+  it "submitted report contains configuration sources section" do
+    expected_report_section =
+      case @runner.type
+      when :ruby, :elixir
+        kind_of(Hash)
+      when :nodejs
+        {}
+      else
+        raise "No clause for runner #{@runner}"
+      end
+    expect_report_for(:config, :sources, expected_report_section)
   end
 
   it "prints the validation section" do
