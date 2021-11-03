@@ -20,6 +20,23 @@ RSpec.describe "Running the diagnose command without any arguments" do
     @received_report = DiagnoseServer.last_received_report
   end
 
+  it "receives the report with the correct query params" do
+    matchers =
+      case @runner.type
+      when :ruby
+        { "gem_version" => VERSION_PATTERN }
+      end
+
+    expect(@received_report.params).to match(
+      {
+        "api_key" => "test",
+        "name" => be_empty.or(be_nil),
+        "environment" => kind_of(String),
+        "hostname" => be_empty.or(be_nil)
+      }.merge(matchers || {})
+    )
+  end
+
   it "prints all sections in the correct order" do
     section_keys =
       [
@@ -839,6 +856,23 @@ RSpec.describe "Running the diagnose command without Push API key" do
     @runner = init_runner(:push_api_key => "", :prompt => "y")
     @runner.run
     @received_report = DiagnoseServer.last_received_report
+  end
+
+  it "receives the report without api_key query params" do
+    matchers =
+      case @runner.type
+      when :ruby
+        { "gem_version" => VERSION_PATTERN }
+      end
+
+    expect(@received_report.params).to match(
+      {
+        "api_key" => be_empty.or(be_nil),
+        "name" => be_empty.or(be_nil),
+        "environment" => kind_of(String),
+        "hostname" => be_empty.or(be_nil)
+      }.merge(matchers || {})
+    )
   end
 
   it "prints agent diagnose section with errors" do
