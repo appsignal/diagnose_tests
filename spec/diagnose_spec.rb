@@ -162,8 +162,11 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /    Musl override: #{TRUE_OR_FALSE_PATTERN}/,
       /    Linux ARM override: false/,
       /    Library type: #{quoted LIBRARY_TYPE_PATTERN}/,
+      /    Dependencies: %?\{\}/,
+      /    Flags: %?\{\}/,
       /  Host details/,
-      /    Root user: #{TRUE_OR_FALSE_PATTERN}/
+      /    Root user: #{TRUE_OR_FALSE_PATTERN}/,
+      /    Dependencies: %?\{\}/
     ]
     expect_output_for(:installation, matchers)
   end
