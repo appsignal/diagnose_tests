@@ -178,7 +178,6 @@ class Runner
 
     def ignored_lines
       [
-        /Implementation: "ruby"/,
         /Flags: {}/,
         /Dependencies: {}/,
         /appsignal: Unable to log to /

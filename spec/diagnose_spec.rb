@@ -122,10 +122,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
       "Extension installation report",
       /  Installation result/,
       /    Status: success/,
-      /  Language details/,
-      /    #{@runner.language_name} version: #{quoted VERSION_PATTERN}/
+      /  Language details/
     ]
-
+    matchers << /    Implementation: #{quoted "ruby"}/ if @runner.type == :ruby
+    matchers << /    #{@runner.language_name} version: #{quoted VERSION_PATTERN}/
     matchers << /    OTP version: #{quoted(/\d+/)}/ if @runner.type == :elixir
 
     matchers += [
