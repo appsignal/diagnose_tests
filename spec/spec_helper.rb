@@ -43,19 +43,20 @@ RSpec.configure do |config|
   config.before :suite do
     # Configure integrations to submit their report to a custom server
     port = 4005
+    ENV["APPSIGNAL_PUSH_API_ENDPOINT"] = "http://localhost:#{port}"
     ENV["APPSIGNAL_DIAGNOSE_ENDPOINT"] = "http://localhost:#{port}/diag"
-    # Boot mock diagnose report server
-    Thread.new { DiagnoseServer.run!(port) }
+    # Boot mock AppSignal server
+    Thread.new { MockServer.run!(port) }
     # Wait for Sinatra to boot if needed
-    sleep 0.01 until DiagnoseServer.running?
+    sleep 0.01 until MockServer.running?
   end
 
   config.after :context do
-    DiagnoseServer.clear!
+    MockServer.clear!
   end
 
   config.after :suite do
-    DiagnoseServer.clear!
-    DiagnoseServer.quit!
+    MockServer.clear!
+    MockServer.quit!
   end
 end

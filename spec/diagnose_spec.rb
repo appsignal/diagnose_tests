@@ -15,9 +15,10 @@ LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/
 
 RSpec.describe "Running the diagnose command without any arguments" do
   before(:all) do
+    MockServer.auth_response_code = 200
     @runner = init_runner(:prompt => "y")
     @runner.run
-    @received_report = DiagnoseServer.last_received_report
+    @received_report = MockServer.last_diagnose_report
   end
 
   it "receives the report with the correct query params" do
@@ -330,7 +331,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  send_environment_metadata: true/,
         /  send_params: true/,
         /  request_headers: \["HTTP_ACCEPT", "HTTP_ACCEPT_CHARSET", "HTTP_ACCEPT_ENCODING", "HTTP_ACCEPT_LANGUAGE", "HTTP_CACHE_CONTROL", "HTTP_CONNECTION", "CONTENT_LENGTH", "PATH_INFO", "HTTP_RANGE", "REQUEST_METHOD", "REQUEST_URI", "SERVER_NAME", "SERVER_PORT", "SERVER_PROTOCOL"\]/, # rubocop:disable Layout/LineLength
-        %r{  endpoint: "https://push.appsignal.com"},
+        /  endpoint: #{quoted ENV["APPSIGNAL_PUSH_API_ENDPOINT"]}/,
+        /    Sources:/,
+        /      default: #{quoted "https://push.appsignal.com"}/,
+        /      env:     #{quoted ENV["APPSIGNAL_PUSH_API_ENDPOINT"]}/,
         /  instrument_net_http: true/,
         /  instrument_redis: true/,
         /  instrument_sequel: true/,
@@ -363,7 +367,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /      default: true/,
         /      env:     false/,
         /  enable_statsd: false/,
-        /  endpoint: #{quoted "https://push.appsignal.com"}/,
+        /  endpoint: #{quoted ENV["APPSIGNAL_PUSH_API_ENDPOINT"]}/,
+        /  Sources:/,
+        /    default: #{quoted "https://push.appsignal.com"}/,
+        /    env:     #{quoted ENV["APPSIGNAL_PUSH_API_ENDPOINT"]}/,
         /  env: #{quoted("development")}/,
         /  files_world_accessible: true/,
         /  filter_data_keys: \[\]/,
@@ -393,7 +400,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /      default: true/,
         /      file:    false/,
         /  enable_statsd: false/,
-        /  endpoint: #{quoted "https://push.appsignal.com"}/,
+        /  endpoint: #{quoted ENV["APPSIGNAL_PUSH_API_ENDPOINT"]}/,
+        /    Sources:/,
+        /      default: #{quoted "https://push.appsignal.com"}/,
+        /      env:     #{quoted ENV["APPSIGNAL_PUSH_API_ENDPOINT"]}/,
         /  env: "dev"/,
         /  files_world_accessible: true/,
         /  filter_data_keys: \[\]/,
@@ -437,7 +447,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "enable_host_metrics" => true,
           "enable_minutely_probes" => false,
           "enable_statsd" => true,
-          "endpoint" => "https://push.appsignal.com",
+          "endpoint" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
           "env" => "development",
           "files_world_accessible" => true,
           "filter_parameters" => [],
@@ -482,7 +492,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "enable_host_metrics" => true,
           "enable_minutely_probes" => false,
           "enable_statsd" => false,
-          "endpoint" => "https://push.appsignal.com",
+          "endpoint" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
           "env" => "dev",
           "files_world_accessible" => true,
           "filter_data_keys" => [],
@@ -524,7 +534,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "enable_host_metrics" => true,
           "enable_minutely_probes" => false,
           "enable_statsd" => false,
-          "endpoint" => "https://push.appsignal.com",
+          "endpoint" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
           "env" => "development",
           "files_world_accessible" => true,
           "filter_data_keys" => [],
@@ -593,6 +603,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "transaction_debug_mode" => false
           },
           "env" => {
+            "endpoint" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
             "push_api_key" => "test"
           },
           "file" => {
@@ -648,6 +659,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "transaction_debug_mode" => false
           },
           "env" => {
+            "endpoint" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
             "diagnose_endpoint" => "http://localhost:4005/diag",
             "push_api_key" => "test"
           },
@@ -682,6 +694,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "transaction_debug_mode" => false
           },
           "env" => {
+            "endpoint" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
             "enable_minutely_probes" => false,
             "push_api_key" => "test",
             "name" => "DiagnoseTests"
@@ -701,7 +714,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       :validation,
       [
         "Validation",
-        /  Validating Push API key: (\e\[31m)?invalid(\e\[0m)?/
+        /  Validating Push API key: (\e\[32m)?valid(\e\[0m)?/
       ]
     )
   end
@@ -709,7 +722,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
   it "submitted report contains validation section" do
     expect_report_for(
       :validation,
-      "push_api_key" => "invalid"
+      "push_api_key" => "valid"
     )
   end
 
@@ -886,7 +899,7 @@ RSpec.describe "Running the diagnose command and not submitting report" do
   before :all do
     @runner = init_runner(:prompt => "n")
     @runner.run
-    @received_report = DiagnoseServer.last_received_report
+    @received_report = MockServer.last_diagnose_report
   end
 
   it "does not ask to send the report" do
@@ -915,7 +928,7 @@ RSpec.describe "Running the diagnose command with the --send-report option" do
   before :all do
     @runner = init_runner(:args => ["--send-report"])
     @runner.run
-    @received_report = DiagnoseServer.last_received_report
+    @received_report = MockServer.last_diagnose_report
   end
 
   it "sends the report automatically" do
@@ -936,7 +949,7 @@ RSpec.describe "Running the diagnose command with the --no-send-report option" d
   before :all do
     @runner = init_runner(:args => ["--no-send-report"])
     @runner.run
-    @received_report = DiagnoseServer.last_received_report
+    @received_report = MockServer.last_diagnose_report
   end
 
   it "does not ask to send the report" do
@@ -956,7 +969,7 @@ RSpec.describe "Running the diagnose command without install report file" do
   before :all do
     @runner = init_runner(:install_report => false, :prompt => "y")
     @runner.run
-    @received_report = DiagnoseServer.last_received_report
+    @received_report = MockServer.last_diagnose_report
   end
 
   it "prints handled errors instead of the report" do
@@ -1012,9 +1025,10 @@ end
 
 RSpec.describe "Running the diagnose command without Push API key" do
   before :all do
+    MockServer.auth_response_code = 401
     @runner = init_runner(:push_api_key => "", :prompt => "y")
     @runner.run
-    @received_report = DiagnoseServer.last_received_report
+    @received_report = MockServer.last_diagnose_report
   end
 
   it "receives the report without api_key query params" do
@@ -1069,6 +1083,40 @@ RSpec.describe "Running the diagnose command without Push API key" do
           }
         }
       }
+    )
+  end
+
+  it "prints error about invalid Push API key" do
+    validation = section(:validation)
+    expect(validation).to match(/Validating Push API key: (\e\[31m)?invalid(\e\[0m)?/)
+  end
+
+  it "submitted report contains an invalid Push API key" do
+    expect_report_for(
+      :validation,
+      "push_api_key" => "invalid"
+    )
+  end
+end
+
+RSpec.describe "Running the diagnose command with Push API key validation error" do
+  before :all do
+    MockServer.auth_response_code = 500
+    @runner = init_runner(:push_api_key => "", :prompt => "y")
+    @runner.run
+    @received_report = MockServer.last_diagnose_report
+  end
+
+  it "prints error about an error validating Push API key" do
+    validation = section(:validation)
+    expect(validation)
+      .to match(/Validating Push API key: (\e\[31m)?Failed to validate: .+(\e\[0m)?/)
+  end
+
+  it "submitted report contains an invalid Push API key" do
+    expect_report_for(
+      :validation,
+      "push_api_key" => starting_with("Failed to validate: ")
     )
   end
 end

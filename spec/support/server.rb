@@ -21,23 +21,24 @@ class DiagnoseReport
   end
 end
 
-class DiagnoseServer < Sinatra::Base
+class MockServer < Sinatra::Base
   class << self
     def run!(port)
       @mutex = Mutex.new
-      @received_requests = []
+      @auth_response_code = 200
+      @received_diagnose_requests = []
       super(:port => port)
     end
 
-    def track_request(request)
+    def track_diagnose_request(request)
       @mutex.synchronize do
-        @received_requests << request
+        @received_diagnose_requests << request
       end
     end
 
-    def last_received_report
+    def last_diagnose_report
       @mutex.synchronize do
-        request = @received_requests.last
+        request = @received_diagnose_requests.last
         if request
           DiagnoseReport.new(
             :params => request.params,
@@ -47,9 +48,22 @@ class DiagnoseServer < Sinatra::Base
       end
     end
 
+    def auth_response_code
+      @mutex.synchronize do
+        @auth_response_code
+      end
+    end
+
+    def auth_response_code=(code)
+      @mutex.synchronize do
+        @auth_response_code = code
+      end
+    end
+
     def clear!
       @mutex.synchronize do
-        @received_requests.clear
+        @auth_response_code = 200
+        @received_diagnose_requests.clear
       end
     end
   end
@@ -57,8 +71,12 @@ class DiagnoseServer < Sinatra::Base
   set :logging, false
 
   post "/diag" do
-    DiagnoseServer.track_request(request)
+    MockServer.track_diagnose_request(request)
     status 200
     JSON.dump({ :token => "diag_support_token" })
+  end
+
+  post "/1/auth" do
+    status MockServer.auth_response_code
   end
 end
