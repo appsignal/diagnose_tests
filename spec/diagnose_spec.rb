@@ -25,16 +25,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       case @runner.type
       when :ruby
         {
-          "gem_version" => VERSION_PATTERN,
-          "name" => "DiagnoseTests"
-        }
-      when :elixir
-        {
-          "name" => "DiagnoseTests"
-        }
-      when :nodejs
-        {
-          "name" => be_empty.or(be_nil)
+          "gem_version" => VERSION_PATTERN
         }
       end
 
@@ -42,7 +33,8 @@ RSpec.describe "Running the diagnose command without any arguments" do
       {
         "api_key" => "test",
         "environment" => kind_of(String),
-        "hostname" => be_empty.or(be_nil)
+        "hostname" => be_empty.or(be_nil),
+        "name" => "DiagnoseTests"
       }.merge(matchers || {})
     )
   end
@@ -382,6 +374,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  ignore_namespaces: \[\]/,
         /  log: #{quoted("file")}/,
         /  log_path: #{quoted("/tmp")}/,
+        /  name: #{quoted "DiagnoseTests"} \(Loaded from: env\)/,
         /  push_api_key: #{quoted "test"} \(Loaded from: env\)/,
         /  transaction_debug_mode: false/
       ]
@@ -542,6 +535,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "ignore_namespaces" => [],
           "log" => "file",
           "log_path" => "/tmp",
+          "name" => "DiagnoseTests",
           "push_api_key" => "test",
           "transaction_debug_mode" => false
         }
@@ -689,7 +683,8 @@ RSpec.describe "Running the diagnose command without any arguments" do
           },
           "env" => {
             "enable_minutely_probes" => false,
-            "push_api_key" => "test"
+            "push_api_key" => "test",
+            "name" => "DiagnoseTests"
           },
           "initial" => {
             "active" => true
@@ -1027,16 +1022,7 @@ RSpec.describe "Running the diagnose command without Push API key" do
       case @runner.type
       when :ruby
         {
-          "gem_version" => VERSION_PATTERN,
-          "name" => "DiagnoseTests"
-        }
-      when :elixir
-        {
-          "name" => "DiagnoseTests"
-        }
-      when :nodejs
-        {
-          "name" => be_empty.or(be_nil)
+          "gem_version" => VERSION_PATTERN
         }
       end
 
@@ -1044,7 +1030,8 @@ RSpec.describe "Running the diagnose command without Push API key" do
       {
         "api_key" => be_empty.or(be_nil),
         "environment" => kind_of(String),
-        "hostname" => be_empty.or(be_nil)
+        "hostname" => be_empty.or(be_nil),
+        "name" => "DiagnoseTests"
       }.merge(matchers || {})
     )
   end

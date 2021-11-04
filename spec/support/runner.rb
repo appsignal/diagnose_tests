@@ -385,7 +385,8 @@ class Runner
     def run_env
       super.merge({
         "NODE_ENV" => "development",
-        "APPSIGNAL_ENABLE_MINUTELY_PROBES" => "false"
+        "APPSIGNAL_ENABLE_MINUTELY_PROBES" => "false",
+        "APPSIGNAL_APP_NAME" => "DiagnoseTests"
       })
     end
 
