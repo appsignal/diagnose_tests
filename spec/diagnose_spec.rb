@@ -24,13 +24,23 @@ RSpec.describe "Running the diagnose command without any arguments" do
     matchers =
       case @runner.type
       when :ruby
-        { "gem_version" => VERSION_PATTERN }
+        {
+          "gem_version" => VERSION_PATTERN,
+          "name" => "DiagnoseTests"
+        }
+      when :elixir
+        {
+          "name" => "DiagnoseTests"
+        }
+      when :nodejs
+        {
+          "name" => be_empty.or(be_nil)
+        }
       end
 
     expect(@received_report.params).to match(
       {
         "api_key" => "test",
-        "name" => be_empty.or(be_nil),
         "environment" => kind_of(String),
         "hostname" => be_empty.or(be_nil)
       }.merge(matchers || {})
@@ -984,13 +994,23 @@ RSpec.describe "Running the diagnose command without Push API key" do
     matchers =
       case @runner.type
       when :ruby
-        { "gem_version" => VERSION_PATTERN }
+        {
+          "gem_version" => VERSION_PATTERN,
+          "name" => "DiagnoseTests"
+        }
+      when :elixir
+        {
+          "name" => "DiagnoseTests"
+        }
+      when :nodejs
+        {
+          "name" => be_empty.or(be_nil)
+        }
       end
 
     expect(@received_report.params).to match(
       {
         "api_key" => be_empty.or(be_nil),
-        "name" => be_empty.or(be_nil),
         "environment" => kind_of(String),
         "hostname" => be_empty.or(be_nil)
       }.merge(matchers || {})
