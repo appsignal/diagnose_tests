@@ -381,7 +381,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  ignore_errors: \[\]/,
         /  ignore_namespaces: \[\]/,
         /  log: #{quoted("file")}/,
-        /  log_file_path: #{quoted ".+\/appsignal.log"}/,
         /  log_path: #{quoted("/tmp")}/,
         /  push_api_key: #{quoted "test"} \(Loaded from: env\)/,
         /  transaction_debug_mode: false/
@@ -542,7 +541,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "ignore_errors" => [],
           "ignore_namespaces" => [],
           "log" => "file",
-          "log_file_path" => "/tmp/appsignal.log",
           "log_path" => "/tmp",
           "push_api_key" => "test",
           "transaction_debug_mode" => false
