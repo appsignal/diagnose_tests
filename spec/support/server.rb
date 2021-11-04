@@ -10,8 +10,10 @@ class DiagnoseReport
     @report = report
   end
 
-  def section(key)
-    @report.fetch(key.to_s) { raise "No `#{key}` key found in the DiagnoseReport" }
+  def section(*keys)
+    @report.dig(*keys.map(&:to_s)).tap do |section|
+      raise "No `#{keys}` keys found in the DiagnoseReport" if section.nil?
+    end
   end
 
   def to_h

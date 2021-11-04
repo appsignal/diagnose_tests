@@ -1,0 +1,3 @@
+test:
+  name: "DiagnoseTests"
+  enable_minutely_probes: false
