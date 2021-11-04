@@ -726,6 +726,25 @@ RSpec.describe "Running the diagnose command without any arguments" do
     )
   end
 
+  it "validates the Push API key with the correct query params" do
+    matchers =
+      case @runner.type
+      when :ruby
+        {
+          "gem_version" => VERSION_PATTERN
+        }
+      end
+
+    expect(MockServer.last_auth_request.params).to match(
+      {
+        "api_key" => "test",
+        "environment" => kind_of(String),
+        "hostname" => be_empty.or(be_nil),
+        "name" => "DiagnoseTests"
+      }.merge(matchers || {})
+    )
+  end
+
   it "prints the paths section" do
     matchers = ["Paths"]
 

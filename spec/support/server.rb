@@ -26,6 +26,7 @@ class MockServer < Sinatra::Base
     def run!(port)
       @mutex = Mutex.new
       @auth_response_code = 200
+      @received_auth_requests = []
       @received_diagnose_requests = []
       super(:port => port)
     end
@@ -48,6 +49,18 @@ class MockServer < Sinatra::Base
       end
     end
 
+    def track_auth_request(request)
+      @mutex.synchronize do
+        @received_auth_requests << request
+      end
+    end
+
+    def last_auth_request
+      @mutex.synchronize do
+        @received_auth_requests.last
+      end
+    end
+
     def auth_response_code
       @mutex.synchronize do
         @auth_response_code
@@ -63,6 +76,7 @@ class MockServer < Sinatra::Base
     def clear!
       @mutex.synchronize do
         @auth_response_code = 200
+        @received_auth_requests.clear
         @received_diagnose_requests.clear
       end
     end
@@ -77,6 +91,7 @@ class MockServer < Sinatra::Base
   end
 
   post "/1/auth" do
+    MockServer.track_auth_request(request)
     status MockServer.auth_response_code
   end
 end
