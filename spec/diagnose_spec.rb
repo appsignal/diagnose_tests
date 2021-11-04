@@ -122,10 +122,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
       "Extension installation report",
       /  Installation result/,
       /    Status: success/,
-      /  Language details/,
-      /    #{@runner.language_name} version: #{quoted VERSION_PATTERN}/
+      /  Language details/
     ]
-
+    matchers << /    Implementation: #{quoted "ruby"}/ if @runner.type == :ruby
+    matchers << /    #{@runner.language_name} version: #{quoted VERSION_PATTERN}/
     matchers << /    OTP version: #{quoted(/\d+/)}/ if @runner.type == :elixir
 
     matchers += [
@@ -162,8 +162,11 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /    Musl override: #{TRUE_OR_FALSE_PATTERN}/,
       /    Linux ARM override: false/,
       /    Library type: #{quoted LIBRARY_TYPE_PATTERN}/,
+      /    Dependencies: %?\{\}/,
+      /    Flags: %?\{\}/,
       /  Host details/,
-      /    Root user: #{TRUE_OR_FALSE_PATTERN}/
+      /    Root user: #{TRUE_OR_FALSE_PATTERN}/,
+      /    Dependencies: %?\{\}/
     ]
     expect_output_for(:installation, matchers)
   end

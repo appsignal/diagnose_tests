@@ -178,9 +178,6 @@ class Runner
 
     def ignored_lines
       [
-        /Implementation: "ruby"/,
-        /Flags: {}/,
-        /Dependencies: {}/,
         /appsignal: Unable to log to /
       ]
     end
@@ -259,8 +256,7 @@ class Runner
       [
         /==> appsignal/,
         /AppSignal extension installation successful/,
-        /Download time:/,
-        /Dependencies: %{}/
+        /Download time:/
       ]
     end
 
@@ -378,8 +374,7 @@ class Runner
 
     def ignored_lines
       [
-        %r{WARNING: Error when reading appsignal config, appsignal \(as \d+/\d+\) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present}, # rubocop:disable Layout/LineLength
-        /Dependencies: {}/
+        %r{WARNING: Error when reading appsignal config, appsignal \(as \d+/\d+\) not starting: Required environment variable '_APPSIGNAL_PUSH_API_KEY' not present} # rubocop:disable Layout/LineLength
       ]
     end
 
