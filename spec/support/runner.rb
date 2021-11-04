@@ -88,6 +88,14 @@ class Runner
     @options.fetch(:install_report, true)
   end
 
+  def run_env
+    { "APPSIGNAL_PUSH_API_KEY" => @push_api_key }
+  end
+
+  def run_command(_arguments)
+    raise NotImplementedError("`Runner` subclasses must implement `run_command`")
+  end
+
   def run # rubocop:disable Metrics/MethodLength
     Dir.chdir directory do
       before_setup
@@ -99,10 +107,10 @@ class Runner
 
     # Run the command
     prompt = @prompt ? %(echo "#{@prompt}" | ) : ""
-    command = run_command
+    command = run_command(@arguments.dup)
     read, write = IO.pipe
     pid = spawn(
-      { "APPSIGNAL_PUSH_API_KEY" => @push_api_key },
+      run_env,
       "#{prompt} #{command}",
       { [:out, :err] => write, :chdir => directory }
     )
@@ -116,7 +124,7 @@ class Runner
         output_lines << line.rstrip
       end
     rescue EOFError
-      # Nothing to read anymore. Reached of "file".
+      # Nothing to read anymore. Reached end of "file".
     end
     @output = Output.new(output_lines, :ignore => ignored_lines)
 
@@ -170,10 +178,16 @@ class Runner
       []
     end
 
-    def run_command
-      arguments = ["--environment=test"] + @arguments
-      "BUNDLE_GEMFILE=#{File.join(directory, "Gemfile")} " \
-        "bundle exec appsignal diagnose #{arguments.join(" ")}"
+    def run_env
+      super.merge({
+        "BUNDLE_GEMFILE" => File.join(directory, "Gemfile")
+      })
+    end
+
+    def run_command(arguments)
+      arguments << "--environment=development"
+
+      "bundle exec appsignal diagnose #{arguments.join(" ")}"
     end
 
     def ignored_lines
@@ -246,8 +260,8 @@ class Runner
       ]
     end
 
-    def run_command
-      arguments = @arguments.map { |a| %("#{a}") }.join(" ")
+    def run_command(arguments)
+      arguments = arguments.map { |a| %("#{a}") }.join(" ")
       "_build/dev/rel/elixir_diagnose/bin/elixir_diagnose " \
         "eval ':appsignal_tasks.diagnose([#{arguments}])'"
     end
@@ -368,8 +382,15 @@ class Runner
       ]
     end
 
-    def run_command
-      "APPSIGNAL_APP_ENV=test node_modules/.bin/appsignal-diagnose #{@arguments.join(" ")}"
+    def run_env
+      super.merge({
+        "NODE_ENV" => "development",
+        "APPSIGNAL_ENABLE_MINUTELY_PROBES" => "false"
+      })
+    end
+
+    def run_command(arguments)
+      "node_modules/.bin/appsignal-diagnose #{arguments.join(" ")}"
     end
 
     def ignored_lines

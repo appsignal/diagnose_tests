@@ -327,7 +327,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
     case @runner.type
     when :ruby
       matchers += [
-        /  Environment: #{quoted("test")} \(Loaded from: initial\)/,
+        /  Environment: #{quoted("development")} \(Loaded from: initial\)/,
         /  debug: false/,
         /  log: #{quoted("file")}/,
         /  ignore_actions: \[\]/,
@@ -366,13 +366,13 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  debug: false/,
         /  dns_servers: \[\]/,
         /  enable_host_metrics: true/,
-        /  enable_minutely_probes: true/,
+        /  enable_minutely_probes: false/,
+        /    Sources:/,
+        /      default: true/,
+        /      env:     false/,
         /  enable_statsd: false/,
         /  endpoint: #{quoted "https://push.appsignal.com"}/,
-        /  env: #{quoted("test")}/,
-        /    Sources:/,
-        /      default: #{quoted("development")}/,
-        /      env:     #{quoted("test")}/,
+        /  env: #{quoted("development")}/,
         /  files_world_accessible: true/,
         /  filter_data_keys: \[\]/,
         /  filter_parameters: \[\]/,
@@ -446,7 +446,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "enable_minutely_probes" => false,
           "enable_statsd" => true,
           "endpoint" => "https://push.appsignal.com",
-          "env" => "test",
+          "env" => "development",
           "files_world_accessible" => true,
           "filter_parameters" => [],
           "filter_session_data" => [],
@@ -530,10 +530,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "debug" => false,
           "dns_servers" => [],
           "enable_host_metrics" => true,
-          "enable_minutely_probes" => true,
+          "enable_minutely_probes" => false,
           "enable_statsd" => false,
           "endpoint" => "https://push.appsignal.com",
-          "env" => "test",
+          "env" => "development",
           "files_world_accessible" => true,
           "filter_data_keys" => [],
           "filter_parameters" => [],
@@ -608,7 +608,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "name" => "DiagnoseTests"
           },
           "initial" => {
-            "env" => "test"
+            "env" => "development"
           },
           "system" => {
             "active" => true
@@ -690,7 +690,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "transaction_debug_mode" => false
           },
           "env" => {
-            "env" => "test",
+            "enable_minutely_probes" => false,
             "push_api_key" => "test"
           },
           "initial" => {
