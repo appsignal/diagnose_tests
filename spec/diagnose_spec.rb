@@ -358,7 +358,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       ]
     when :nodejs
       matchers += [
-        /  active: true/,
+        /  active: true \(Loaded from: initial\)/,
         /  ca_file_path: #{quoted ".+\/cacert.pem"}/,
         /  debug: false/,
         /  dns_servers: \[\]/,
@@ -367,6 +367,9 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  enable_statsd: false/,
         /  endpoint: #{quoted "https://push.appsignal.com"}/,
         /  env: #{quoted("test")}/,
+        /    Sources:/,
+        /      default: #{quoted("development")}/,
+        /      env:     #{quoted("test")}/,
         /  files_world_accessible: true/,
         /  filter_data_keys: \[\]/,
         /  filter_parameters: \[\]/,
@@ -377,7 +380,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  log: #{quoted("file")}/,
         /  log_file_path: #{quoted ".+\/appsignal.log"}/,
         /  log_path: #{quoted("/tmp")}/,
-        /  push_api_key: #{quoted "test"}/,
+        /  push_api_key: #{quoted "test"} \(Loaded from: env\)/,
         /  transaction_debug_mode: false/
       ]
     when :elixir
