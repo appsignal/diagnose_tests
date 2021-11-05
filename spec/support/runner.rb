@@ -288,7 +288,7 @@ class Runner
       # reports
       package_dirs = Dir.glob(
         "_build/dev/rel/elixir_diagnose/lib/appsignal-*.*.*/",
-        :base => File.join(project_path, "elixir")
+        :base => directory
       )
       package_dirs.each do |dir|
         FileUtils.rm_rf(dir)
@@ -298,7 +298,7 @@ class Runner
     def after_setup
       priv_dir = Dir.glob(
         "_build/dev/rel/elixir_diagnose/lib/appsignal-*.*.*/priv/",
-        :base => File.join(project_path, "elixir")
+        :base => directory
       ).first
       raise "No Elixir package priv dir found!" unless priv_dir
 
