@@ -146,6 +146,10 @@ class Runner
     # Placeholder
   end
 
+  def setup_commands
+    []
+  end
+
   def after_setup
     # Placeholder
   end
@@ -169,13 +173,20 @@ class Runner
     File.expand_path("../../", __dir__)
   end
 
+  def integration_path
+    integration_path_env = "#{type.to_s.upcase}_INTEGRATION_PATH"
+    path = ENV.fetch(integration_path_env, "../../../")
+
+    if File.absolute_path?(path)
+      path
+    else
+      File.expand_path(path, project_path)
+    end
+  end
+
   class Ruby < Runner
     def directory
       File.join(project_path, "ruby")
-    end
-
-    def setup_commands
-      []
     end
 
     def run_env
@@ -209,7 +220,7 @@ class Runner
     end
 
     def after_setup
-      install_report_path = File.expand_path("../../../ext/install.report", project_path)
+      install_report_path = File.expand_path("ext/install.report", integration_path)
       if install_report?
         # Overwite created install report so we have a consistent test environment
         File.write(install_report_path, install_report)

@@ -2,4 +2,13 @@
 
 source "https://rubygems.org"
 
-gem "appsignal", :path => "../../../../"
+def integration_path
+  path = ENV.fetch("RUBY_INTEGRATION_PATH", "../../../")
+  if File.absolute_path?(path)
+    path
+  else
+    File.join("../", path)
+  end
+end
+
+gem "appsignal", :path => integration_path
