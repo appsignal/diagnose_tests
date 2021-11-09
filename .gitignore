@@ -2,3 +2,4 @@ node_modules
 tmp
 .bundle
 spec/examples.txt
+nodejs/package-lock.json

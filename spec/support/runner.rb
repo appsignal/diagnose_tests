@@ -3,6 +3,8 @@
 require "logger"
 require "forwardable"
 require "digest"
+require "fileutils"
+require "json"
 
 class Runner
   attr_reader :output
@@ -146,6 +148,10 @@ class Runner
     # Placeholder
   end
 
+  def setup_commands
+    []
+  end
+
   def after_setup
     # Placeholder
   end
@@ -169,13 +175,20 @@ class Runner
     File.expand_path("../../", __dir__)
   end
 
+  def integration_path
+    integration_path_env = "#{type.to_s.upcase}_INTEGRATION_PATH"
+    path = ENV.fetch(integration_path_env, "../../../")
+
+    if File.absolute_path?(path)
+      path
+    else
+      File.expand_path(path, project_path)
+    end
+  end
+
   class Ruby < Runner
     def directory
       File.join(project_path, "ruby")
-    end
-
-    def setup_commands
-      []
     end
 
     def run_env
@@ -209,7 +222,7 @@ class Runner
     end
 
     def after_setup
-      install_report_path = File.expand_path("../../../ext/install.report", project_path)
+      install_report_path = File.expand_path("ext/install.report", integration_path)
       if install_report?
         # Overwite created install report so we have a consistent test environment
         File.write(install_report_path, install_report)
@@ -288,7 +301,7 @@ class Runner
       # reports
       package_dirs = Dir.glob(
         "_build/dev/rel/elixir_diagnose/lib/appsignal-*.*.*/",
-        :base => File.join(project_path, "elixir")
+        :base => directory
       )
       package_dirs.each do |dir|
         FileUtils.rm_rf(dir)
@@ -298,7 +311,7 @@ class Runner
     def after_setup
       priv_dir = Dir.glob(
         "_build/dev/rel/elixir_diagnose/lib/appsignal-*.*.*/priv/",
-        :base => File.join(project_path, "elixir")
+        :base => directory
       ).first
       raise "No Elixir package priv dir found!" unless priv_dir
 
@@ -376,10 +389,11 @@ class Runner
     end
 
     def setup_commands
-      [
-        "npm install",
-        "npm link @appsignal/nodejs @appsignal/nodejs-ext"
-      ]
+      package_paths = ["nodejs", "nodejs-ext"].map do |package|
+        File.join(integration_path, "packages", package)
+      end
+
+      ["npm link #{package_paths.join(" ")}"]
     end
 
     def run_env
@@ -409,12 +423,15 @@ class Runner
     end
 
     def before_setup
-      # Placeholder
+      # Remove `package-lock.json` and `node_modules`, which may point or
+      # symlink to the wrong directories
+      FileUtils.rm_f(File.join(directory, "package-lock.json"))
+      FileUtils.rm_rf(File.join(directory, "node_modules"), :secure => true)
     end
 
     def after_setup
       # Overwite created install report so we have a consistent test environment
-      package_path = "#{File.expand_path("../../../../", project_path)}/"
+      package_path = "#{File.expand_path("../", integration_path)}/"
       report_path_digest = Digest::SHA256.hexdigest(package_path)
 
       install_report_path = "/tmp/appsignal-#{report_path_digest}-install.report"

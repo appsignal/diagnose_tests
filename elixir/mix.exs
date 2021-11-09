@@ -18,11 +18,16 @@ defmodule Elixir.MixProject do
     ]
   end
 
+  defp integration_path do
+    path = System.get_env("ELIXIR_INTEGRATION_PATH", "../../..")
+    Path.absname(path, "../")
+  end
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:jason, "~> 1.2"},
-      {:appsignal, path: "../../../.."}
+      {:appsignal, path: integration_path()}
     ]
   end
 end
