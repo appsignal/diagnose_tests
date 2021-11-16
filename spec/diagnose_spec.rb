@@ -16,6 +16,7 @@ LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/
 RSpec.describe "Running the diagnose command without any arguments" do
   before(:all) do
     MockServer.auth_response_code = 200
+    MockServer.diagnose_response_code = 200
     @runner = init_runner(:prompt => "y")
     @runner.run
     @received_report = MockServer.last_diagnose_report
@@ -944,8 +945,29 @@ RSpec.describe "Running the diagnose command and not submitting report" do
   end
 end
 
+RSpec.describe "Running the diagnose command with report submission error" do
+  before(:all) do
+    MockServer.auth_response_code = 200
+    MockServer.diagnose_response_code = 500
+    @runner = init_runner(:prompt => "y")
+    @runner.run
+    @received_report = MockServer.last_diagnose_report
+  end
+
+  it "prints an error about report submission" do
+    send_report = section(:send_report)
+    expect(send_report).to include(
+      "  Error: Something went wrong while submitting the report to AppSignal.",
+      "  Response code: 500",
+      "  Response body:",
+      "{\"error\":\"Internal server error\"}"
+    )
+  end
+end
+
 RSpec.describe "Running the diagnose command with the --send-report option" do
   before :all do
+    MockServer.diagnose_response_code = 200
     @runner = init_runner(:args => ["--send-report"])
     @runner.run
     @received_report = MockServer.last_diagnose_report
@@ -1046,6 +1068,7 @@ end
 RSpec.describe "Running the diagnose command without Push API key" do
   before :all do
     MockServer.auth_response_code = 401
+    MockServer.diagnose_response_code = 200
     @runner = init_runner(:push_api_key => "", :prompt => "y")
     @runner.run
     @received_report = MockServer.last_diagnose_report
@@ -1122,6 +1145,7 @@ end
 RSpec.describe "Running the diagnose command with Push API key validation error" do
   before :all do
     MockServer.auth_response_code = 500
+    MockServer.diagnose_response_code = 200
     @runner = init_runner(:push_api_key => "", :prompt => "y")
     @runner.run
     @received_report = MockServer.last_diagnose_report
