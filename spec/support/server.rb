@@ -49,6 +49,18 @@ class MockServer < Sinatra::Base
       end
     end
 
+    def diagnose_response_code=(code)
+      @mutex.synchronize do
+        @diagnose_response_code = code
+      end
+    end
+
+    def diagnose_response_code
+      @mutex.synchronize do
+        @diagnose_response_code
+      end
+    end
+
     def track_auth_request(request)
       @mutex.synchronize do
         @received_auth_requests << request
@@ -86,8 +98,14 @@ class MockServer < Sinatra::Base
 
   post "/diag" do
     MockServer.track_diagnose_request(request)
-    status 200
-    JSON.dump({ :token => "diag_support_token" })
+    status_code = MockServer.diagnose_response_code
+    status status_code
+
+    if status_code == 200
+      JSON.dump({ :token => "diag_support_token" })
+    else
+      JSON.dump({ :error => "Internal server error" })
+    end
   end
 
   post "/1/auth" do
