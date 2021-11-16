@@ -419,8 +419,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  request_headers: \["accept", "accept-charset", "accept-encoding", "accept-language", "cache-control", "connection", "content-length", "path-info", "range", "request-method", "request-uri", "server-name", "server-port", "server-protocol"\]/, # rubocop:disable Layout/LineLength
         /  send_params: true/,
         /  skip_session_data: false/,
-        /  transaction_debug_mode: false/,
-        /  valid: true/
+        /  transaction_debug_mode: false/
       ]
     else
       raise "No clause for runner #{@runner}"
@@ -524,8 +523,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           ],
           "send_params" => true,
           "skip_session_data" => false,
-          "transaction_debug_mode" => false,
-          "valid" => true
+          "transaction_debug_mode" => false
         }
       when :nodejs
         {
