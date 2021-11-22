@@ -359,7 +359,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
     when :nodejs
       matchers += [
         /  active: true \(Loaded from: initial\)/,
-        /  apiKey: #{quoted "test"} \(Loaded from: env\)/,
         /  caFilePath: #{quoted ".+\/cacert.pem"}/,
         /  debug: false/,
         /  dnsServers: \[\]/,
@@ -383,6 +382,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  log: #{quoted("file")}/,
         /  logPath: #{quoted("/tmp")}/,
         /  name: #{quoted "DiagnoseTests"} \(Loaded from: env\)/,
+        /  pushApiKey: #{quoted "test"} \(Loaded from: env\)/,
         /  transactionDebugMode: false/
       ]
     when :elixir
