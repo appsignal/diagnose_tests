@@ -383,6 +383,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  logPath: #{quoted("/tmp")}/,
         /  name: #{quoted "DiagnoseTests"} \(Loaded from: env\)/,
         /  pushApiKey: #{quoted "test"} \(Loaded from: env\)/,
+        /  requestHeaders: \["accept","accept-charset","accept-encoding","accept-language","cache-control","connection","content-length","range"\]/, # rubocop:disable Layout/LineLength
         /  transactionDebugMode: false/
       ]
     when :elixir
@@ -542,6 +543,16 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "log_path" => "/tmp",
           "name" => "DiagnoseTests",
           "push_api_key" => "test",
+          "request_headers" => [
+            "accept",
+            "accept-charset",
+            "accept-encoding",
+            "accept-language",
+            "cache-control",
+            "connection",
+            "content-length",
+            "range"
+          ],
           "transaction_debug_mode" => false
         }
       else
@@ -684,6 +695,16 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "ignore_namespaces" => [],
             "log" => "file",
             "log_path" => "/tmp",
+            "request_headers" => [
+              "accept",
+              "accept-charset",
+              "accept-encoding",
+              "accept-language",
+              "cache-control",
+              "connection",
+              "content-length",
+              "range"
+            ],
             "transaction_debug_mode" => false
           },
           "env" => {
