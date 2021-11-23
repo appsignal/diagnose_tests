@@ -694,7 +694,8 @@ RSpec.describe "Running the diagnose command without any arguments" do
           },
           "initial" => {
             "active" => true
-          }
+          },
+          "system" => {}
         }
       else
         raise "No clause for runner #{@runner}"
