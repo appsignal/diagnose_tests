@@ -383,6 +383,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  name: #{quoted "DiagnoseTests"} \(Loaded from: env\)/,
         /  pushApiKey: #{quoted "test"} \(Loaded from: env\)/,
         /  requestHeaders: \["accept","accept-charset","accept-encoding","accept-language","cache-control","connection","content-length","range"\]/, # rubocop:disable Layout/LineLength
+        /  sendEnvironmentMetadata: true/,
         /  transactionDebugMode: false/
       ]
     when :elixir
@@ -415,6 +416,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  name: #{quoted "DiagnoseTests"} \(Loaded from file\)/,
         /  push_api_key: #{quoted "test"} \(Loaded from env\)/,
         /  request_headers: \["accept", "accept-charset", "accept-encoding", "accept-language", "cache-control", "connection", "content-length", "path-info", "range", "request-method", "request-uri", "server-name", "server-port", "server-protocol"\]/, # rubocop:disable Layout/LineLength
+        /  send_environment_metadata: true/,
         /  send_params: true/,
         /  skip_session_data: false/,
         /  transaction_debug_mode: false/
@@ -517,6 +519,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "server-port",
             "server-protocol"
           ],
+          "send_environment_metadata" => true,
           "send_params" => true,
           "skip_session_data" => false,
           "transaction_debug_mode" => false
@@ -551,6 +554,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "content-length",
             "range"
           ],
+          "send_environment_metadata" => true,
           "transaction_debug_mode" => false
         }
       else
@@ -657,6 +661,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
               "server-port",
               "server-protocol"
             ],
+            "send_environment_metadata" => true,
             "send_params" => true,
             "skip_session_data" => false,
             "transaction_debug_mode" => false
@@ -702,6 +707,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
               "content-length",
               "range"
             ],
+            "send_environment_metadata" => true,
             "transaction_debug_mode" => false
           },
           "env" => {
