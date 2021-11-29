@@ -380,7 +380,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  ignoreErrors: \[\]/,
         /  ignoreNamespaces: \[\]/,
         /  log: #{quoted("file")}/,
-        /  logPath: #{quoted("/tmp")}/,
         /  name: #{quoted "DiagnoseTests"} \(Loaded from: env\)/,
         /  pushApiKey: #{quoted "test"} \(Loaded from: env\)/,
         /  requestHeaders: \["accept","accept-charset","accept-encoding","accept-language","cache-control","connection","content-length","range"\]/, # rubocop:disable Layout/LineLength
@@ -540,7 +539,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "ignore_errors" => [],
           "ignore_namespaces" => [],
           "log" => "file",
-          "log_path" => "/tmp",
           "name" => "DiagnoseTests",
           "push_api_key" => "test",
           "request_headers" => [
@@ -694,7 +692,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "ignore_errors" => [],
             "ignore_namespaces" => [],
             "log" => "file",
-            "log_path" => "/tmp",
             "request_headers" => [
               "accept",
               "accept-charset",
