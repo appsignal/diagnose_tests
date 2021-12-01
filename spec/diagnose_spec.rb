@@ -321,25 +321,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
     case @runner.type
     when :ruby
       matchers += [
-        /  Environment: #{quoted("development")} \(Loaded from: initial\)/,
+        /  active: true \(Loaded from: system\)/,
+        %r{  ca_file_path: ".+/appsignal[-/]ruby/resources/cacert.pem"},
         /  debug: false/,
-        /  log: #{quoted("file")}/,
-        /  ignore_actions: \[\]/,
-        /  ignore_errors: \[\]/,
-        /  ignore_namespaces: \[\]/,
-        /  filter_parameters: \[\]/,
-        /  filter_session_data: \[\]/,
-        /  send_environment_metadata: true/,
-        /  send_params: true/,
-        /  request_headers: \["HTTP_ACCEPT", "HTTP_ACCEPT_CHARSET", "HTTP_ACCEPT_ENCODING", "HTTP_ACCEPT_LANGUAGE", "HTTP_CACHE_CONTROL", "HTTP_CONNECTION", "CONTENT_LENGTH", "PATH_INFO", "HTTP_RANGE", "REQUEST_METHOD", "REQUEST_URI", "SERVER_NAME", "SERVER_PORT", "SERVER_PROTOCOL"\]/, # rubocop:disable Layout/LineLength
-        /  endpoint: #{quoted ENV["APPSIGNAL_PUSH_API_ENDPOINT"]}/,
-        /    Sources:/,
-        /      default: #{quoted "https://push.appsignal.com"}/,
-        /      env:     #{quoted ENV["APPSIGNAL_PUSH_API_ENDPOINT"]}/,
-        /  instrument_net_http: true/,
-        /  instrument_redis: true/,
-        /  instrument_sequel: true/,
-        /  skip_session_data: false/,
+        /  dns_servers: \[\]/,
         /  enable_allocation_tracking: true/,
         /  enable_gc_instrumentation: false/,
         /  enable_host_metrics: true/,
@@ -348,13 +333,28 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /      default: true/,
         /      file:    false/,
         /  enable_statsd: true/,
-        %r{  ca_file_path: ".+/appsignal[-/]ruby/resources/cacert.pem"},
-        /  dns_servers: \[\]/,
+        /  endpoint: #{quoted ENV["APPSIGNAL_PUSH_API_ENDPOINT"]}/,
+        /    Sources:/,
+        /      default: #{quoted "https://push.appsignal.com"}/,
+        /      env:     #{quoted ENV["APPSIGNAL_PUSH_API_ENDPOINT"]}/,
+        /  environment: #{quoted("development")} \(Loaded from: initial\)/,
         /  files_world_accessible: true/,
-        /  transaction_debug_mode: false/,
-        /  active: true \(Loaded from: system\)/,
+        /  filter_parameters: \[\]/,
+        /  filter_session_data: \[\]/,
+        /  ignore_actions: \[\]/,
+        /  ignore_errors: \[\]/,
+        /  ignore_namespaces: \[\]/,
+        /  instrument_net_http: true/,
+        /  instrument_redis: true/,
+        /  instrument_sequel: true/,
+        /  log: #{quoted("file")}/,
         /  name: #{quoted "DiagnoseTests"} \(Loaded from: file\)/,
-        /  push_api_key: "test" \(Loaded from: env\)/
+        /  push_api_key: "test" \(Loaded from: env\)/,
+        /  request_headers: \["HTTP_ACCEPT", "HTTP_ACCEPT_CHARSET", "HTTP_ACCEPT_ENCODING", "HTTP_ACCEPT_LANGUAGE", "HTTP_CACHE_CONTROL", "HTTP_CONNECTION", "CONTENT_LENGTH", "PATH_INFO", "HTTP_RANGE", "REQUEST_METHOD", "REQUEST_URI", "SERVER_NAME", "SERVER_PORT", "SERVER_PROTOCOL"\]/, # rubocop:disable Layout/LineLength
+        /  send_environment_metadata: true/,
+        /  send_params: true/,
+        /  skip_session_data: false/,
+        /  transaction_debug_mode: false/
       ]
     when :nodejs
       matchers += [
