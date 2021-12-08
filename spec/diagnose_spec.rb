@@ -348,7 +348,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  instrument_redis: true/,
         /  instrument_sequel: true/,
         /  log: #{quoted("file")}/,
-        /  log_level: #{quoted "info"}/,
         /  name: #{quoted "DiagnoseTests"} \(Loaded from: file\)/,
         /  push_api_key: "test" \(Loaded from: env\)/,
         /  request_headers: \["HTTP_ACCEPT", "HTTP_ACCEPT_CHARSET", "HTTP_ACCEPT_ENCODING", "HTTP_ACCEPT_LANGUAGE", "HTTP_CACHE_CONTROL", "HTTP_CONNECTION", "CONTENT_LENGTH", "PATH_INFO", "HTTP_RANGE", "REQUEST_METHOD", "REQUEST_URI", "SERVER_NAME", "SERVER_PORT", "SERVER_PROTOCOL"\]/, # rubocop:disable Layout/LineLength
@@ -373,15 +372,14 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /    Sources:/,
         /      default: #{quoted "https://push.appsignal.com"}/,
         /      env:     #{quoted ENV["APPSIGNAL_PUSH_API_ENDPOINT"]}/,
-        /  environment: #{quoted "development"}/,
+        /  environment: #{quoted("development")}/,
         /  filesWorldAccessible: true/,
         /  filterParameters: \[\]/,
         /  filterSessionData: \[\]/,
         /  ignoreActions: \[\]/,
         /  ignoreErrors: \[\]/,
         /  ignoreNamespaces: \[\]/,
-        /  log: #{quoted "file"}/,
-        /  logLevel: #{quoted "info"}/,
+        /  log: #{quoted("file")}/,
         /  name: #{quoted "DiagnoseTests"} \(Loaded from: env\)/,
         /  pushApiKey: #{quoted "test"} \(Loaded from: env\)/,
         /  requestHeaders: \["accept","accept-charset","accept-encoding","accept-language","cache-control","connection","content-length","range"\]/, # rubocop:disable Layout/LineLength
@@ -415,7 +413,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  ignore_errors: \[\]/,
         /  ignore_namespaces: \[\]/,
         /  log: "file"/,
-        /  log_level: #{quoted "info"}/,
         /  name: #{quoted "DiagnoseTests"} \(Loaded from file\)/,
         /  push_api_key: #{quoted "test"} \(Loaded from env\)/,
         /  request_headers: \["accept", "accept-charset", "accept-encoding", "accept-language", "cache-control", "connection", "content-length", "path-info", "range", "request-method", "request-uri", "server-name", "server-port", "server-protocol"\]/, # rubocop:disable Layout/LineLength
@@ -462,7 +459,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "instrument_redis" => true,
           "instrument_sequel" => true,
           "log" => "file",
-          "log_level" => "info",
           "name" => "DiagnoseTests",
           "push_api_key" => "test",
           "request_headers" => [
@@ -505,7 +501,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "ignore_errors" => [],
           "ignore_namespaces" => [],
           "log" => "file",
-          "log_level" => "info",
           "name" => "DiagnoseTests",
           "push_api_key" => "test",
           "request_headers" => [
@@ -547,7 +542,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "ignore_errors" => [],
           "ignore_namespaces" => [],
           "log" => "file",
-          "log_level" => "info",
           "name" => "DiagnoseTests",
           "push_api_key" => "test",
           "request_headers" => [
@@ -595,7 +589,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "instrument_redis" => true,
             "instrument_sequel" => true,
             "log" => "file",
-            "log_level" => "info",
             "request_headers" => [
               "HTTP_ACCEPT",
               "HTTP_ACCEPT_CHARSET",
@@ -652,7 +645,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "ignore_errors" => [],
             "ignore_namespaces" => [],
             "log" => "file",
-            "log_level" => "info",
             "request_headers" => [
               "accept",
               "accept-charset",
@@ -705,7 +697,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "ignore_errors" => [],
             "ignore_namespaces" => [],
             "log" => "file",
-            "log_level" => "info",
             "request_headers" => [
               "accept",
               "accept-charset",
