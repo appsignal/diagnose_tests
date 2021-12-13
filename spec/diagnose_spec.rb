@@ -415,7 +415,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  log: "file"/,
         /  name: #{quoted "DiagnoseTests"} \(Loaded from file\)/,
         /  push_api_key: #{quoted "test"} \(Loaded from env\)/,
-        /  request_headers: \["accept", "accept-charset", "accept-encoding", "accept-language", "cache-control", "connection", "content-length", "path-info", "range", "request-method", "request-uri", "server-name", "server-port", "server-protocol"\]/, # rubocop:disable Layout/LineLength
+        /  request_headers: \["accept", "accept-charset", "accept-encoding", "accept-language", "cache-control", "connection", "content-length", "range"\]/, # rubocop:disable Layout/LineLength
         /  send_environment_metadata: true/,
         /  send_params: true/,
         /  skip_session_data: false/,
@@ -511,13 +511,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "cache-control",
             "connection",
             "content-length",
-            "path-info",
-            "range",
-            "request-method",
-            "request-uri",
-            "server-name",
-            "server-port",
-            "server-protocol"
+            "range"
           ],
           "send_environment_metadata" => true,
           "send_params" => true,
@@ -653,13 +647,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
               "cache-control",
               "connection",
               "content-length",
-              "path-info",
-              "range",
-              "request-method",
-              "request-uri",
-              "server-name",
-              "server-port",
-              "server-protocol"
+              "range"
             ],
             "send_environment_metadata" => true,
             "send_params" => true,
