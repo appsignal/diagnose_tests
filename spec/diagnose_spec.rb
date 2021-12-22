@@ -384,6 +384,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  pushApiKey: #{quoted "test"} \(Loaded from: env\)/,
         /  requestHeaders: \["accept","accept-charset","accept-encoding","accept-language","cache-control","connection","content-length","range"\]/, # rubocop:disable Layout/LineLength
         /  sendEnvironmentMetadata: true/,
+        /  sendParams: true/,
         /  transactionDebugMode: false/
       ]
     when :elixir
@@ -549,6 +550,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "range"
           ],
           "send_environment_metadata" => true,
+          "send_params" => true,
           "transaction_debug_mode" => false
         }
       else
@@ -696,6 +698,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
               "range"
             ],
             "send_environment_metadata" => true,
+            "send_params" => true,
             "transaction_debug_mode" => false
           },
           "env" => {
