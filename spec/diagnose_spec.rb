@@ -385,6 +385,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  requestHeaders: \["accept","accept-charset","accept-encoding","accept-language","cache-control","connection","content-length","range"\]/, # rubocop:disable Layout/LineLength
         /  sendEnvironmentMetadata: true/,
         /  sendParams: true/,
+        /  sendSessionData: true/,
         /  transactionDebugMode: false/
       ]
     when :elixir
@@ -551,6 +552,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           ],
           "send_environment_metadata" => true,
           "send_params" => true,
+          "send_session_data" => true,
           "transaction_debug_mode" => false
         }
       else
@@ -699,6 +701,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             ],
             "send_environment_metadata" => true,
             "send_params" => true,
+            "send_session_data" => true,
             "transaction_debug_mode" => false
           },
           "env" => {
