@@ -234,29 +234,38 @@ class Runner
 
     def install_report
       <<~REPORT
-        ---
-        result:
-          status: success
-        language:
-          name: ruby
-          implementation: ruby
-          version: 2.7.0-p83
-        download:
-          download_url: https://appsignal-agent-releases.global.ssl.fastly.net/20f7d0d/appsignal-x86_64-darwin-all-static.tar.gz
-          checksum: verified
-        build:
-          time: 2020-11-17 14:01:02.281856000 Z
-          architecture: x86_64
-          target: darwin
-          musl_override: false
-          linux_arm_override: false
-          library_type: static
-          dependencies: {}
-          source: remote
-          flags: {}
-        host:
-          root_user: false
-          dependencies: {}
+        {
+          "result": {
+            "status": "success"
+          },
+          "language": {
+            "name": "ruby",
+            "implementation": "ruby",
+            "version": "2.7.0-p83"
+          },
+          "download": {
+            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/20f7d0d/appsignal-x86_64-darwin-all-static.tar.gz",
+            "checksum": "verified"
+          },
+          "build": {
+            "time": "2020-11-17 14:01:02 UTC",
+            "architecture": "x86_64",
+            "target": "darwin",
+            "musl_override": false,
+            "linux_arm_override": false,
+            "library_type": "static",
+            "dependencies": {
+            },
+            "source": "remote",
+            "flags": {
+            }
+          },
+          "host": {
+            "root_user": false,
+            "dependencies": {
+            }
+          }
+        }
       REPORT
     end
   end
