@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "@appsignal/nodejs": "*",
-    "@appsignal/nodejs-ext": "*"
+    "@appsignal/nodejs": "*"
   }
 }

@@ -389,11 +389,9 @@ class Runner
     end
 
     def setup_commands
-      package_paths = ["nodejs", "nodejs-ext"].map do |package|
-        File.join(integration_path, "packages", package)
-      end
+      package_path = File.join(integration_path, "packages", "nodejs")
 
-      ["npm link #{package_paths.join(" ")}"]
+      ["npm link #{package_path}"]
     end
 
     def run_env
