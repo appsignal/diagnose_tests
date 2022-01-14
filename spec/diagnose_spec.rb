@@ -353,7 +353,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  request_headers: \["HTTP_ACCEPT", "HTTP_ACCEPT_CHARSET", "HTTP_ACCEPT_ENCODING", "HTTP_ACCEPT_LANGUAGE", "HTTP_CACHE_CONTROL", "HTTP_CONNECTION", "CONTENT_LENGTH", "PATH_INFO", "HTTP_RANGE", "REQUEST_METHOD", "REQUEST_URI", "SERVER_NAME", "SERVER_PORT", "SERVER_PROTOCOL"\]/, # rubocop:disable Layout/LineLength
         /  send_environment_metadata: true/,
         /  send_params: true/,
-        /  skip_session_data: false/,
+        /  send_session_data: true/,
         /  transaction_debug_mode: false/
       ]
     when :nodejs
@@ -481,7 +481,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           ],
           "send_environment_metadata" => true,
           "send_params" => true,
-          "skip_session_data" => false,
+          "send_session_data" => true,
           "transaction_debug_mode" => false
         }
       when :elixir
@@ -605,7 +605,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
             ],
             "send_environment_metadata" => true,
             "send_params" => true,
-            "skip_session_data" => false,
             "transaction_debug_mode" => false
           },
           "env" => {
@@ -620,7 +619,8 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "env" => "development"
           },
           "system" => {
-            "active" => true
+            "active" => true,
+            "send_session_data" => true
           }
         }
       when :elixir
