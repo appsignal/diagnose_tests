@@ -358,7 +358,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       ]
     when :nodejs
       matchers += [
-        /  active: true \(Loaded from: initial\)/,
+        /  active: false/,
         /  caFilePath: #{quoted ".+\/cacert.pem"}/,
         /  debug: false/,
         /  dnsServers: \[\]/,
@@ -522,7 +522,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         }
       when :nodejs
         {
-          "active" => true,
+          "active" => false,
           "ca_file_path" => ending_with("cert/cacert.pem"),
           "debug" => false,
           "dns_servers" => [],
@@ -674,6 +674,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       when :nodejs
         {
           "default" => {
+            "active" => false,
             "ca_file_path" => ending_with("cert/cacert.pem"),
             "debug" => false,
             "dns_servers" => [],
@@ -710,9 +711,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "push_api_key" => "test",
             "name" => "DiagnoseTests"
           },
-          "initial" => {
-            "active" => true
-          },
+          "initial" => {},
           "system" => {}
         }
       else
