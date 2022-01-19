@@ -437,11 +437,7 @@ class Runner
     end
 
     def after_setup
-      # Overwite created install report so we have a consistent test environment
-      package_path = "#{File.expand_path("../", integration_path)}/"
-      report_path_digest = Digest::SHA256.hexdigest(package_path)
-
-      install_report_path = "/tmp/appsignal-#{report_path_digest}-install.report"
+      install_report_path = File.join(integration_path, "packages/nodejs/ext/install.report")
       if install_report?
         File.write(install_report_path, install_report)
       elsif File.exist?(install_report_path)
