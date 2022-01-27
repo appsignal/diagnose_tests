@@ -670,6 +670,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
           },
           "system" => {
             "active" => true
+          },
+          "override" => {
+            "send_session_data" => true,
+            "skip_session_data" => false
           }
         }
       when :nodejs
