@@ -621,7 +621,9 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "env" => "development"
           },
           "system" => {
-            "active" => true,
+            "active" => true
+          },
+          "override" => {
             "send_session_data" => true
           }
         }
