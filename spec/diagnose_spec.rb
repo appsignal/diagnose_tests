@@ -2,7 +2,7 @@
 
 VERSION_PATTERN = /\d+\.\d+\.\d+(-[a-z0-9]+)?/
 REVISION_PATTERN = /[a-z0-9]{7}/
-ARCH_PATTERN = /(x(86_)?64|i686)/
+ARCH_PATTERN = /(x(86_)?64|i686|arm64)/
 TARGET_PATTERN = /(darwin\d*|linux(-gnu|-musl)?|freebsd)/
 LIBRARY_TYPE_PATTERN = /static|dynamic/
 TAR_FILENAME_PATTERN =
