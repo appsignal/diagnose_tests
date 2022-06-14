@@ -398,9 +398,7 @@ class Runner
     end
 
     def setup_commands
-      package_path = File.join(integration_path, "packages", "nodejs")
-
-      ["npm link #{package_path}"]
+      ["npm link #{integration_path}"]
     end
 
     def run_env
@@ -437,7 +435,7 @@ class Runner
     end
 
     def after_setup
-      install_report_path = File.join(integration_path, "packages/nodejs/ext/install.report")
+      install_report_path = File.join(integration_path, "ext/install.report")
       if install_report?
         File.write(install_report_path, install_report)
       elsif File.exist?(install_report_path)
