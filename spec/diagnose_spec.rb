@@ -360,7 +360,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
       matchers += [
         /  active: false/,
         /  caFilePath: #{quoted ".+\/cacert.pem"}/,
-        /  debug: false/,
         /  disableDefaultInstrumentations: false/,
         /  dnsServers: \[\]/,
         /  enableHostMetrics: true/,
@@ -386,8 +385,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  requestHeaders: \["accept","accept-charset","accept-encoding","accept-language","cache-control","connection","content-length","range"\]/, # rubocop:disable Layout/LineLength
         /  sendEnvironmentMetadata: true/,
         /  sendParams: true/,
-        /  sendSessionData: true/,
-        /  transactionDebugMode: false/
+        /  sendSessionData: true/
       ]
     when :elixir
       matchers += [
@@ -527,7 +525,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
         {
           "active" => false,
           "ca_file_path" => ending_with("cert/cacert.pem"),
-          "debug" => false,
           "disable_default_instrumentations" => false,
           "dns_servers" => [],
           "enable_host_metrics" => true,
@@ -556,8 +553,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           ],
           "send_environment_metadata" => true,
           "send_params" => true,
-          "send_session_data" => true,
-          "transaction_debug_mode" => false
+          "send_session_data" => true
         }
       else
         raise "No clause for runner #{@runner}"
@@ -685,7 +681,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "default" => {
             "active" => false,
             "ca_file_path" => ending_with("cert/cacert.pem"),
-            "debug" => false,
             "disable_default_instrumentations" => false,
             "dns_servers" => [],
             "enable_host_metrics" => true,
@@ -712,8 +707,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             ],
             "send_environment_metadata" => true,
             "send_params" => true,
-            "send_session_data" => true,
-            "transaction_debug_mode" => false
+            "send_session_data" => true
           },
           "env" => {
             "endpoint" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
