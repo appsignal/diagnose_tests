@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-VERSION_PATTERN = /\d+\.\d+\.\d+(-[a-z0-9]+)?/
+VERSION_PATTERN = /\d+\.\d+\.\d+(-[a-z0-9]+)?([-.].+)?/
 REVISION_PATTERN = /[a-z0-9]{7}/
 ARCH_PATTERN = /(x(86_)?64|i686|arm64)/
 TARGET_PATTERN = /(darwin\d*|linux(-gnu|-musl)?|freebsd)/
