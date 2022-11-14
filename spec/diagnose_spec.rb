@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-VERSION_PATTERN = /\d+\.\d+\.\d+(-[a-z0-9]+)?/
+VERSION_PATTERN = /\d+\.\d+\.\d+(-[a-z0-9]+)?([-.].+)?/
 REVISION_PATTERN = /[a-z0-9]{7}/
 ARCH_PATTERN = /(x(86_)?64|i686|arm64)/
 TARGET_PATTERN = /(darwin\d*|linux(-gnu|-musl)?|freebsd)/
@@ -359,7 +359,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       matchers += [
         /  active: false/,
         /  caFilePath: #{quoted ".+\/cacert.pem"}/,
-        /  debug: false/,
+        /  disableDefaultInstrumentations: false/,
         /  dnsServers: \[\]/,
         /  enableHostMetrics: true/,
         /  enableMinutelyProbes: false/,
@@ -378,17 +378,13 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  ignoreActions: \[\]/,
         /  ignoreErrors: \[\]/,
         /  ignoreNamespaces: \[\]/,
-        /  instrumentHttp: true/,
-        /  instrumentPg: true/,
-        /  instrumentRedis: true/,
         /  log: #{quoted("file")}/,
         /  name: #{quoted "DiagnoseTests"} \(Loaded from: env\)/,
         /  pushApiKey: #{quoted "test"} \(Loaded from: env\)/,
         /  requestHeaders: \["accept","accept-charset","accept-encoding","accept-language","cache-control","connection","content-length","range"\]/, # rubocop:disable Layout/LineLength
         /  sendEnvironmentMetadata: true/,
         /  sendParams: true/,
-        /  sendSessionData: true/,
-        /  transactionDebugMode: false/
+        /  sendSessionData: true/
       ]
     when :elixir
       matchers += [
@@ -527,7 +523,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         {
           "active" => false,
           "ca_file_path" => ending_with("cert/cacert.pem"),
-          "debug" => false,
+          "disable_default_instrumentations" => false,
           "dns_servers" => [],
           "enable_host_metrics" => true,
           "enable_minutely_probes" => false,
@@ -540,9 +536,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "ignore_actions" => [],
           "ignore_errors" => [],
           "ignore_namespaces" => [],
-          "instrument_http" => true,
-          "instrument_pg" => true,
-          "instrument_redis" => true,
           "log" => "file",
           "name" => "DiagnoseTests",
           "push_api_key" => "test",
@@ -558,8 +551,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           ],
           "send_environment_metadata" => true,
           "send_params" => true,
-          "send_session_data" => true,
-          "transaction_debug_mode" => false
+          "send_session_data" => true
         }
       else
         raise "No clause for runner #{@runner}"
@@ -686,7 +678,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "default" => {
             "active" => false,
             "ca_file_path" => ending_with("cert/cacert.pem"),
-            "debug" => false,
+            "disable_default_instrumentations" => false,
             "dns_servers" => [],
             "enable_host_metrics" => true,
             "enable_minutely_probes" => true,
@@ -699,9 +691,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "ignore_actions" => [],
             "ignore_errors" => [],
             "ignore_namespaces" => [],
-            "instrument_http" => true,
-            "instrument_pg" => true,
-            "instrument_redis" => true,
             "log" => "file",
             "request_headers" => [
               "accept",
@@ -715,8 +704,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             ],
             "send_environment_metadata" => true,
             "send_params" => true,
-            "send_session_data" => true,
-            "transaction_debug_mode" => false
+            "send_session_data" => true
           },
           "env" => {
             "endpoint" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
