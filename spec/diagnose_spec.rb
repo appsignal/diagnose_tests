@@ -247,6 +247,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       "heroku" => false,
       "language_version" => VERSION_PATTERN,
       "os" => TARGET_PATTERN,
+      "os_distribution" => kind_of(String),
       "root" => false,
       "running_in_container" => boolean
     }
