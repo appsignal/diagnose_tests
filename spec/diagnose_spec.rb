@@ -427,6 +427,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  logging_endpoint: #{quoted("https://appsignal-endpoint.net")}/,
         /  name: #{quoted "DiagnoseTests"} \(Loaded from file\)/,
         /  push_api_key: #{quoted "test"} \(Loaded from env\)/,
+        /  report_oban_errors: "all"/,
         /  request_headers: \["accept", "accept-charset", "accept-encoding", "accept-language", "cache-control", "connection", "content-length", "range"\]/, # rubocop:disable Layout/LineLength
         /  send_environment_metadata: true/,
         /  send_params: true/,
@@ -524,6 +525,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "logging_endpoint" => "https://appsignal-endpoint.net",
           "name" => "DiagnoseTests",
           "push_api_key" => "test",
+          "report_oban_errors" => "all",
           "request_headers" => [
             "accept",
             "accept-charset",
@@ -674,6 +676,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "instrument_oban" => true,
             "log" => "file",
             "logging_endpoint" => "https://appsignal-endpoint.net",
+            "report_oban_errors" => "all",
             "request_headers" => [
               "accept",
               "accept-charset",
