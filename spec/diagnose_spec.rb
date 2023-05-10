@@ -844,6 +844,14 @@ RSpec.describe "Running the diagnose command without any arguments" do
       /    Path: #{quoted(PATH_PATTERN)}/
     ]
 
+    if @runner.type == :nodejs
+      matchers += [
+        "",
+        %(  AppSignal client file),
+        /    Path: #{quoted(PATH_PATTERN)}/
+      ]
+    end
+
     if [:ruby, :elixir].include? @runner.type
       matchers += [
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
@@ -921,8 +929,19 @@ RSpec.describe "Running the diagnose command without any arguments" do
 
     matchers =
       case @runner.type
-      when :elixir, :nodejs
+      when :elixir
         default_paths
+      when :nodejs
+        default_paths.merge(
+          "appsignal.cjs" => {
+            "exists" => true,
+            "mode" => kind_of(String),
+            "ownership" => path_ownership(@runner.type),
+            "path" => ending_with("/appsignal.cjs"),
+            "type" => "file",
+            "writable" => true
+          }
+        )
       when :ruby
         default_paths.merge(
           "ext/mkmf.log" => {
