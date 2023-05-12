@@ -405,7 +405,8 @@ class Runner
       super.merge({
         "NODE_ENV" => "development",
         "APPSIGNAL_ENABLE_MINUTELY_PROBES" => "false",
-        "APPSIGNAL_APP_NAME" => "DiagnoseTests"
+        "APPSIGNAL_APP_NAME" => "DiagnoseTests",
+        "APPSIGNAL_DIAGNOSE" => "true"
       })
     end
 

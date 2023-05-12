@@ -363,7 +363,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
       ]
     when :nodejs
       matchers += [
-        /  active: false/,
+        /  active: true/,
+        /    Sources:/,
+        /      default: false/,
+        /      initial: true/,
         /  caFilePath: #{quoted ".+\/cacert.pem"}/,
         /  disableDefaultInstrumentations: false/,
         /  dnsServers: \[\]/,
@@ -386,8 +389,12 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  ignoreErrors: \[\]/,
         /  ignoreNamespaces: \[\]/,
         /  log: #{quoted("file")}/,
+        /  logLevel: #{quoted "debug"} \(Loaded from: initial\)/,
         /  loggingEndpoint: #{quoted("https://appsignal-endpoint.net")}/,
-        /  name: #{quoted "DiagnoseTests"} \(Loaded from: env\)/,
+        /  name: #{quoted "DiagnoseTests"}/,
+        /    Sources:/,
+        /      env:     #{quoted "DiagnoseTests"}/,
+        /      initial: #{quoted "DiagnoseTests"}/,
         /  pushApiKey: #{quoted "test"} \(Loaded from: env\)/,
         /  requestHeaders: \["accept","accept-charset","accept-encoding","accept-language","cache-control","connection","content-length","range"\]/, # rubocop:disable Layout/LineLength
         /  sendEnvironmentMetadata: true/,
@@ -550,7 +557,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         }
       when :nodejs
         {
-          "active" => false,
+          "active" => true,
           "ca_file_path" => ending_with("cert/cacert.pem"),
           "disable_default_instrumentations" => false,
           "dns_servers" => [],
@@ -567,6 +574,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "ignore_errors" => [],
           "ignore_namespaces" => [],
           "log" => "file",
+          "log_level" => "debug",
           "logging_endpoint" => "https://appsignal-endpoint.net",
           "name" => "DiagnoseTests",
           "push_api_key" => "test",
@@ -758,7 +766,11 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "push_api_key" => "test",
             "name" => "DiagnoseTests"
           },
-          "initial" => {},
+          "initial" => {
+            "active" => true,
+            "log_level" => "debug",
+            "name" => "DiagnoseTests"
+          },
           "system" => {}
         }
       else
