@@ -360,6 +360,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  send_environment_metadata: true/,
         /  send_params: true/,
         /  send_session_data: true/,
+        /  sinatra_sanitized_routes: false/,
         /  transaction_debug_mode: false/
       ]
     when :nodejs
@@ -511,6 +512,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "send_environment_metadata" => true,
           "send_params" => true,
           "send_session_data" => true,
+          "sinatra_sanitized_routes" => false,
           "transaction_debug_mode" => false
         }
       when :elixir
@@ -651,6 +653,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             ],
             "send_environment_metadata" => true,
             "send_params" => true,
+            "sinatra_sanitized_routes" => false,
             "transaction_debug_mode" => false
           },
           "env" => {
