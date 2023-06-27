@@ -4,7 +4,8 @@ module RunnerHelper
   LANGUAGE_RUNNERS = {
     "ruby" => Runner::Ruby,
     "elixir" => Runner::Elixir,
-    "nodejs" => Runner::Nodejs
+    "nodejs" => Runner::Nodejs,
+    "python" => Runner::Python
   }.freeze
 
   def init_runner(options = {})

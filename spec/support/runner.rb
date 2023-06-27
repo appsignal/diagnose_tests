@@ -479,4 +479,10 @@ class Runner
       REPORT
     end
   end
+
+  class Python < Runner
+    def directory
+      File.join(project_path, "python")
+    end
+  end
 end
