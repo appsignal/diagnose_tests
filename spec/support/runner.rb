@@ -484,5 +484,9 @@ class Runner
     def directory
       File.join(project_path, "python")
     end
+
+    def run_command(arguments)
+      "hatch run appsignal diagnose"
+    end
   end
 end
