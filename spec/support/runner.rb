@@ -488,5 +488,17 @@ class Runner
     def run_command(arguments)
       "hatch run appsignal diagnose"
     end
+
+    def ignored_lines
+      []
+    end
+
+    def type
+      :python
+    end
+
+    def language_name
+      "Python"
+    end
   end
 end
