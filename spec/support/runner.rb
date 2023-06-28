@@ -490,7 +490,7 @@ class Runner
     end
 
     def ignored_lines
-      []
+      ["Checking dependencies"]
     end
 
     def type
