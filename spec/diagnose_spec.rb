@@ -96,7 +96,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  Language: #{@runner.language_name}/,
         /  (Gem|Package) version: #{quoted VERSION_PATTERN}/,
         /  Agent version: #{quoted REVISION_PATTERN}/,
-        /  (Extension|Nif) loaded: true/
+        /  (Extension|Nif) loaded: (t|T)rue/
       ]
     )
   end
