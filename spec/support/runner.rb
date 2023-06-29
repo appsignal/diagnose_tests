@@ -485,6 +485,12 @@ class Runner
       File.join(project_path, "python")
     end
 
+    def run_env
+      super.merge({
+        "APPSIGNAL_APP_NAME" => "DiagnoseTests",
+      })
+    end
+
     def run_command(arguments)
       "hatch run appsignal diagnose"
     end
