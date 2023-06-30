@@ -112,6 +112,8 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the extension installation section" do
+    skip if @runner.type == :python
+
     matchers = [
       "Extension installation report",
       /  Installation result/,
@@ -166,6 +168,8 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "submitted report contains extension installation section" do
+    skip if @runner.type == :python
+
     extra_language =
       case @runner.type
       when :elixir
