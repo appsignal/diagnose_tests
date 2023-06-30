@@ -42,32 +42,31 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints all sections in the correct order" do
-    section_keys =
-      [
+    section_keys = [
         :header,
         :library,
-        :installation,
+        (:installation unless @runner.type == :python),
         :host,
         :agent,
         :config,
         :validation,
         :paths,
         :send_report
-      ]
+      ].compact
     expect(@runner.output.sections.keys).to eq(section_keys), @runner.output.to_s
   end
 
   it "submitted report contains all keys" do
-    expect(@received_report.to_h.keys).to contain_exactly(
+    expect(@received_report.to_h.keys).to contain_exactly(*[
       "agent",
       "config",
       "host",
-      "installation",
+      ("installation" unless @runner.type == :python),
       "library",
       "paths",
       "process",
       "validation"
-    )
+    ].compact)
   end
 
   it "prints no 'other' section" do
