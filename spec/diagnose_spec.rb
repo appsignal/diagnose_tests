@@ -9,7 +9,7 @@ TAR_FILENAME_PATTERN =
   /appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz/
 DOWNLOAD_URL = %r{https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}}
 DATETIME_PATTERN = /\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}( ?UTC|.\d+Z)?/
-TRUE_OR_FALSE_PATTERN = /true|false/
+TRUE_OR_FALSE_PATTERN = /(t|T)rue|(f|F)alse/
 PATH_PATTERN = %r{[/\w.-]+}
 LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/
 

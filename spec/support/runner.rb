@@ -496,7 +496,12 @@ class Runner
     end
 
     def ignored_lines
-      ["Checking dependencies"]
+      [
+        /Creating environment: default/,
+        /Installing project in development mode/,
+        /Checking dependencies/,
+        /Syncing dependencies/
+      ]
     end
 
     def type
