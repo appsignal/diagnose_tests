@@ -450,6 +450,26 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  skip_session_data: false/,
         /  transaction_debug_mode: false/
       ]
+    when :python
+      matchers += [
+        /  ca_file_path: #{quoted ".+/src/appsignal/resources/cacert.pem"}/,
+        /  diagnose_endpoint: #{quoted "http:\/\/localhost:4005\/diag"}/,
+        /  enable_host_metrics: True/,
+        /  enable_nginx_metrics: False/,
+        /  enable_statsd: False/,
+        /  environment: #{quoted "development"}/,
+        /  endpoint: #{quoted ENV["APPSIGNAL_PUSH_API_ENDPOINT"]}/,
+        /  files_world_accessible: True/,
+        /  log: #{quoted "file"}/,
+        /  log_level: #{quoted "info"}/,
+        /  send_environment_metadata: True/,
+        /  send_params: True/,
+        /  send_session_data: True/,
+        /  request_headers: \['accept', 'accept-charset', 'accept-encoding', 'accept-language', 'cache-control', 'connection', 'content-length', 'range'\]/, # rubocop:disable Layout/LineLength
+        /  app_path:/,
+        /  name: #{quoted "DiagnoseTests"}/,
+        /  push_api_key: #{quoted "test"}/,
+      ]
     else
       raise "No clause for runner #{@runner}"
     end
