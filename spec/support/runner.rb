@@ -493,7 +493,7 @@ class Runner
     end
 
     def run_command(arguments)
-      "hatch run appsignal diagnose"
+      "hatch run appsignal diagnose #{arguments.join(" ")}"
     end
 
     def ignored_lines
