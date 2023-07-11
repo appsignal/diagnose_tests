@@ -488,7 +488,7 @@ class Runner
     def run_env
       super.merge({
         "APPSIGNAL_APP_NAME" => "DiagnoseTests",
-        "APPSIGNAL_APP_ENV" => "development",
+        "APPSIGNAL_APP_ENV" => "development"
       })
     end
 

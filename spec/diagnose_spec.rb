@@ -43,16 +43,16 @@ RSpec.describe "Running the diagnose command without any arguments" do
 
   it "prints all sections in the correct order" do
     section_keys = [
-        :header,
-        :library,
-        (:installation unless @runner.type == :python),
-        :host,
-        :agent,
-        :config,
-        :validation,
-        :paths,
-        :send_report
-      ].compact
+      :header,
+      :library,
+      (:installation unless @runner.type == :python),
+      :host,
+      :agent,
+      :config,
+      :validation,
+      :paths,
+      :send_report
+    ].compact
     expect(@runner.output.sections.keys).to eq(section_keys), @runner.output.to_s
   end
 
@@ -286,8 +286,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "submitted report contains agent diagnostics section" do
-    expect_report_for(
-      :agent,
+    agent_matcher = {
       "agent" => {
         "boot" => {
           "started" => { "result" => true }
@@ -310,13 +309,26 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "mode" => { "result" => kind_of(Numeric) },
           "uid" => { "result" => kind_of(Numeric) }
         }
-      },
-      "extension" => {
-        "config" => {
-          "valid" => { "result" => true }
-        }
       }
-    )
+    }
+
+    if @runner.type == :python
+      expect_report_for(
+        :agent,
+        agent_matcher
+      )
+    else
+      expect_report_for(
+        :agent,
+        agent_matcher.merge(
+          "extension" => {
+            "config" => {
+              "valid" => { "result" => true }
+            }
+          }
+        )
+      )
+    end
   end
 
   it "prints the configuration section" do
@@ -468,7 +480,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  request_headers: \['accept', 'accept-charset', 'accept-encoding', 'accept-language', 'cache-control', 'connection', 'content-length', 'range'\]/, # rubocop:disable Layout/LineLength
         /  app_path:/,
         /  name: #{quoted "DiagnoseTests"}/,
-        /  push_api_key: #{quoted "test"}/,
+        /  push_api_key: #{quoted "test"}/
       ]
     else
       raise "No clause for runner #{@runner}"
@@ -603,6 +615,35 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "log" => "file",
           "log_level" => "debug",
           "logging_endpoint" => "https://appsignal-endpoint.net",
+          "name" => "DiagnoseTests",
+          "push_api_key" => "test",
+          "request_headers" => [
+            "accept",
+            "accept-charset",
+            "accept-encoding",
+            "accept-language",
+            "cache-control",
+            "connection",
+            "content-length",
+            "range"
+          ],
+          "send_environment_metadata" => true,
+          "send_params" => true,
+          "send_session_data" => true
+        }
+      when :python
+        {
+          "app_path" => ending_with("appsignal-python"),
+          "ca_file_path" => ending_with("resources/cacert.pem"),
+          "diagnose_endpoint" => ending_with("diag"),
+          "enable_host_metrics" => true,
+          "enable_nginx_metrics" => false,
+          "enable_statsd" => false,
+          "endpoint" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
+          "environment" => "development",
+          "files_world_accessible" => true,
+          "log" => "file",
+          "log_level" => "info",
           "name" => "DiagnoseTests",
           "push_api_key" => "test",
           "request_headers" => [
@@ -802,6 +843,38 @@ RSpec.describe "Running the diagnose command without any arguments" do
           },
           "system" => {}
         }
+      when :python
+        { "default" =>
+          { "ca_file_path" => ending_with("resources/cacert.pem"),
+            "diagnose_endpoint" => ending_with("diag"),
+            "enable_host_metrics" => true,
+            "enable_nginx_metrics" => false,
+            "enable_statsd" => false,
+            "environment" => "development",
+            "endpoint" => "https://push.appsignal.com",
+            "files_world_accessible" => true,
+            "log" => "file",
+            "log_level" => "info",
+            "send_environment_metadata" => true,
+            "send_params" => true,
+            "send_session_data" => true,
+            "request_headers" =>
+            ["accept",
+             "accept-charset",
+             "accept-encoding",
+             "accept-language",
+             "cache-control",
+             "connection",
+             "content-length",
+             "range"] },
+          "system" => { "app_path" => ending_with("appsignal-python") },
+          "initial" => {},
+          "environment" =>
+          { "diagnose_endpoint" => ending_with("diag"),
+            "endpoint" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
+            "environment" => "development",
+            "name" => "DiagnoseTests",
+            "push_api_key" => "test" } }
       else
         raise "No clause for runner #{@runner}"
       end
