@@ -1043,7 +1043,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
 
     matchers =
       case @runner.type
-      when :elixir
+      when :elixir, :python
         default_paths
       when :nodejs
         default_paths.merge(
@@ -1206,7 +1206,7 @@ RSpec.describe "Running the diagnose command without install report file" do
   it "prints handled errors instead of the report" do
     matchers = ["Extension installation report"]
     case @runner.type
-    when :ruby, :nodejs
+    when :ruby, :nodejs, :python
       matchers += [
         "  Error found while parsing the report.",
         /^  Error: .* [nN]o such file or directory.*install\.report/

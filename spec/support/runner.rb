@@ -509,6 +509,10 @@ class Runner
       :python
     end
 
+    def after_setup
+      File.write("/tmp/appsignal.log", appsignal_log)
+    end
+
     def language_name
       "Python"
     end
