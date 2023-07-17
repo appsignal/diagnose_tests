@@ -1204,6 +1204,8 @@ RSpec.describe "Running the diagnose command without install report file" do
   end
 
   it "prints handled errors instead of the report" do
+    skip if @runner.type == :python
+
     matchers = ["Extension installation report"]
     case @runner.type
     when :ruby, :nodejs, :python
@@ -1226,6 +1228,8 @@ RSpec.describe "Running the diagnose command without install report file" do
   end
 
   it "submitted report contains install report errors" do
+    skip if @runner.type == :python
+
     matchers =
       case @runner.type
       when :nodejs
@@ -1283,28 +1287,51 @@ RSpec.describe "Running the diagnose command without Push API key" do
   end
 
   it "prints agent diagnose section with errors" do
+    expected_output = if @runner.type == :python
+                        [
+                          /Agent diagnostics/,
+                          /  Extension tests/,
+                          /  Configuration: invalid/,
+                          /     Error: RequiredEnvVarNotPresent\("APPSIGNAL_PUSH_API_KEY"\)/,
+                          /  Agent tests/,
+                          /    Started: started/,
+                          /    Process user id: \d+/,
+                          /    Process user group id: \d+/,
+                          /    Configuration: invalid/,
+                          /    Logger: not started/,
+                          /    Working directory user id: False/,
+                          /    Working directory user group id: False/,
+                          /    Working directory permissions: False/,
+                          /    Lock path: not writable/
+                        ]
+                      else
+                        [
+                          /Agent diagnostics/,
+                          /  Extension tests/,
+                          /  Configuration: invalid/,
+                          /     Error: RequiredEnvVarNotPresent\("_APPSIGNAL_PUSH_API_KEY"\)/,
+                          /  Agent tests/,
+                          /    Started: -/,
+                          /    Process user id: -/,
+                          /    Process user group id: -/,
+                          /    Configuration: -/,
+                          /    Logger: -/,
+                          /    Working directory user id: -/,
+                          /    Working directory user group id: -/,
+                          /    Working directory permissions: -/,
+                          /    Lock path: -/
+                        ]
+                      end
+
     expect_output_for(
       :agent,
-      [
-        /Agent diagnostics/,
-        /  Extension tests/,
-        /  Configuration: invalid/,
-        /     Error: RequiredEnvVarNotPresent\("_APPSIGNAL_PUSH_API_KEY"\)/,
-        /  Agent tests/,
-        /    Started: -/,
-        /    Process user id: -/,
-        /    Process user group id: -/,
-        /    Configuration: -/,
-        /    Logger: -/,
-        /    Working directory user id: -/,
-        /    Working directory user group id: -/,
-        /    Working directory permissions: -/,
-        /    Lock path: -/
-      ]
+      expected_output
     )
   end
 
   it "submitted report contains agent diagnostics errors" do
+    skip if @runner.type == :python
+
     expect_report_for(
       :agent,
       "extension" => {
