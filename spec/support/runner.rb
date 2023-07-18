@@ -95,7 +95,7 @@ class Runner
   end
 
   def run_command(_arguments)
-    raise NotImplementedError("`Runner` subclasses must implement `run_command`")
+    raise NotImplementedError, "`Runner` subclasses must implement `run_command`"
   end
 
   def run # rubocop:disable Metrics/MethodLength
