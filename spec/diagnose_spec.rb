@@ -88,25 +88,42 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the library section" do
+    expected_output = if @runner.type == :python
+                        [
+                          /AppSignal library/,
+                          /  Language: #{@runner.language_name}/,
+                          /  (Gem|Package) version: #{quoted VERSION_PATTERN}/,
+                          /  Agent version: #{quoted REVISION_PATTERN}/
+                        ]
+                      else
+                        [
+                          /AppSignal library/,
+                          /  Language: #{@runner.language_name}/,
+                          /  (Gem|Package) version: #{quoted VERSION_PATTERN}/,
+                          /  Agent version: #{quoted REVISION_PATTERN}/,
+                          /  (Extension|Nif) loaded: (t|T)rue/
+                        ]
+                      end
+
     expect_output_for(
       :library,
-      [
-        /AppSignal library/,
-        /  Language: #{@runner.language_name}/,
-        /  (Gem|Package) version: #{quoted VERSION_PATTERN}/,
-        /  Agent version: #{quoted REVISION_PATTERN}/,
-        /  (Extension|Nif) loaded: (t|T)rue/
-      ]
+      expected_output
     )
   end
 
   it "submitted report contains library section" do
-    expect_report_for(
-      :library,
+    expected_output = {
       "language" => @runner.type.to_s,
       "agent_version" => REVISION_PATTERN,
       "package_version" => VERSION_PATTERN,
       "extension_loaded" => true
+    }
+
+    expected_output.delete("extension_loaded") if @runner.type == :python
+
+    expect_report_for(
+      :library,
+      expected_output
     )
   end
 
@@ -265,23 +282,41 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the agent diagnostics section" do
+    expected_output = if @runner.type == :python
+                        [
+                          /Agent diagnostics/,
+                          /  Agent tests/,
+                          /    Started: started/,
+                          /    Process user id: \d+/,
+                          /    Process user group id: \d+/,
+                          /    Configuration: valid/,
+                          /    Logger: started/,
+                          /    Working directory user id: \d+/,
+                          /    Working directory user group id: \d+/,
+                          /    Working directory permissions: \d+/,
+                          /    Lock path: writable/
+                        ]
+                      else
+                        [
+                          /Agent diagnostics/,
+                          /  Extension tests/,
+                          /    Configuration: valid/,
+                          /  Agent tests/,
+                          /    Started: started/,
+                          /    Process user id: \d+/,
+                          /    Process user group id: \d+/,
+                          /    Configuration: valid/,
+                          /    Logger: started/,
+                          /    Working directory user id: \d+/,
+                          /    Working directory user group id: \d+/,
+                          /    Working directory permissions: \d+/,
+                          /    Lock path: writable/
+                        ]
+                      end
+
     expect_output_for(
       :agent,
-      [
-        /Agent diagnostics/,
-        /  Extension tests/,
-        /    Configuration: valid/,
-        /  Agent tests/,
-        /    Started: started/,
-        /    Process user id: \d+/,
-        /    Process user group id: \d+/,
-        /    Configuration: valid/,
-        /    Logger: started/,
-        /    Working directory user id: \d+/,
-        /    Working directory user group id: \d+/,
-        /    Working directory permissions: \d+/,
-        /    Lock path: writable/
-      ]
+      expected_output
     )
   end
 
@@ -1290,14 +1325,12 @@ RSpec.describe "Running the diagnose command without Push API key" do
     expected_output = if @runner.type == :python
                         [
                           /Agent diagnostics/,
-                          /  Extension tests/,
-                          /  Configuration: invalid/,
-                          /     Error: RequiredEnvVarNotPresent\("APPSIGNAL_PUSH_API_KEY"\)/,
                           /  Agent tests/,
                           /    Started: started/,
                           /    Process user id: \d+/,
                           /    Process user group id: \d+/,
                           /    Configuration: invalid/,
+                          /       Error: RequiredEnvVarNotPresent\("APPSIGNAL_PUSH_API_KEY"\)/,
                           /    Logger: not started/,
                           /    Working directory user id: False/,
                           /    Working directory user group id: False/,
