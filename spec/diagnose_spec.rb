@@ -255,9 +255,13 @@ RSpec.describe "Running the diagnose command without any arguments" do
     ]
     matchers << /  OTP version: #{quoted(/\d+/)}/ if @runner.type == :elixir
     matchers += [
-      /  Root user: #{TRUE_OR_FALSE_PATTERN}/,
-      /  Running in container: #{TRUE_OR_FALSE_PATTERN}/
+      /  Root user: #{TRUE_OR_FALSE_PATTERN}/
     ]
+    if @runner.type != :python
+      matchers += [
+        /  Running in container: #{TRUE_OR_FALSE_PATTERN}/
+      ]
+    end
     expect_output_for(:host, matchers)
   end
 
@@ -268,8 +272,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       "language_version" => VERSION_PATTERN,
       "os" => TARGET_PATTERN,
       "os_distribution" => kind_of(String),
-      "root" => false,
-      "running_in_container" => boolean
+      "root" => false
     }
     matchers =
       case @runner.type
@@ -277,6 +280,12 @@ RSpec.describe "Running the diagnose command without any arguments" do
         default_fields.merge("otp_version" => matching(/\d+/))
       else
         default_fields
+      end
+    matchers =
+      if @runner.type == :python
+        matchers
+      else
+        matchers.merge("running_in_container" => boolean)
       end
     expect_report_for(:host, matchers)
   end
