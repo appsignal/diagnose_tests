@@ -1340,11 +1340,11 @@ RSpec.describe "Running the diagnose command without Push API key" do
                           /    Process user group id: \d+/,
                           /    Configuration: invalid/,
                           /       Error: RequiredEnvVarNotPresent\("APPSIGNAL_PUSH_API_KEY"\)/,
-                          /    Logger: not started/,
-                          /    Working directory user id: False/,
-                          /    Working directory user group id: False/,
-                          /    Working directory permissions: False/,
-                          /    Lock path: not writable/
+                          /    Logger: -/,
+                          /    Working directory user id: -/,
+                          /    Working directory user group id: -/,
+                          /    Working directory permissions: -/,
+                          /    Lock path: -/
                         ]
                       else
                         [
