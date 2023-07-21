@@ -7,6 +7,7 @@ module DiagnoseReportHelper
     end
 
     section = @received_report.section(*section_keys)
+
     expect(section).to match(expected)
   end
 

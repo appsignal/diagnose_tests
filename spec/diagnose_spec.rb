@@ -9,7 +9,7 @@ TAR_FILENAME_PATTERN =
   /appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz/
 DOWNLOAD_URL = %r{https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}}
 DATETIME_PATTERN = /\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}( ?UTC|.\d+Z)?/
-TRUE_OR_FALSE_PATTERN = /true|false/
+TRUE_OR_FALSE_PATTERN = /(t|T)rue|(f|F)alse/
 PATH_PATTERN = %r{[/\w.-]+}
 LOG_LINE_PATTERN = /^(#.+|\[#{DATETIME_PATTERN} \(\w+\) \#\d+\]\[\w+\])/
 
@@ -42,32 +42,31 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints all sections in the correct order" do
-    section_keys =
-      [
-        :header,
-        :library,
-        :installation,
-        :host,
-        :agent,
-        :config,
-        :validation,
-        :paths,
-        :send_report
-      ]
+    section_keys = [
+      :header,
+      :library,
+      (:installation unless @runner.type == :python),
+      :host,
+      :agent,
+      :config,
+      :validation,
+      :paths,
+      :send_report
+    ].compact
     expect(@runner.output.sections.keys).to eq(section_keys), @runner.output.to_s
   end
 
   it "submitted report contains all keys" do
-    expect(@received_report.to_h.keys).to contain_exactly(
+    expect(@received_report.to_h.keys).to contain_exactly(*[
       "agent",
       "config",
       "host",
-      "installation",
+      ("installation" unless @runner.type == :python),
       "library",
       "paths",
       "process",
       "validation"
-    )
+    ].compact)
   end
 
   it "prints no 'other' section" do
@@ -89,29 +88,48 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "prints the library section" do
+    expected_output = if @runner.type == :python
+                        [
+                          /AppSignal library/,
+                          /  Language: #{@runner.language_name}/,
+                          /  (Gem|Package) version: #{quoted VERSION_PATTERN}/,
+                          /  Agent version: #{quoted REVISION_PATTERN}/
+                        ]
+                      else
+                        [
+                          /AppSignal library/,
+                          /  Language: #{@runner.language_name}/,
+                          /  (Gem|Package) version: #{quoted VERSION_PATTERN}/,
+                          /  Agent version: #{quoted REVISION_PATTERN}/,
+                          /  (Extension|Nif) loaded: (t|T)rue/
+                        ]
+                      end
+
     expect_output_for(
       :library,
-      [
-        /AppSignal library/,
-        /  Language: #{@runner.language_name}/,
-        /  (Gem|Package) version: #{quoted VERSION_PATTERN}/,
-        /  Agent version: #{quoted REVISION_PATTERN}/,
-        /  (Extension|Nif) loaded: true/
-      ]
+      expected_output
     )
   end
 
   it "submitted report contains library section" do
-    expect_report_for(
-      :library,
+    expected_output = {
       "language" => @runner.type.to_s,
       "agent_version" => REVISION_PATTERN,
       "package_version" => VERSION_PATTERN,
       "extension_loaded" => true
+    }
+
+    expected_output.delete("extension_loaded") if @runner.type == :python
+
+    expect_report_for(
+      :library,
+      expected_output
     )
   end
 
   it "prints the extension installation section" do
+    skip if @runner.type == :python
+
     matchers = [
       "Extension installation report",
       /  Installation result/,
@@ -166,6 +184,8 @@ RSpec.describe "Running the diagnose command without any arguments" do
   end
 
   it "submitted report contains extension installation section" do
+    skip if @runner.type == :python
+
     extra_language =
       case @runner.type
       when :elixir
@@ -235,9 +255,13 @@ RSpec.describe "Running the diagnose command without any arguments" do
     ]
     matchers << /  OTP version: #{quoted(/\d+/)}/ if @runner.type == :elixir
     matchers += [
-      /  Root user: #{TRUE_OR_FALSE_PATTERN}/,
-      /  Running in container: #{TRUE_OR_FALSE_PATTERN}/
+      /  Root user: #{TRUE_OR_FALSE_PATTERN}/
     ]
+    if @runner.type != :python
+      matchers += [
+        /  Running in container: #{TRUE_OR_FALSE_PATTERN}/
+      ]
+    end
     expect_output_for(:host, matchers)
   end
 
@@ -248,8 +272,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       "language_version" => VERSION_PATTERN,
       "os" => TARGET_PATTERN,
       "os_distribution" => kind_of(String),
-      "root" => false,
-      "running_in_container" => boolean
+      "root" => false
     }
     matchers =
       case @runner.type
@@ -258,33 +281,56 @@ RSpec.describe "Running the diagnose command without any arguments" do
       else
         default_fields
       end
+    matchers =
+      if @runner.type == :python
+        matchers
+      else
+        matchers.merge("running_in_container" => boolean)
+      end
     expect_report_for(:host, matchers)
   end
 
   it "prints the agent diagnostics section" do
+    expected_output = if @runner.type == :python
+                        [
+                          /Agent diagnostics/,
+                          /  Agent tests/,
+                          /    Started: started/,
+                          /    Process user id: \d+/,
+                          /    Process user group id: \d+/,
+                          /    Configuration: valid/,
+                          /    Logger: started/,
+                          /    Working directory user id: \d+/,
+                          /    Working directory user group id: \d+/,
+                          /    Working directory permissions: \d+/,
+                          /    Lock path: writable/
+                        ]
+                      else
+                        [
+                          /Agent diagnostics/,
+                          /  Extension tests/,
+                          /    Configuration: valid/,
+                          /  Agent tests/,
+                          /    Started: started/,
+                          /    Process user id: \d+/,
+                          /    Process user group id: \d+/,
+                          /    Configuration: valid/,
+                          /    Logger: started/,
+                          /    Working directory user id: \d+/,
+                          /    Working directory user group id: \d+/,
+                          /    Working directory permissions: \d+/,
+                          /    Lock path: writable/
+                        ]
+                      end
+
     expect_output_for(
       :agent,
-      [
-        /Agent diagnostics/,
-        /  Extension tests/,
-        /    Configuration: valid/,
-        /  Agent tests/,
-        /    Started: started/,
-        /    Process user id: \d+/,
-        /    Process user group id: \d+/,
-        /    Configuration: valid/,
-        /    Logger: started/,
-        /    Working directory user id: \d+/,
-        /    Working directory user group id: \d+/,
-        /    Working directory permissions: \d+/,
-        /    Lock path: writable/
-      ]
+      expected_output
     )
   end
 
   it "submitted report contains agent diagnostics section" do
-    expect_report_for(
-      :agent,
+    agent_matcher = {
       "agent" => {
         "boot" => {
           "started" => { "result" => true }
@@ -307,13 +353,26 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "mode" => { "result" => kind_of(Numeric) },
           "uid" => { "result" => kind_of(Numeric) }
         }
-      },
-      "extension" => {
-        "config" => {
-          "valid" => { "result" => true }
-        }
       }
-    )
+    }
+
+    if @runner.type == :python
+      expect_report_for(
+        :agent,
+        agent_matcher
+      )
+    else
+      expect_report_for(
+        :agent,
+        agent_matcher.merge(
+          "extension" => {
+            "config" => {
+              "valid" => { "result" => true }
+            }
+          }
+        )
+      )
+    end
   end
 
   it "prints the configuration section" do
@@ -447,6 +506,26 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  send_session_data: true/,
         /  skip_session_data: false/,
         /  transaction_debug_mode: false/
+      ]
+    when :python
+      matchers += [
+        /  ca_file_path: #{quoted ".+/src/appsignal/resources/cacert.pem"}/,
+        /  diagnose_endpoint: #{quoted "http:\/\/localhost:4005\/diag"}/,
+        /  enable_host_metrics: True/,
+        /  enable_nginx_metrics: False/,
+        /  enable_statsd: False/,
+        /  environment: #{quoted "development"}/,
+        /  endpoint: #{quoted ENV["APPSIGNAL_PUSH_API_ENDPOINT"]}/,
+        /  files_world_accessible: True/,
+        /  log: #{quoted "file"}/,
+        /  log_level: #{quoted "info"}/,
+        /  send_environment_metadata: True/,
+        /  send_params: True/,
+        /  send_session_data: True/,
+        /  request_headers: \['accept', 'accept-charset', 'accept-encoding', 'accept-language', 'cache-control', 'connection', 'content-length', 'range'\]/, # rubocop:disable Layout/LineLength
+        /  app_path:/,
+        /  name: #{quoted "DiagnoseTests"}/,
+        /  push_api_key: #{quoted "test"}/
       ]
     else
       raise "No clause for runner #{@runner}"
@@ -582,6 +661,35 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "log" => "file",
           "log_level" => "debug",
           "logging_endpoint" => "https://appsignal-endpoint.net",
+          "name" => "DiagnoseTests",
+          "push_api_key" => "test",
+          "request_headers" => [
+            "accept",
+            "accept-charset",
+            "accept-encoding",
+            "accept-language",
+            "cache-control",
+            "connection",
+            "content-length",
+            "range"
+          ],
+          "send_environment_metadata" => true,
+          "send_params" => true,
+          "send_session_data" => true
+        }
+      when :python
+        {
+          "app_path" => ending_with("appsignal-python"),
+          "ca_file_path" => ending_with("resources/cacert.pem"),
+          "diagnose_endpoint" => ending_with("diag"),
+          "enable_host_metrics" => true,
+          "enable_nginx_metrics" => false,
+          "enable_statsd" => false,
+          "endpoint" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
+          "environment" => "development",
+          "files_world_accessible" => true,
+          "log" => "file",
+          "log_level" => "info",
           "name" => "DiagnoseTests",
           "push_api_key" => "test",
           "request_headers" => [
@@ -782,6 +890,38 @@ RSpec.describe "Running the diagnose command without any arguments" do
           },
           "system" => {}
         }
+      when :python
+        { "default" =>
+          { "ca_file_path" => ending_with("resources/cacert.pem"),
+            "diagnose_endpoint" => ending_with("diag"),
+            "enable_host_metrics" => true,
+            "enable_nginx_metrics" => false,
+            "enable_statsd" => false,
+            "environment" => "development",
+            "endpoint" => "https://push.appsignal.com",
+            "files_world_accessible" => true,
+            "log" => "file",
+            "log_level" => "info",
+            "send_environment_metadata" => true,
+            "send_params" => true,
+            "send_session_data" => true,
+            "request_headers" =>
+            ["accept",
+             "accept-charset",
+             "accept-encoding",
+             "accept-language",
+             "cache-control",
+             "connection",
+             "content-length",
+             "range"] },
+          "system" => { "app_path" => ending_with("appsignal-python") },
+          "initial" => {},
+          "environment" =>
+          { "diagnose_endpoint" => ending_with("diag"),
+            "endpoint" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
+            "environment" => "development",
+            "name" => "DiagnoseTests",
+            "push_api_key" => "test" } }
       else
         raise "No clause for runner #{@runner}"
       end
@@ -950,7 +1090,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
 
     matchers =
       case @runner.type
-      when :elixir
+      when :elixir, :python
         default_paths
       when :nodejs
         default_paths.merge(
@@ -1111,9 +1251,11 @@ RSpec.describe "Running the diagnose command without install report file" do
   end
 
   it "prints handled errors instead of the report" do
+    skip if @runner.type == :python
+
     matchers = ["Extension installation report"]
     case @runner.type
-    when :ruby, :nodejs
+    when :ruby, :nodejs, :python
       matchers += [
         "  Error found while parsing the report.",
         /^  Error: .* [nN]o such file or directory.*install\.report/
@@ -1133,6 +1275,8 @@ RSpec.describe "Running the diagnose command without install report file" do
   end
 
   it "submitted report contains install report errors" do
+    skip if @runner.type == :python
+
     matchers =
       case @runner.type
       when :nodejs
@@ -1190,28 +1334,49 @@ RSpec.describe "Running the diagnose command without Push API key" do
   end
 
   it "prints agent diagnose section with errors" do
+    expected_output = if @runner.type == :python
+                        [
+                          /Agent diagnostics/,
+                          /  Agent tests/,
+                          /    Started: started/,
+                          /    Process user id: \d+/,
+                          /    Process user group id: \d+/,
+                          /    Configuration: invalid/,
+                          /       Error: RequiredEnvVarNotPresent\("APPSIGNAL_PUSH_API_KEY"\)/,
+                          /    Logger: -/,
+                          /    Working directory user id: -/,
+                          /    Working directory user group id: -/,
+                          /    Working directory permissions: -/,
+                          /    Lock path: -/
+                        ]
+                      else
+                        [
+                          /Agent diagnostics/,
+                          /  Extension tests/,
+                          /  Configuration: invalid/,
+                          /     Error: RequiredEnvVarNotPresent\("_APPSIGNAL_PUSH_API_KEY"\)/,
+                          /  Agent tests/,
+                          /    Started: -/,
+                          /    Process user id: -/,
+                          /    Process user group id: -/,
+                          /    Configuration: -/,
+                          /    Logger: -/,
+                          /    Working directory user id: -/,
+                          /    Working directory user group id: -/,
+                          /    Working directory permissions: -/,
+                          /    Lock path: -/
+                        ]
+                      end
+
     expect_output_for(
       :agent,
-      [
-        /Agent diagnostics/,
-        /  Extension tests/,
-        /  Configuration: invalid/,
-        /     Error: RequiredEnvVarNotPresent\("_APPSIGNAL_PUSH_API_KEY"\)/,
-        /  Agent tests/,
-        /    Started: -/,
-        /    Process user id: -/,
-        /    Process user group id: -/,
-        /    Configuration: -/,
-        /    Logger: -/,
-        /    Working directory user id: -/,
-        /    Working directory user group id: -/,
-        /    Working directory permissions: -/,
-        /    Lock path: -/
-      ]
+      expected_output
     )
   end
 
   it "submitted report contains agent diagnostics errors" do
+    skip if @runner.type == :python
+
     expect_report_for(
       :agent,
       "extension" => {

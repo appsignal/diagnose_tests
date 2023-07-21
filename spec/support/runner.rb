@@ -479,4 +479,42 @@ class Runner
       REPORT
     end
   end
+
+  class Python < Runner
+    def directory
+      File.join(project_path, "python")
+    end
+
+    def run_env
+      super.merge({
+        "APPSIGNAL_APP_NAME" => "DiagnoseTests",
+        "APPSIGNAL_APP_ENV" => "development"
+      })
+    end
+
+    def run_command(arguments)
+      "hatch run appsignal diagnose #{arguments.join(" ")}"
+    end
+
+    def ignored_lines
+      [
+        /Creating environment: default/,
+        /Installing project in development mode/,
+        /Checking dependencies/,
+        /Syncing dependencies/
+      ]
+    end
+
+    def type
+      :python
+    end
+
+    def after_setup
+      File.write("/tmp/appsignal.log", appsignal_log)
+    end
+
+    def language_name
+      "Python"
+    end
+  end
 end
