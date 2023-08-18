@@ -519,6 +519,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  files_world_accessible: True/,
         /  log: #{quoted "file"}/,
         /  log_level: #{quoted "info"}/,
+        /  opentelemetry_port: 8099/,
         /  send_environment_metadata: True/,
         /  send_params: True/,
         /  send_session_data: True/,
@@ -690,6 +691,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "files_world_accessible" => true,
           "log" => "file",
           "log_level" => "info",
+          "opentelemetry_port" => 8099,
           "name" => "DiagnoseTests",
           "push_api_key" => "test",
           "request_headers" => [
@@ -902,6 +904,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "files_world_accessible" => true,
             "log" => "file",
             "log_level" => "info",
+            "opentelemetry_port" => 8099,
             "send_environment_metadata" => true,
             "send_params" => true,
             "send_session_data" => true,
