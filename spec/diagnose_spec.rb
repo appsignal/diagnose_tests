@@ -420,7 +420,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  send_environment_metadata: true/,
         /  send_params: true/,
         /  send_session_data: true/,
-        /  transaction_debug_mode: false/
+        /  transaction_debug_mode: false/,
+        "",
+        /Configuration modifiers/,
+        /  APPSIGNAL_INACTIVE_ON_CONFIG_FILE_ERROR: ""/
       ]
     when :nodejs
       matchers += [
