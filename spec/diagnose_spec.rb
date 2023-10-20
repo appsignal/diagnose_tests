@@ -388,6 +388,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  ignoreActions: \[\]/,
         /  ignoreErrors: \[\]/,
         /  ignoreNamespaces: \[\]/,
+        /  initializeOpentelemetrySdk: true/,
         /  log: #{quoted("file")}/,
         /  logLevel: #{quoted "debug"} \(Loaded from: initial\)/,
         /  loggingEndpoint: #{quoted("https://appsignal-endpoint.net")}/,
@@ -575,6 +576,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "ignore_actions" => [],
           "ignore_errors" => [],
           "ignore_namespaces" => [],
+          "initialize_opentelemetry_sdk" => true,
           "log" => "file",
           "log_level" => "debug",
           "logging_endpoint" => "https://appsignal-endpoint.net",
@@ -747,6 +749,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "ignore_actions" => [],
             "ignore_errors" => [],
             "ignore_namespaces" => [],
+            "initialize_opentelemetry_sdk" => true,
             "log" => "file",
             "logging_endpoint" => "https://appsignal-endpoint.net",
             "request_headers" => [
