@@ -988,23 +988,18 @@ RSpec.describe "Running the diagnose command without any arguments" do
 
     matchers += [
       %(  Current working directory),
-      /    Path: #{quoted(PATH_PATTERN)}/
+      /    Path: #{quoted(PATH_PATTERN)}/,
+      /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
+      /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+/,
+      ""
     ]
-
-    if [:ruby, :elixir].include? @runner.type
-      matchers += [
-        /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/
-      ]
-    end
-    matchers += [""]
 
     if @runner.type == :ruby
       matchers += [
         %(  Root path),
         /    Path: #{quoted(PATH_PATTERN)}/,
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/,
+        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+/,
         ""
       ]
     end
@@ -1013,22 +1008,21 @@ RSpec.describe "Running the diagnose command without any arguments" do
       %(  Log directory),
       /    Path: #{quoted(PATH_PATTERN)}/
     ]
-
-    if @runner.type == :nodejs
-      matchers += [
-        "",
-        %(  AppSignal client file),
-        /    Path: #{quoted(PATH_PATTERN)}/
-      ]
-    end
-
-    if [:ruby, :elixir].include? @runner.type
+    if [:ruby, :elixir, :python].include? @runner.type
       matchers += [
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/
+        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+/
       ]
     end
     matchers += [""]
+
+    if @runner.type == :nodejs
+      matchers += [
+        %(  AppSignal client file),
+        /    Path: #{quoted(PATH_PATTERN)}/,
+        ""
+      ]
+    end
 
     if @runner.type == :ruby
       matchers += [
@@ -1039,19 +1033,11 @@ RSpec.describe "Running the diagnose command without any arguments" do
       ]
     end
 
-    matchers += [
-      %(  AppSignal log),
-      /    Path: #{quoted(PATH_PATTERN)}/
-    ]
-
-    if [:ruby, :elixir].include? @runner.type
-      matchers += [
-        /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
-        /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/
-      ]
-    end
-
     matchers += ([
+      %(  AppSignal log),
+      /    Path: #{quoted(PATH_PATTERN)}/,
+      /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
+      /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+/,
       /    Contents \(last 10 lines\):/
     ] + Array.new(10).map { LOG_LINE_PATTERN })
 
