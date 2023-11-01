@@ -93,7 +93,9 @@ RSpec.describe "Running the diagnose command without any arguments" do
                           /AppSignal library/,
                           /  Language: #{@runner.language_name}/,
                           /  (Gem|Package) version: #{quoted VERSION_PATTERN}/,
-                          /  Agent version: #{quoted REVISION_PATTERN}/
+                          /  Agent version: #{quoted REVISION_PATTERN}/,
+                          /  Package architecture: #{quoted ARCH_PATTERN}/,
+                          /  Package platform: #{quoted TARGET_PATTERN}/
                         ]
                       else
                         [
@@ -115,11 +117,15 @@ RSpec.describe "Running the diagnose command without any arguments" do
     expected_output = {
       "language" => @runner.type.to_s,
       "agent_version" => REVISION_PATTERN,
-      "package_version" => VERSION_PATTERN,
-      "extension_loaded" => true
+      "package_version" => VERSION_PATTERN
     }
 
-    expected_output.delete("extension_loaded") if @runner.type == :python
+    if @runner.type == :python
+      expected_output["package_architecture"] = ARCH_PATTERN
+      expected_output["package_platform"] = TARGET_PATTERN
+    else
+      expected_output["extension_loaded"] = true
+    end
 
     expect_report_for(
       :library,
