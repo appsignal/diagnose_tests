@@ -261,38 +261,23 @@ RSpec.describe "Running the diagnose command without any arguments" do
     ]
     matchers << /  OTP version: #{quoted(/\d+/)}/ if @runner.type == :elixir
     matchers += [
-      /  Root user: #{TRUE_OR_FALSE_PATTERN}/
+      /  Root user: #{TRUE_OR_FALSE_PATTERN}/,
+      /  Running in container: #{TRUE_OR_FALSE_PATTERN}/
     ]
-    if @runner.type != :python
-      matchers += [
-        /  Running in container: #{TRUE_OR_FALSE_PATTERN}/
-      ]
-    end
     expect_output_for(:host, matchers)
   end
 
   it "submitted report contains host section" do
-    default_fields = {
+    matchers = {
       "architecture" => ARCH_PATTERN,
       "heroku" => false,
       "language_version" => VERSION_PATTERN,
       "os" => TARGET_PATTERN,
       "os_distribution" => kind_of(String),
-      "root" => false
+      "root" => false,
+      "running_in_container" => boolean
     }
-    matchers =
-      case @runner.type
-      when :elixir
-        default_fields.merge("otp_version" => matching(/\d+/))
-      else
-        default_fields
-      end
-    matchers =
-      if @runner.type == :python
-        matchers
-      else
-        matchers.merge("running_in_container" => boolean)
-      end
+    matchers.merge!("otp_version" => matching(/\d+/)) if @runner.type == :elixir
     expect_report_for(:host, matchers)
   end
 
@@ -346,7 +331,8 @@ RSpec.describe "Running the diagnose command without any arguments" do
         },
         "host" => {
           "gid" => { "result" => kind_of(Numeric) },
-          "uid" => { "result" => kind_of(Numeric) }
+          "uid" => { "result" => kind_of(Numeric) },
+          "running_in_container" => { "result" => (be(true).or be(false)) }
         },
         "lock_path" => {
           "created" => { "result" => true }
