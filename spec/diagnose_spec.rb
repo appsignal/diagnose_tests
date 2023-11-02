@@ -982,9 +982,9 @@ RSpec.describe "Running the diagnose command without any arguments" do
   it "prints the paths section" do
     matchers = ["Paths"]
 
-    if @runner.type == :ruby
+    if [:ruby, :python].include?(@runner.type)
       matchers += [
-        %(  AppSignal gem path),
+        /  (AppSignal gem path|Package install path)/,
         /    Path: #{quoted(PATH_PATTERN)}/,
         /    Writable\?: #{TRUE_OR_FALSE_PATTERN}/,
         /    Ownership\?: #{TRUE_OR_FALSE_PATTERN} \(file: (\w+:)?\d+, process: (\w+:)?\d+\)/,
@@ -1091,7 +1091,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
 
     matchers =
       case @runner.type
-      when :elixir, :python
+      when :elixir
         default_paths
       when :nodejs
         default_paths.merge(
@@ -1101,6 +1101,17 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "ownership" => path_ownership(@runner.type),
             "path" => ending_with("/appsignal.cjs"),
             "type" => "file",
+            "writable" => true
+          }
+        )
+      when :python
+        default_paths.merge(
+          "package_install_path" => {
+            "exists" => true,
+            "mode" => kind_of(String),
+            "ownership" => path_ownership(@runner.type),
+            "path" => ending_with("python"),
+            "type" => "directory",
             "writable" => true
           }
         )
