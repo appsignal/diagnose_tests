@@ -531,7 +531,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
     matchers += [
       "",
       "Read more about how the diagnose config output is rendered",
-      "https://docs.appsignal.com/#{@runner.type}/command-line/diagnose.html"
+      %r{https://docs\.appsignal\.com/#{@runner.type}(/3.x)?/command-line/diagnose.html}
     ]
     expect_output_for(:config, matchers)
   end
