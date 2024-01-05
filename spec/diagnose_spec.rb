@@ -1103,7 +1103,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         default_paths.merge(
           "ext/mkmf.log" => {
             "exists" => false,
-            "path" => ending_with("ext/mkmf.log")
+            "path" => ending_with("mkmf.log")
           },
           "package_install_path" => { # TODO: Add this to Elixir and Node.js as well
             "exists" => true,
