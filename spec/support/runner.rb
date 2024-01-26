@@ -244,7 +244,7 @@ class Runner
             "version": "2.7.0-p83"
           },
           "download": {
-            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/20f7d0d/appsignal-x86_64-darwin-all-static.tar.gz",
+            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/0.0.1/appsignal-x86_64-darwin-all-static.tar.gz",
             "checksum": "verified"
           },
           "build": {
@@ -344,7 +344,7 @@ class Runner
           "download": {
             "architecture": "x86_64",
             "checksum": "verified",
-            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/7376537/appsignal-x86_64-darwin-all-static.tar.gz",
+            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/0.0.1/appsignal-x86_64-darwin-all-static.tar.gz",
             "library_type": "static",
             "linux_arm_override": false,
             "musl_override": false,
@@ -359,7 +359,7 @@ class Runner
       <<~REPORT
         {
           "build": {
-            "agent_version": "7376537",
+            "agent_version": "0.0.1",
             "architecture": "x86_64",
             "library_type": "static",
             "linux_arm_override": false,
@@ -373,7 +373,7 @@ class Runner
           },
           "download": {
             "checksum": "verified",
-            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/7376537/appsignal-x86_64-darwin-all-static.tar.gz"
+            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/0.0.1/appsignal-x86_64-darwin-all-static.tar.gz"
           },
           "host": {
             "dependencies": {},
@@ -458,7 +458,7 @@ class Runner
           },
           "download": {
             "checksum": "verified",
-            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/d08ae6c/appsignal-x86_64-darwin-all-static.tar.gz"
+            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/0.0.1/appsignal-x86_64-darwin-all-static.tar.gz"
           },
           "build": {
             "time": "2021-05-19 15:47:39UTC",

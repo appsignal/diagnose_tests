@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 VERSION_PATTERN = /\d+\.\d+\.\d+(-[a-z0-9]+)?([-.].+)?/
-REVISION_PATTERN = /[a-z0-9]{7}/
+AGENT_VERSION_PATTERN = VERSION_PATTERN
 ARCH_PATTERN = /(x(86_)?64|i686|arm64)/
 TARGET_PATTERN = /(darwin\d*|linux(-gnu|-musl)?|freebsd)/
 LIBRARY_TYPE_PATTERN = /static|dynamic/
 TAR_FILENAME_PATTERN =
   /appsignal-#{ARCH_PATTERN}-#{TARGET_PATTERN}-all-#{LIBRARY_TYPE_PATTERN}.tar.gz/
-DOWNLOAD_URL = %r{https://appsignal-agent-releases.global.ssl.fastly.net/#{REVISION_PATTERN}/#{TAR_FILENAME_PATTERN}}
+DOWNLOAD_URL = %r{https://appsignal-agent-releases.global.ssl.fastly.net/#{AGENT_VERSION_PATTERN}/#{TAR_FILENAME_PATTERN}}
 DATETIME_PATTERN = /\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}( ?UTC|.\d+Z)?/
 TRUE_OR_FALSE_PATTERN = /(t|T)rue|(f|F)alse/
 PATH_PATTERN = %r{[/\w.-]+}
@@ -93,7 +93,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
                           /AppSignal library/,
                           /  Language: #{@runner.language_name}/,
                           /  (Gem|Package) version: #{quoted VERSION_PATTERN}/,
-                          /  Agent version: #{quoted REVISION_PATTERN}/,
+                          /  Agent version: #{quoted AGENT_VERSION_PATTERN}/,
                           /  Package architecture: #{quoted ARCH_PATTERN}/,
                           /  Package platform: #{quoted TARGET_PATTERN}/
                         ]
@@ -102,7 +102,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
                           /AppSignal library/,
                           /  Language: #{@runner.language_name}/,
                           /  (Gem|Package) version: #{quoted VERSION_PATTERN}/,
-                          /  Agent version: #{quoted REVISION_PATTERN}/,
+                          /  Agent version: #{quoted AGENT_VERSION_PATTERN}/,
                           /  (Extension|Nif) loaded: (t|T)rue/
                         ]
                       end
@@ -116,7 +116,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
   it "submitted report contains library section" do
     expected_output = {
       "language" => @runner.type.to_s,
-      "agent_version" => REVISION_PATTERN,
+      "agent_version" => AGENT_VERSION_PATTERN,
       "package_version" => VERSION_PATTERN
     }
 
@@ -170,7 +170,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
     if @runner.type == :elixir
       matchers += [
         /    Source: #{quoted "remote"}/,
-        /    Agent version: #{quoted REVISION_PATTERN}/
+        /    Agent version: #{quoted AGENT_VERSION_PATTERN}/
       ]
     end
 
@@ -213,7 +213,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
     extra_build =
       if @runner.type == :elixir
         { # TODO: should also be part of the other integrations?
-          "agent_version" => REVISION_PATTERN,
+          "agent_version" => AGENT_VERSION_PATTERN,
           "package_path" => ending_with("appsignal/priv")
         }
       end
