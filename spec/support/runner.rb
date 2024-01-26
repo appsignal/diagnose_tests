@@ -458,7 +458,7 @@ class Runner
           },
           "download": {
             "checksum": "verified",
-            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/d08ae6c/appsignal-x86_64-darwin-all-static.tar.gz"
+            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/0.0.1/appsignal-x86_64-darwin-all-static.tar.gz"
           },
           "build": {
             "time": "2021-05-19 15:47:39UTC",
