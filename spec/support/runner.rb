@@ -244,7 +244,7 @@ class Runner
             "version": "2.7.0-p83"
           },
           "download": {
-            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/20f7d0d/appsignal-x86_64-darwin-all-static.tar.gz",
+            "download_url": "https://appsignal-agent-releases.global.ssl.fastly.net/0.0.1/appsignal-x86_64-darwin-all-static.tar.gz",
             "checksum": "verified"
           },
           "build": {
