@@ -453,6 +453,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /    Sources:/,
         /      env:     #{quoted "DiagnoseTests"}/,
         /      initial: #{quoted "DiagnoseTests"}/,
+        /  opentelemetryPort: #{quoted "8099"}/,
         /  pushApiKey: #{quoted "test"} \(Loaded from: env\)/,
         /  requestHeaders: \["accept","accept-charset","accept-encoding","accept-language","cache-control","connection","content-length","range"\]/, # rubocop:disable Layout/LineLength
         /  sendEnvironmentMetadata: true/,
@@ -662,6 +663,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "log_level" => "debug",
           "logging_endpoint" => "https://appsignal-endpoint.net",
           "name" => "DiagnoseTests",
+          "opentelemetry_port" => "8099",
           "push_api_key" => "test",
           "request_headers" => [
             "accept",
@@ -866,6 +868,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "initialize_opentelemetry_sdk" => true,
             "log" => "file",
             "logging_endpoint" => "https://appsignal-endpoint.net",
+            "opentelemetry_port" => "8099",
             "request_headers" => [
               "accept",
               "accept-charset",
