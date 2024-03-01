@@ -374,6 +374,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
     when :ruby
       matchers += [
         /  active: true \(Loaded from: system\)/,
+        /  activejob_report_errors: "all"/,
         %r{  ca_file_path: ".+/appsignal[-/]ruby/resources/cacert.pem"},
         /  debug: false/,
         /  dns_servers: \[\]/,
@@ -544,6 +545,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       when :ruby
         {
           "active" => true,
+          "activejob_report_errors" => "all",
           "ca_file_path" => matching(%r{.+/appsignal[-/]ruby/resources/cacert\.pem$}),
           "debug" => false,
           "dns_servers" => [],
@@ -722,6 +724,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       when :ruby
         {
           "default" => {
+            "activejob_report_errors" => "all",
             "ca_file_path" => matching(%r{.+/appsignal[-/]ruby/resources/cacert\.pem$}),
             "debug" => false,
             "dns_servers" => [],
