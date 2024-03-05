@@ -502,7 +502,7 @@ class Runner
         /Installing project in development mode/,
         /Checking dependencies/,
         /Syncing dependencies/,
-        /Could not load the configuration from the `__appsignal__.py` configuration file/,
+        /Could not load the configuration from the `__appsignal__.py` configuration file/
       ]
     end
 

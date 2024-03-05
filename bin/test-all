@@ -9,8 +9,9 @@ INTEGRATIONS_FOLDER="${INTEGRATIONS_FOLDER:-".."}"
 export RUBY_INTEGRATION_PATH="${RUBY_INTEGRATION_PATH:-"${INTEGRATIONS_FOLDER}/appsignal-ruby"}"
 export ELIXIR_INTEGRATION_PATH="${ELIXIR_INTEGRATION_PATH:-"${INTEGRATIONS_FOLDER}/appsignal-elixir"}"
 export NODEJS_INTEGRATION_PATH="${NODEJS_INTEGRATION_PATH:-"${INTEGRATIONS_FOLDER}/appsignal-nodejs"}"
+export PYTHON_INTEGRATION_PATH="${PYTHON_INTEGRATION_PATH:-"${INTEGRATIONS_FOLDER}/appsignal-python"}"
 
-for language in "ruby" "elixir" "nodejs"; do
+for language in "ruby" "elixir" "nodejs" "python"; do
   echo
   echo "Run $language suite"
   echo "========"
