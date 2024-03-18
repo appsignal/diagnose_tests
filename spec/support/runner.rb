@@ -331,8 +331,8 @@ class Runner
         File.write(download_report_path, download_report)
         File.write(install_report_path, install_report)
       else
-        File.delete(download_report_path) if File.exist?(download_report_path)
-        File.delete(install_report_path) if File.exist?(install_report_path)
+        FileUtils.rm_f(download_report_path)
+        FileUtils.rm_f(install_report_path)
       end
 
       File.write("/tmp/appsignal.log", appsignal_log)
@@ -488,7 +488,8 @@ class Runner
     def run_env
       super.merge({
         "APPSIGNAL_APP_NAME" => "DiagnoseTests",
-        "APPSIGNAL_APP_ENV" => "development"
+        "APPSIGNAL_APP_ENV" => "development",
+        "APPSIGNAL_ENABLE_MINUTELY_PROBES" => "false"
       })
     end
 

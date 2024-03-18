@@ -10,7 +10,7 @@ module OutputHelper
     section_lines = actual_section.split("\n")
     unless section_lines.length == expected.length
       raise "Not enough expectations given to `expect_section` for section `#{section_key}`. " \
-        "Actual: #{section_lines.length} lines. Expected: #{expected.length} lines. "\
+        "Actual: #{section_lines.length} lines. Expected: #{expected.length} lines. " \
         "Actual contents:\n#{actual_section}\n\nExpectations:\n#{expected.join("\n")}"
     end
 
