@@ -502,8 +502,7 @@ class Runner
         /Creating environment: default/,
         /Installing project in development mode/,
         /Checking dependencies/,
-        /Syncing dependencies/,
-        /Could not load the configuration from the `__appsignal__.py` configuration file/
+        /Syncing dependencies/
       ]
     end
 

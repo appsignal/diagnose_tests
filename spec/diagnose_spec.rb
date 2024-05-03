@@ -691,7 +691,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         }
       when :python
         {
-          "app_path" => ending_with("appsignal-python"),
+          "app_path" => ending_with("diagnose/python"),
           "ca_file_path" => ending_with("resources/cacert.pem"),
           "diagnose_endpoint" => ending_with("diag"),
           "enable_host_metrics" => true,
@@ -939,8 +939,8 @@ RSpec.describe "Running the diagnose command without any arguments" do
              "connection",
              "content-length",
              "range"] },
-          "system" => { "app_path" => ending_with("appsignal-python") },
-          "initial" => {},
+          "system" => { "app_path" => ending_with("diagnose/python") },
+          "initial" => { "name" => "DiagnoseTests" },
           "environment" =>
           { "diagnose_endpoint" => ending_with("diag"),
             "enable_minutely_probes" => false,
