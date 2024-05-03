@@ -16,9 +16,6 @@ Style/StringLiteralsInInterpolation:
 Style/HashSyntax:
   EnforcedStyle: hash_rockets
 
-Layout/HashAlignment:
-  EnforcedLastArgumentHashStyle: ignore_implicit
-
 Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation
 
@@ -30,6 +27,12 @@ Layout/MultilineMethodCallIndentation:
 
 Layout/MultilineOperationIndentation:
   EnforcedStyle: indented
+
+Layout/FirstHashElementLineBreak:
+  Enabled: true
+
+Layout/FirstArrayElementLineBreak:
+  Enabled: true
 
 Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent

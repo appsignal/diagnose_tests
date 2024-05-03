@@ -913,8 +913,9 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "system" => {}
         }
       when :python
-        { "default" =>
-          { "ca_file_path" => ending_with("resources/cacert.pem"),
+        {
+          "default" => {
+            "ca_file_path" => ending_with("resources/cacert.pem"),
             "diagnose_endpoint" => ending_with("diag"),
             "enable_host_metrics" => true,
             "enable_minutely_probes" => true,
@@ -930,24 +931,28 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "send_environment_metadata" => true,
             "send_params" => true,
             "send_session_data" => true,
-            "request_headers" =>
-            ["accept",
-             "accept-charset",
-             "accept-encoding",
-             "accept-language",
-             "cache-control",
-             "connection",
-             "content-length",
-             "range"] },
+            "request_headers" => [
+              "accept",
+              "accept-charset",
+              "accept-encoding",
+              "accept-language",
+              "cache-control",
+              "connection",
+              "content-length",
+              "range"
+            ]
+          },
           "system" => { "app_path" => ending_with("diagnose/python") },
           "initial" => { "name" => "DiagnoseTests" },
-          "environment" =>
-          { "diagnose_endpoint" => ending_with("diag"),
+          "environment" => {
+            "diagnose_endpoint" => ending_with("diag"),
             "enable_minutely_probes" => false,
             "endpoint" => ENV.fetch("APPSIGNAL_PUSH_API_ENDPOINT", nil),
             "environment" => "development",
             "name" => "DiagnoseTests",
-            "push_api_key" => "test" } }
+            "push_api_key" => "test"
+          }
+        }
       else
         raise "No clause for runner #{@runner}"
       end
