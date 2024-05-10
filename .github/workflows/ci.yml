@@ -1,0 +1,26 @@
+name: Integration diagnose
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  lint-style:
+    name: "Ruby style linter (RuboCop)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      - run: bundle exec rubocop
+
+  lint-git:
+    name: "Git linter (Lintje)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch depth is required
+      - uses: lintje/action@v0.11
