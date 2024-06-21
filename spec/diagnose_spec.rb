@@ -414,6 +414,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  send_environment_metadata: true/,
         /  send_params: true/,
         /  send_session_data: true/,
+        /  sidekiq_report_errors: "all"/,
         /  transaction_debug_mode: false/,
         "",
         /Configuration modifiers/,
@@ -599,6 +600,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "send_environment_metadata" => true,
           "send_params" => true,
           "send_session_data" => true,
+          "sidekiq_report_errors" => "all",
           "transaction_debug_mode" => false
         }
       when :elixir
@@ -779,6 +781,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             ],
             "send_environment_metadata" => true,
             "send_params" => true,
+            "sidekiq_report_errors" => "all",
             "transaction_debug_mode" => false
           },
           "env" => {
