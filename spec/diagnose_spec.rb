@@ -377,7 +377,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  activejob_report_errors: "all"/,
         %r{  ca_file_path: ".+/appsignal[-/]ruby/resources/cacert.pem"},
         /  debug: false/,
-        /  dns_servers: \[\]/,
+        "  dns_servers: []",
         /  enable_allocation_tracking: true/,
         /  enable_gvl_global_timer: true/,
         /  enable_gvl_waiting_threads: true/,
@@ -472,7 +472,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /      system:  true/,
         /  ca_file_path: #{quoted ".+/_build/dev/rel/elixir_diagnose/lib/appsignal-\\d+\\.\\d+\\.\\d+(-\\w+\\.\\d+)?/priv/cacert.pem"}/, # rubocop:disable Layout/LineLength
         /  debug: false/,
-        /  dns_servers: \[\]/,
+        "  dns_servers: []",
         /  enable_error_backend: true/,
         /  enable_host_metrics: true/,
         /  enable_minutely_probes: false/,
