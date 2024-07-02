@@ -191,6 +191,13 @@ class Runner
       File.join(project_path, "ruby")
     end
 
+    def setup_commands
+      [
+        "bundle config set --local gemfile #{directory}/Gemfile",
+        "bundle install"
+      ]
+    end
+
     def run_env
       super.merge({
         "BUNDLE_GEMFILE" => File.join(directory, "Gemfile")
