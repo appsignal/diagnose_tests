@@ -91,7 +91,11 @@ class Runner
   end
 
   def run_env
-    { "APPSIGNAL_PUSH_API_KEY" => @push_api_key }
+    {
+      "APPSIGNAL_PUSH_API_KEY" => @push_api_key,
+      "APPSIGNAL_PUSH_API_ENDPOINT" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
+      "APPSIGNAL_DIAGNOSE_ENDPOINT" => ENV["APPSIGNAL_DIAGNOSE_ENDPOINT"]
+    }
   end
 
   def run_command(_arguments)
@@ -99,23 +103,29 @@ class Runner
   end
 
   def run # rubocop:disable Metrics/MethodLength
-    Dir.chdir directory do
-      before_setup
-      setup_commands.each do |command|
-        run_setup command
+    Bundler.with_unbundled_env do
+      Dir.chdir directory do
+        before_setup
+        setup_commands.each do |command|
+          run_setup command
+        end
+        after_setup
       end
-      after_setup
     end
 
     # Run the command
     prompt = @prompt ? %(echo "#{@prompt}" | ) : ""
     command = run_command(@arguments.dup)
     read, write = IO.pipe
-    pid = spawn(
-      run_env,
-      "#{prompt} #{command}",
-      { [:out, :err] => write, :chdir => directory }
-    )
+    env = run_env
+    pid =
+      Bundler.with_unbundled_env do
+        spawn(
+          env,
+          "#{prompt} #{command}",
+          { [:out, :err] => write, :chdir => directory }
+        )
+      end
     _pid, status = Process.wait2 pid # Wait until command exits
     write.close
 
@@ -278,7 +288,7 @@ class Runner
     end
   end
 
-  class Elixir < Runner # rubocop:disable Metrics/ClassLength
+  class Elixir < Runner
     def directory
       File.join(project_path, "elixir")
     end
