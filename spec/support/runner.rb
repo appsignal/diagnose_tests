@@ -205,7 +205,8 @@ class Runner
 
     def ignored_lines
       [
-        /appsignal: Unable to log to /
+        /appsignal: Unable to log to /,
+        /Calling `DidYouMean::SPELL_CHECKERS/
       ]
     end
 
