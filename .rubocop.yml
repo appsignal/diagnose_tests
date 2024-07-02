@@ -58,6 +58,9 @@ Style/SymbolArray:
 Metrics/AbcSize:
   Enabled: false
 
+Metrics/ClassLength:
+  Enabled: false
+
 Metrics/BlockLength:
   Exclude:
     - Rakefile
