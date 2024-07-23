@@ -1,13 +1,13 @@
 PATH
   remote: ../../../..
   specs:
-    appsignal (3.9.2)
+    appsignal (3.12.0)
       rack
 
 GEM
   remote: https://rubygems.org/
   specs:
-    rack (3.1.5)
+    rack (3.1.7)
 
 PLATFORMS
   ruby

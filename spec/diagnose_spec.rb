@@ -376,7 +376,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  active: true \(Loaded from: system\)/,
         /  activejob_report_errors: "all"/,
         %r{  ca_file_path: ".+/appsignal[-/]ruby/resources/cacert.pem"},
-        /  debug: false/,
         "  dns_servers: []",
         /  enable_allocation_tracking: true/,
         /  enable_gvl_global_timer: true/,
@@ -416,7 +415,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  send_params: true/,
         /  send_session_data: true/,
         /  sidekiq_report_errors: "all"/,
-        /  transaction_debug_mode: false/,
         "",
         /Configuration modifiers/,
         /  APPSIGNAL_INACTIVE_ON_CONFIG_FILE_ERROR: ""/
@@ -508,8 +506,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  send_environment_metadata: true/,
         /  send_params: true/,
         /  send_session_data: true/,
-        /  skip_session_data: false/,
-        /  transaction_debug_mode: false/
+        /  skip_session_data: false/
       ]
     when :python
       matchers += [
@@ -554,7 +551,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "active" => true,
           "activejob_report_errors" => "all",
           "ca_file_path" => matching(%r{.+/appsignal[-/]ruby/resources/cacert\.pem$}),
-          "debug" => false,
           "dns_servers" => [],
           "enable_allocation_tracking" => true,
           "enable_gvl_global_timer" => true,
@@ -602,14 +598,12 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "send_environment_metadata" => true,
           "send_params" => true,
           "send_session_data" => true,
-          "sidekiq_report_errors" => "all",
-          "transaction_debug_mode" => false
+          "sidekiq_report_errors" => "all"
         }
       when :elixir
         {
           "active" => true,
           "ca_file_path" => ending_with("priv/cacert.pem"),
-          "debug" => false,
           "diagnose_endpoint" => ENV.fetch("APPSIGNAL_DIAGNOSE_ENDPOINT", nil),
           "dns_servers" => [],
           "enable_error_backend" => true,
@@ -649,8 +643,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "send_environment_metadata" => true,
           "send_params" => true,
           "send_session_data" => true,
-          "skip_session_data" => false,
-          "transaction_debug_mode" => false
+          "skip_session_data" => false
         }
       when :nodejs
         {
@@ -740,7 +733,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "default" => {
             "activejob_report_errors" => "all",
             "ca_file_path" => matching(%r{.+/appsignal[-/]ruby/resources/cacert\.pem$}),
-            "debug" => false,
             "dns_servers" => [],
             "enable_allocation_tracking" => true,
             "enable_gvl_global_timer" => true,
@@ -784,8 +776,8 @@ RSpec.describe "Running the diagnose command without any arguments" do
             ],
             "send_environment_metadata" => true,
             "send_params" => true,
-            "sidekiq_report_errors" => "all",
-            "transaction_debug_mode" => false
+            "send_session_data" => true,
+            "sidekiq_report_errors" => "all"
           },
           "env" => {
             "endpoint" => ENV.fetch("APPSIGNAL_PUSH_API_ENDPOINT", nil),
@@ -801,16 +793,13 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "system" => {
             "active" => true
           },
-          "override" => {
-            "send_session_data" => true
-          }
+          "override" => {}
         }
       when :elixir
         {
           "default" => {
             "active" => false,
             "ca_file_path" => ending_with("priv/cacert.pem"),
-            "debug" => false,
             "diagnose_endpoint" => "https://appsignal.com/diag",
             "dns_servers" => [],
             "enable_error_backend" => true,
@@ -846,8 +835,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
               "range"
             ],
             "send_environment_metadata" => true,
-            "send_params" => true,
-            "transaction_debug_mode" => false
+            "send_params" => true
           },
           "env" => {
             "endpoint" => ENV.fetch("APPSIGNAL_PUSH_API_ENDPOINT", nil),
@@ -861,10 +849,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "system" => {
             "active" => true
           },
-          "override" => {
-            "send_session_data" => true,
-            "skip_session_data" => false
-          }
+          "override" => {}
         }
       when :nodejs
         {
