@@ -779,21 +779,23 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "send_session_data" => true,
             "sidekiq_report_errors" => "all"
           },
-          "env" => {
-            "endpoint" => ENV.fetch("APPSIGNAL_PUSH_API_ENDPOINT", nil),
-            "push_api_key" => "test"
+          "system" => {
+            "active" => true
+          },
+          "loaders" => {},
+          "initial" => {
+            "env" => "development"
           },
           "file" => {
             "enable_minutely_probes" => false,
             "name" => "DiagnoseTests"
           },
-          "initial" => {
-            "env" => "development"
+          "env" => {
+            "endpoint" => ENV.fetch("APPSIGNAL_PUSH_API_ENDPOINT", nil),
+            "push_api_key" => "test"
           },
-          "system" => {
-            "active" => true
-          },
-          "override" => {}
+          "override" => {},
+          "dsl" => {}
         }
       when :elixir
         {
