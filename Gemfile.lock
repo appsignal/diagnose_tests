@@ -9,12 +9,15 @@ GEM
     method_source (1.0.0)
     mustermann (3.0.3)
       ruby2_keywords (~> 0.0.1)
+    nio4r (2.7.4)
     parallel (1.20.1)
     parser (3.0.2.0)
       ast (~> 2.4.1)
     pry (0.14.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    puma (6.5.0)
+      nio4r (~> 2.0)
     rack (3.1.8)
     rack-protection (4.1.0)
       base64 (>= 0.1.0)
@@ -22,6 +25,8 @@ GEM
       rack (>= 3.0.0, < 4)
     rack-session (2.0.0)
       rack (>= 3.0.0)
+    rackup (2.2.1)
+      rack (>= 3)
     rainbow (3.0.0)
     regexp_parser (2.1.1)
     rexml (3.3.9)
@@ -60,18 +65,18 @@ GEM
       tilt (~> 2.0)
     tilt (2.4.0)
     unicode-display_width (2.0.0)
-    webrick (1.8.2)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   pry
+  puma
   rack
+  rackup
   rspec
   rubocop
   sinatra
-  webrick
 
 BUNDLED WITH
    2.3.12
