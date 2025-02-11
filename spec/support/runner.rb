@@ -520,7 +520,8 @@ class Runner
         /Creating environment: default/,
         /Installing project in development mode/,
         /Checking dependencies/,
-        /Syncing dependencies/
+        /Syncing dependencies/,
+        /DEPRECATION: --no-python-version-warning is deprecated/
       ]
     end
 
