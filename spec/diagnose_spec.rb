@@ -35,7 +35,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       {
         "api_key" => "test",
         "environment" => kind_of(String),
-        "hostname" => be_empty.or(be_nil).or(kind_of(String)),
+        "hostname" => be_empty.or(be_nil).or(be_a(String)),
         "name" => "DiagnoseTests"
       }.merge(matchers || {})
     )
@@ -521,7 +521,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  environment: #{quoted "development"}/,
         /  endpoint: #{quoted ENV.fetch("APPSIGNAL_PUSH_API_ENDPOINT", nil)}/,
         /  files_world_accessible: True/,
-        /  hostname: \w+/,
         /  log: #{quoted "file"}/,
         /  log_level: #{quoted "info"}/,
         /  logging_endpoint: #{quoted "https://appsignal-endpoint.net"}/,
@@ -531,6 +530,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  send_session_data: True/,
         /  request_headers: \['accept', 'accept-charset', 'accept-encoding', 'accept-language', 'cache-control', 'connection', 'content-length', 'range'\]/, # rubocop:disable Layout/LineLength
         /  app_path:/,
+        /  hostname:/,
         /  name: #{quoted "DiagnoseTests"}/,
         /  push_api_key: #{quoted "test"}/
       ]
@@ -931,7 +931,6 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "environment" => "development",
             "endpoint" => "https://push.appsignal.com",
             "files_world_accessible" => true,
-            "hostname" => kind_of(String),
             "log" => "file",
             "log_level" => "info",
             "logging_endpoint" => "https://appsignal-endpoint.net",
@@ -950,7 +949,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
               "range"
             ]
           },
-          "system" => { "app_path" => ending_with("diagnose/python") },
+          "system" => {
+            "app_path" => ending_with("diagnose/python"),
+            "hostname" => kind_of(String)
+          },
           "initial" => { "name" => "DiagnoseTests" },
           "environment" => {
             "diagnose_endpoint" => ending_with("diag"),
@@ -997,7 +999,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
       {
         "api_key" => "test",
         "environment" => kind_of(String),
-        "hostname" => be_empty.or(be_nil).or(kind_of(String)),
+        "hostname" => be_empty.or(be_nil).or(be_a(String)),
         "name" => "DiagnoseTests"
       }.merge(matchers || {})
     )
@@ -1361,7 +1363,7 @@ RSpec.describe "Running the diagnose command without Push API key" do
       {
         "api_key" => be_empty.or(be_nil),
         "environment" => kind_of(String),
-        "hostname" => be_empty.or(be_nil).or(kind_of(String)),
+        "hostname" => be_empty.or(be_nil).or(be_a(String)),
         "name" => "DiagnoseTests"
       }.merge(matchers || {})
     )

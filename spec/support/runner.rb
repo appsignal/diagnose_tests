@@ -31,8 +31,6 @@ class Runner
       @lines.join("\n")
     end
 
-    private
-
     SECTIONS = {
       "AppSignal diagnose" => :header,
       "AppSignal library" => :library,
@@ -44,6 +42,8 @@ class Runner
       "Paths" => :paths,
       "Diagnostics report" => :send_report
     }.freeze
+
+    private
 
     def parse_output
       sections = Hash.new { |hash, key| hash[key] = [] }
@@ -93,8 +93,8 @@ class Runner
   def run_env
     {
       "APPSIGNAL_PUSH_API_KEY" => @push_api_key,
-      "APPSIGNAL_PUSH_API_ENDPOINT" => ENV["APPSIGNAL_PUSH_API_ENDPOINT"],
-      "APPSIGNAL_DIAGNOSE_ENDPOINT" => ENV["APPSIGNAL_DIAGNOSE_ENDPOINT"]
+      "APPSIGNAL_PUSH_API_ENDPOINT" => ENV.fetch("APPSIGNAL_PUSH_API_ENDPOINT", nil),
+      "APPSIGNAL_DIAGNOSE_ENDPOINT" => ENV.fetch("APPSIGNAL_DIAGNOSE_ENDPOINT", nil)
     }
   end
 
@@ -244,8 +244,8 @@ class Runner
       if install_report?
         # Overwite created install report so we have a consistent test environment
         File.write(install_report_path, install_report)
-      elsif File.exist?(install_report_path)
-        File.delete(install_report_path)
+      else
+        FileUtils.rm_f(install_report_path)
       end
       File.write("/tmp/appsignal.log", appsignal_log)
     end
@@ -457,8 +457,8 @@ class Runner
       install_report_path = File.join(integration_path, "ext/install.report")
       if install_report?
         File.write(install_report_path, install_report)
-      elsif File.exist?(install_report_path)
-        File.delete(install_report_path)
+      else
+        FileUtils.rm_f(install_report_path)
       end
       File.write("/tmp/appsignal.log", appsignal_log)
     end
