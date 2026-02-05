@@ -376,6 +376,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  active: true \(Loaded from: system\)/,
         /  activejob_report_errors: "all"/,
         %r{  ca_file_path: ".+/appsignal[-/]ruby/resources/cacert.pem"},
+        /  default_tags: \{\}/,
         "  dns_servers: []",
         /  enable_active_support_event_log_reporter: false/,
         /  enable_allocation_tracking: true/,
@@ -556,6 +557,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "active" => true,
           "activejob_report_errors" => "all",
           "ca_file_path" => matching(%r{.+/appsignal[-/]ruby/resources/cacert\.pem$}),
+          "default_tags" => {},
           "dns_servers" => [],
           "enable_active_support_event_log_reporter" => false,
           "enable_allocation_tracking" => true,
@@ -747,6 +749,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "default" => {
             "activejob_report_errors" => "all",
             "ca_file_path" => matching(%r{.+/appsignal[-/]ruby/resources/cacert\.pem$}),
+            "default_tags" => {},
             "dns_servers" => [],
             "enable_active_support_event_log_reporter" => false,
             "enable_allocation_tracking" => true,
