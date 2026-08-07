@@ -376,6 +376,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  active: true \(Loaded from: system\)/,
         /  activejob_report_errors: "all"/,
         %r{  ca_file_path: ".+/appsignal[-/]ruby/resources/cacert.pem"},
+        /  collector_endpoint: nil/,
         /  default_tags: \{\}/,
         "  dns_servers: []",
         /  enable_active_support_event_log_reporter: false/,
@@ -400,8 +401,12 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /      env:     #{quoted ENV.fetch("APPSIGNAL_PUSH_API_ENDPOINT", nil)}/,
         /  environment: #{quoted("development")} \(Loaded from: initial\)/,
         /  files_world_accessible: true/,
+        /  filter_attributes: \[\]/,
+        /  filter_function_parameters: \[\]/,
         /  filter_metadata: \[\]/,
         /  filter_parameters: \[\]/,
+        /  filter_request_payload: \[\]/,
+        /  filter_request_query_parameters: \[\]/,
         /  filter_session_data: \[\]/,
         /  ignore_actions: \[\]/,
         /  ignore_errors: \[\]/,
@@ -428,9 +433,14 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  ownership_set_namespace: false/,
         /  push_api_key: "test" \(Loaded from: env\)/,
         /  request_headers: \["HTTP_ACCEPT", "HTTP_ACCEPT_CHARSET", "HTTP_ACCEPT_ENCODING", "HTTP_ACCEPT_LANGUAGE", "HTTP_CACHE_CONTROL", "HTTP_CONNECTION", "CONTENT_LENGTH", "PATH_INFO", "HTTP_RANGE", "REQUEST_METHOD", "REQUEST_PATH", "SERVER_NAME", "SERVER_PORT", "SERVER_PROTOCOL"\]/, # rubocop:disable Layout/LineLength
+        /  response_headers: \[\]/,
         /  send_environment_metadata: true/,
+        /  send_function_parameters: nil/,
         /  send_params: true/,
+        /  send_request_payload: nil/,
+        /  send_request_query_parameters: nil/,
         /  send_session_data: true/,
+        /  service_name: nil/,
         /  sidekiq_report_errors: "all"/
       ]
     when :nodejs
@@ -567,6 +577,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "active" => true,
           "activejob_report_errors" => "all",
           "ca_file_path" => matching(%r{.+/appsignal[-/]ruby/resources/cacert\.pem$}),
+          "collector_endpoint" => nil,
           "default_tags" => {},
           "dns_servers" => [],
           "enable_active_support_event_log_reporter" => false,
@@ -585,8 +596,12 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "endpoint" => ENV.fetch("APPSIGNAL_PUSH_API_ENDPOINT", nil),
           "env" => "development",
           "files_world_accessible" => true,
+          "filter_attributes" => [],
+          "filter_function_parameters" => [],
           "filter_metadata" => [],
           "filter_parameters" => [],
+          "filter_request_payload" => [],
+          "filter_request_query_parameters" => [],
           "filter_session_data" => [],
           "ignore_actions" => [],
           "ignore_errors" => [],
@@ -628,9 +643,14 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "SERVER_PORT",
             "SERVER_PROTOCOL"
           ],
+          "response_headers" => [],
           "send_environment_metadata" => true,
+          "send_function_parameters" => nil,
           "send_params" => true,
+          "send_request_payload" => nil,
+          "send_request_query_parameters" => nil,
           "send_session_data" => true,
+          "service_name" => nil,
           "sidekiq_report_errors" => "all"
         }
       when :elixir
@@ -769,6 +789,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "default" => {
             "activejob_report_errors" => "all",
             "ca_file_path" => matching(%r{.+/appsignal[-/]ruby/resources/cacert\.pem$}),
+            "collector_endpoint" => nil,
             "default_tags" => {},
             "dns_servers" => [],
             "enable_active_support_event_log_reporter" => false,
@@ -786,8 +807,12 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "enable_statsd" => true,
             "endpoint" => "https://push.appsignal.com",
             "files_world_accessible" => true,
+            "filter_attributes" => [],
+            "filter_function_parameters" => [],
             "filter_metadata" => [],
             "filter_parameters" => [],
+            "filter_request_payload" => [],
+            "filter_request_query_parameters" => [],
             "filter_session_data" => [],
             "ignore_actions" => [],
             "ignore_errors" => [],
@@ -827,9 +852,14 @@ RSpec.describe "Running the diagnose command without any arguments" do
               "SERVER_PORT",
               "SERVER_PROTOCOL"
             ],
+            "response_headers" => [],
             "send_environment_metadata" => true,
+            "send_function_parameters" => nil,
             "send_params" => true,
+            "send_request_payload" => nil,
+            "send_request_query_parameters" => nil,
             "send_session_data" => true,
+            "service_name" => nil,
             "sidekiq_report_errors" => "all"
           },
           "system" => {
