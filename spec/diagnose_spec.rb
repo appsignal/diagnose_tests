@@ -408,6 +408,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  filter_request_payload: \[\]/,
         /  filter_request_query_parameters: \[\]/,
         /  filter_session_data: \[\]/,
+        /  hostname: ".+" \(Loaded from: system\)/,
         /  ignore_actions: \[\]/,
         /  ignore_errors: \[\]/,
         /  ignore_logs: \[\]/,
@@ -603,6 +604,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "filter_request_payload" => [],
           "filter_request_query_parameters" => [],
           "filter_session_data" => [],
+          "hostname" => kind_of(String),
           "ignore_actions" => [],
           "ignore_errors" => [],
           "ignore_logs" => [],
@@ -863,7 +865,8 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "sidekiq_report_errors" => "all"
           },
           "system" => {
-            "active" => true
+            "active" => true,
+            "hostname" => kind_of(String)
           },
           "loaders" => {},
           "initial" => {
