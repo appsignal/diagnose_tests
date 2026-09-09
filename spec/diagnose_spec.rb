@@ -888,6 +888,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "service_name" => nil,
             "sidekiq_report_errors" => "all"
           },
+          "derived" => {},
           "system" => {
             "active" => true,
             "hostname" => kind_of(String)
