@@ -1051,6 +1051,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
               "range"
             ]
           },
+          "derived" => {},
           "system" => {
             "app_path" => ending_with("diagnose/python"),
             "hostname" => kind_of(String)
