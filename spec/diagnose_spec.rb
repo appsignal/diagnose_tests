@@ -538,12 +538,24 @@ RSpec.describe "Running the diagnose command without any arguments" do
       matchers += [
         /  ca_file_path: #{quoted ".+/src/appsignal/resources/cacert.pem"}/,
         /  diagnose_endpoint: #{quoted "http://localhost:4005/diag"}/,
+        /    Sources:/,
+        /      default:     #{quoted "https://appsignal.com/diag"}/,
+        /      environment: #{quoted "http://localhost:4005/diag"}/,
         /  enable_host_metrics: True/,
         /  enable_minutely_probes: False/,
+        /    Sources:/,
+        /      default:     True/,
+        /      environment: False/,
         /  enable_nginx_metrics: False/,
         /  enable_statsd: False/,
         /  environment: #{quoted "development"}/,
+        /    Sources:/,
+        /      default:     #{quoted "development"}/,
+        /      environment: #{quoted "development"}/,
         /  endpoint: #{quoted ENV.fetch("APPSIGNAL_PUSH_API_ENDPOINT", nil)}/,
+        /    Sources:/,
+        /      default:     #{quoted "https://push.appsignal.com"}/,
+        /      environment: #{quoted ENV.fetch("APPSIGNAL_PUSH_API_ENDPOINT", nil)}/,
         /  files_world_accessible: True/,
         /  log: #{quoted "file"}/,
         /  log_level: #{quoted "info"}/,
@@ -553,10 +565,13 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  send_params: True/,
         /  send_session_data: True/,
         /  request_headers: \['accept', 'accept-charset', 'accept-encoding', 'accept-language', 'cache-control', 'connection', 'content-length', 'range'\]/, # rubocop:disable Layout/LineLength
-        /  app_path:/,
-        /  hostname:/,
+        /  app_path: .+ \(Loaded from: system\)/,
+        /  hostname: .+ \(Loaded from: system\)/,
         /  name: #{quoted "DiagnoseTests"}/,
-        /  push_api_key: #{quoted "test"}/
+        /    Sources:/,
+        /      environment: #{quoted "DiagnoseTests"}/,
+        /      initial:     #{quoted "DiagnoseTests"}/,
+        /  push_api_key: #{quoted "test"} \(Loaded from: environment\)/
       ]
     else
       raise "No clause for runner #{@runner}"
