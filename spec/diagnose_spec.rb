@@ -576,7 +576,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  logging_endpoint: #{quoted "https://appsignal-endpoint.net"}/,
         /  opentelemetry_port: 8099/,
         /  send_environment_metadata: True/,
+        /  send_function_parameters: True/,
         /  send_params: True/,
+        /  send_request_payload: True/,
+        /  send_request_query_parameters: True/,
         /  send_session_data: True/,
         /  request_headers: \['accept', 'accept-charset', 'accept-encoding', 'accept-language', 'cache-control', 'connection', 'content-length', 'range'\]/, # rubocop:disable Layout/LineLength
         /  app_path: .+ \(Loaded from: system\)/,
@@ -825,7 +828,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "range"
           ],
           "send_environment_metadata" => true,
+          "send_function_parameters" => true,
           "send_params" => true,
+          "send_request_payload" => true,
+          "send_request_query_parameters" => true,
           "send_session_data" => true
         }
       else
@@ -1089,7 +1095,10 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "logging_endpoint" => "https://appsignal-endpoint.net",
             "opentelemetry_port" => 8099,
             "send_environment_metadata" => true,
+            "send_function_parameters" => true,
             "send_params" => true,
+            "send_request_payload" => true,
+            "send_request_query_parameters" => true,
             "send_session_data" => true,
             "request_headers" => [
               "accept",
