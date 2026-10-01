@@ -443,7 +443,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
         /  send_request_payload: true/,
         /  send_request_query_parameters: true/,
         /  send_session_data: true/,
-        /  service_name: nil/,
+        /  service_name: "app"/,
         /  sidekiq_report_errors: "all"/
       ]
     when :nodejs
@@ -696,7 +696,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
           "send_request_payload" => true,
           "send_request_query_parameters" => true,
           "send_session_data" => true,
-          "service_name" => nil,
+          "service_name" => "app",
           "sidekiq_report_errors" => "all"
         }
       when :elixir
@@ -932,7 +932,7 @@ RSpec.describe "Running the diagnose command without any arguments" do
             "send_request_payload" => true,
             "send_request_query_parameters" => true,
             "send_session_data" => true,
-            "service_name" => nil,
+            "service_name" => "app",
             "sidekiq_report_errors" => "all"
           },
           "derived" => {},
